@@ -1,0 +1,2 @@
+export const API_BASE_URL = 'http://localhost:8080'
+export const IMG_BASE_URL = 'https://api.imgur.com/3/image'
