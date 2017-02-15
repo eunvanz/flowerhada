@@ -113,7 +113,7 @@ export const convertRawStringToTime = rawString => {
 export const extractDetailScheduleFromLessonDays = lessonDays => {
   let result = []
   result = lessonDays.map(lessonDay => {
-    return `${lessonDay.day}요일 ${convertRawStringToTime(lessonDay.startTime)} ~ ${convertRawStringToTime(lessonDay.endTime)}`
+    return `${lessonDay.day}요일 ${convertRawStringToTime(lessonDay.startTime)} ~ ${convertRawStringToTime(lessonDay.endTime)}` // eslint-disable-line
   })
   return result
 }
@@ -130,10 +130,39 @@ export const maskName = name => {
 }
 
 export const convertSqlDateToString = date => {
-  return `${date.year}-${appendZeroTo1digitNumber(date.monthValue)}-${appendZeroTo1digitNumber(date.dayOfMonth)} ${appendZeroTo1digitNumber(date.hour)}:${appendZeroTo1digitNumber(date.minute)}:${appendZeroTo1digitNumber(date.second)}`
+  return `${date.year}-${appendZeroTo1digitNumber(date.monthValue)}-${appendZeroTo1digitNumber(date.dayOfMonth)} ${appendZeroTo1digitNumber(date.hour)}:${appendZeroTo1digitNumber(date.minute)}:${appendZeroTo1digitNumber(date.second)}` // eslint-disable-line
 }
 
 export const appendZeroTo1digitNumber = number => {
   if (number < 10) number = `0${number}`
   return number
+}
+
+export const setRecentItemToLocalStorage = item => {
+  const localStorage = window.localStorage
+  const recentItems = JSON.parse(localStorage.getItem('recentItems'))
+  // recentItems가 없을 경우에는 새로 생성
+  if (!recentItems) {
+    const newArr = []
+    newArr.push(item)
+    localStorage.setItem('recentItems', JSON.stringify(newArr))
+  } else {
+    if (recentItems.length > 5) recentItems.shift()
+    // recentItems가 있을 경우에는 기존 array에 추가하는데,
+    // 기존 array에 id가 존재할 경우에는 기존걸 삭제하고 새로 받은걸 0번으로 세팅한다.
+    let existIndex = -1
+    for (let i = 0; i < recentItems.length; i++) {
+      if (recentItems[i].id === item.id) {
+        existIndex = i
+        break
+      }
+    }
+    if (existIndex === -1) {
+      recentItems.push(item)
+    } else {
+      recentItems.splice(existIndex, 1)
+      recentItems.push(item)
+    }
+    localStorage.setItem('recentItems', JSON.stringify(recentItems))
+  }
 }

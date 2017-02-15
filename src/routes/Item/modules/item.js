@@ -11,10 +11,17 @@ export const APPEND_REVIEWS = 'APPEND_REVIEWS'
 export const RECEIVE_INQUIRIES = 'RECEIVE_INQUIRIES'
 export const CLEAR_INQUIRIES = 'CLEAR_INQUIRIES'
 export const APPEND_INQUIRIES = 'APPEND_INQUIRIES'
+export const RECEIVE_RECENT_ITEMS = 'RECEIVE_RECENT_ITEMS'
 
 // ------------------------------------
 // Actions
 // ------------------------------------
+export function receiveRecentItems (recentItems = null) {
+  return {
+    type: RECEIVE_RECENT_ITEMS,
+    payload: { recentItems }
+  }
+}
 
 export function receiveReviews (reviews = null) {
   return {

@@ -34,7 +34,7 @@ export const actions = {
 // ------------------------------------
 const ACTION_HANDLERS = {
   [RECEIVE_ACTIVE_MAIN_BANNERS] : (state, action) => {
-    return Object.assign({}, ...state, action.payload)
+    return Object.assign({}, state, action.payload)
   }
 }
 

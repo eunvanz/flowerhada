@@ -49,6 +49,10 @@ class Login extends React.Component {
     userInfo.append('password', this.state.password)
     this.props.fetchAuthUser(userInfo)
     .then(() => {
+      const sessionStorage = window.sessionStorage
+      sessionStorage.setItem('authUser', JSON.stringify(this.props.authUser.data))
+    })
+    .then(() => {
       return this.props.fetchUser(this.props.authUser.data.email)
     })
     .then(() => {

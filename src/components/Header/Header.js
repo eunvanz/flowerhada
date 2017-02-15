@@ -1,8 +1,8 @@
 import React, { PropTypes } from 'react'
 import { IndexLink, Link } from 'react-router'
 import { connect } from 'react-redux'
-import { removeUser } from '../../store/user'
-import { removeAuthUser } from '../../store/authUser'
+import { removeUser, fetchUser } from 'store/user'
+import { removeAuthUser, receiveAuthUser } from 'store/authUser'
 import { address, phone, email, facebook, instagram } from '../../common/constants'
 import { ROOT } from 'common/constants'
 
@@ -13,7 +13,9 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   removeUser,
-  removeAuthUser
+  removeAuthUser,
+  fetchUser,
+  receiveAuthUser
 }
 
 class Header extends React.Component {
@@ -22,7 +24,17 @@ class Header extends React.Component {
     this.displayName = 'Header'
     this._handleOnClickLogout = this._handleOnClickLogout.bind(this)
   }
+  componentDidMount () {
+    const sessionStorage = window.sessionStorage
+    const authUser = JSON.parse(sessionStorage.getItem('authUser'))
+    if (authUser) { // 세션에 authUser가 있을 경우 store에 세팅하고 db에서 user 가져옴
+      this.props.receiveAuthUser(authUser)
+      this.props.fetchUser(authUser.email)
+    }
+  }
   _handleOnClickLogout () {
+    const sessionStorage = window.sessionStorage
+    sessionStorage.removeItem('authUser')
     this.props.removeUser()
     this.props.removeAuthUser()
     this.context.router.push('/')
@@ -374,7 +386,9 @@ Header.propTypes = {
   user: PropTypes.object,
   removeUser: PropTypes.func.isRequired,
   removeAuthUser: PropTypes.func.isRequired,
-  authUser: PropTypes.object
+  authUser: PropTypes.object,
+  receiveAuthUser: PropTypes.func.isRequired,
+  fetchUser: PropTypes.func.isRequired
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header)

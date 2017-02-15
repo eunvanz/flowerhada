@@ -25,7 +25,8 @@ const webpackConfig = {
       layouts: 'layouts',
       images: 'static/images',
       store: 'store',
-      routes: 'routes'
+      routes: 'routes',
+      containers: 'containers'
     }
   },
   module : {}

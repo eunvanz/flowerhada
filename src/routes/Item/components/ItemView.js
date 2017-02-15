@@ -1,8 +1,8 @@
 import React from 'react'
-import { convertDateToString, extractDaysFromLessonDays, extractDetailScheduleFromLessonDays } from 'common/util'
+import { convertDateToString, extractDaysFromLessonDays, extractDetailScheduleFromLessonDays,
+  setRecentItemToLocalStorage } from 'common/util'
 import MapModal from 'components/MapModal'
 import numeral from 'numeral'
-import { Link } from 'react-router'
 import ActionBlock from 'components/ActionBlock'
 import LinkButton from 'components/LinkButton'
 import Comment from 'components/Comment'
@@ -10,6 +10,7 @@ import $ from 'jquery'
 import CommentModal from 'components/CommentModal'
 import keygen from 'keygenerator'
 import Button from 'components/Button'
+import RecentItem from 'components/RecentItem'
 
 class ItemView extends React.Component {
   constructor (props) {
@@ -32,8 +33,25 @@ class ItemView extends React.Component {
     this._handleOnClickCloseCommentModal = this._handleOnClickCloseCommentModal.bind(this)
     this._handleOnSubmitComplete = this._handleOnSubmitComplete.bind(this)
     this._handleOnClickMoreList = this._handleOnClickMoreList.bind(this)
+    this._loadItemInfo = this._loadItemInfo.bind(this)
   }
   componentDidMount () {
+    this._loadItemInfo()
+  }
+  componentWillReceiveProps (nextProps) {
+    if (this.props.params !== nextProps.params) {
+      this._loadItemInfo()
+    }
+  }
+  componentWillUnmount () {
+    const type = this.props.params.type
+    if (type === 'lesson') {
+      this.props.unselectLesson()
+    }
+    this.props.clearInquiries()
+    this.props.clearReviews()
+  }
+  _loadItemInfo () {
     const type = this.props.params.type
     if (type === 'lesson') {
       this.props.fetchLesson(this.props.params.id)
@@ -47,16 +65,19 @@ class ItemView extends React.Component {
       })
       .then(() => {
         this.setState({ totalAmount: this.props.item.price })
+        const recentItem = {
+          id: this.props.item.id,
+          type: 'lesson',
+          mainCategory: this.props.item.mainCategory,
+          subCategory: this.props.item.subCategory,
+          title: this.props.item.title,
+          titleImg: this.props.item.titleImg,
+          price: this.props.item.price,
+          discountedPrice: this.props.item.discountedPrice
+        }
+        setRecentItemToLocalStorage(recentItem)
       })
     }
-  }
-  componentWillUnmount () {
-    const type = this.props.params.type
-    if (type === 'lesson') {
-      this.props.unselectLesson()
-    }
-    this.props.clearInquiries()
-    this.props.clearReviews()
   }
   _handleOnClickShowMap () {
     this.setState({ showMap: true })
@@ -108,8 +129,8 @@ class ItemView extends React.Component {
     })
   }
   render () {
-    const type = this.props.params.type
-    const item = this.props.item
+    const { type } = this.props.params
+    const { item } = this.props
     const renderShowMoreReviewsButton = () => {
       if (this.props.reviews && !this.props.reviews.last) {
         return (
@@ -158,6 +179,7 @@ class ItemView extends React.Component {
     }
     const renderSpecs = () => {
       if (type === 'lesson') {
+        /* eslint-disable */
         return (
           <table className='table' style={{ marginBottom: '0px' }}>
             <tbody>
@@ -193,6 +215,7 @@ class ItemView extends React.Component {
             </tbody>
           </table>
         )
+        /* eslint-enable */
       }
     }
     const renderLessonQuantity = () => {
@@ -207,6 +230,7 @@ class ItemView extends React.Component {
     }
     const renderOptions = () => {
       if (type === 'lesson') {
+        /* eslint-disable */
         return (
           <div>
             <div className='form-group'>
@@ -217,10 +241,12 @@ class ItemView extends React.Component {
             </div>
           </div>
         )
+        /* eslint-enable */
       }
     }
     const renderProductSection = () => {
       if (item) {
+        /* eslint-disable */
         return (
           <section className='main-container'>
             <div className='container'>
@@ -287,6 +313,7 @@ class ItemView extends React.Component {
             </div>
           </section>
         )
+        /* eslint-enable */
       } else {
         return <div>loading...</div>
       }
@@ -309,7 +336,22 @@ class ItemView extends React.Component {
       }
       return returnComponent || <div className='text-center'>문의가 없습니다.</div>
     }
+    const renderRecentItems = () => {
+      let returnComponent = <div className='text-center'>최근 본 상품이 없습니다.</div>
+      const localStorage = window.localStorage
+      const recentItems = JSON.parse(localStorage.getItem('recentItems'))
+      if (recentItems) {
+        recentItems.reverse()
+        returnComponent = recentItems.map(item => {
+          return (
+            <RecentItem key={keygen._()} item={item} />
+          )
+        })
+      }
+      return returnComponent
+    }
     const renderTabSection = () => {
+      /* eslint-disable */
       return (
         <section className='pv-30'>
           <div className='container'>
@@ -389,18 +431,7 @@ class ItemView extends React.Component {
                   <div className='bolck clearfix'>
                     <h3 className='title'>최근 본 상품</h3>
                     <div className='separator-2'></div>
-                    <div className='media margin-clear'>
-                      <div className='media-left'>
-                        <div className='overlay-container'>
-                          <img className='media-object' src='' />
-                          <Link to='/' className='overlay-link small'><i className='fa fa-link' /></Link>
-                        </div>
-                      </div>
-                      <div className='media-body'>
-                        <h6 className='media-heading'><Link to='/'>Title</Link></h6>
-                        <p className='price'>￦{numeral(1000).format('0,0')}</p>
-                      </div>
-                    </div>
+                    {renderRecentItems()}
                   </div>
                 </div>
               </div>
@@ -408,6 +439,7 @@ class ItemView extends React.Component {
           </div>
         </section>
       )
+      /* eslint-enable */
     }
     const renderPolicySection = () => {
       return (

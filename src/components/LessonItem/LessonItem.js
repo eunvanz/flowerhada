@@ -26,6 +26,7 @@ class LessonItem extends React.Component {
     const renderTag = () => {
       let returnComponent = null
       if (lesson.oneday) {
+        /* eslint-disable */
         returnComponent = (
           <span>오는 <span className='text-default'>{convertDateToString(lesson.lessonDate)}</span>에 진행되는 <span className='text-default'>원데이레슨</span></span>
         )
@@ -35,6 +36,7 @@ class LessonItem extends React.Component {
             오는 <span className='text-default'>{convertDateToString(lesson.lessonDate)}</span>부터 <span className='text-default'>{`${lesson.weekType} ${extractDaysFromLessonDays(lesson.lessonDays)}요일`}</span>에 <span className='text-default'>{lesson.weekLong}주간</span> 진행
           </span>
         )
+        /* eslint-enable */
       }
       return returnComponent
     }
