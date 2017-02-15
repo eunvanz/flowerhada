@@ -38,8 +38,8 @@ class ItemView extends React.Component {
   componentDidMount () {
     this._loadItemInfo()
   }
-  componentWillReceiveProps (nextProps) {
-    if (this.props.params !== nextProps.params) {
+  componentDidUpdate (prevProps, prevState) {
+    if (this.props.params !== prevProps.params) {
       this._loadItemInfo()
     }
   }
