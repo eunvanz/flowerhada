@@ -1,10 +1,19 @@
 import React from 'react'
-import ReactLoading from 'react-loading'
 
-export const Loading = () => (
-  <div style={{ marginTop: '8px' }}>
-    <ReactLoading type='spin' color='#21bb9d' width='15px' height='15px' />
-  </div>
-)
+class Loading extends React.Component {
+  render () {
+    return (
+      <div className='text-center' style={{ height: '200px' }}>
+        <div style={{ position: 'relative', top: '90px' }}>
+          <i className='fa fa-spinner fa-pulse fa-fw' /> {this.props.text}
+        </div>
+      </div>
+    )
+  }
+}
+
+Loading.propTypes = {
+  text: React.PropTypes.string.isRequired
+}
 
 export default Loading

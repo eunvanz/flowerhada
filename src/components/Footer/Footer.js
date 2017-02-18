@@ -4,7 +4,7 @@ import { address, phone, email, facebook, instagram, ROOT } from 'common/constan
 class Footer extends React.Component {
   render () {
     return (
-      <footer id='footer' className='cleafix'>
+      <footer id='footer' className='cleafix dark'>
         <div className='footer'>
           <div className='container'>
             <div className='footer-inner'>

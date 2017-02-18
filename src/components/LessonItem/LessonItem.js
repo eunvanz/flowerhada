@@ -11,16 +11,18 @@ class LessonItem extends React.Component {
       if (lesson.discountedPrice &&
       lesson.discountedPrice !== 0 &&
       lesson.discountedPrice !== lesson.price) {
+        /* eslint-disable */
         returnComponent = (
           <span className='price'>
-            <del>￦{`${numeral(lesson.price).format('0,0')}`}</del> ￦{`${numeral(lesson.discountedPrice).format('0,0')}`}
+            <del>￦{`${numeral(lesson.price).format('0,0')}`}</del> ￦<span className='text-default'>{`${numeral(lesson.discountedPrice).format('0,0')}`}</span>
           </span>
         )
       } else {
         returnComponent = (
-          <span className='price'>￦{`${numeral(lesson.price).format('0,0')}`}</span>
+          <span className='price'>￦ <span className='text-default'>{`${numeral(lesson.price).format('0,0')}`}</span></span>
         )
       }
+      /* eslint-enable */
       return returnComponent
     }
     const renderTag = () => {

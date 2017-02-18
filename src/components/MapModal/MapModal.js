@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react'
 import CustomModal from 'components/CustomModal'
+import keygen from 'keygenerator'
 
 class MapModal extends React.Component {
   constructor (props) {
@@ -51,6 +52,7 @@ class MapModal extends React.Component {
           close={this.props.close}
           backdrop
           width='1024px'
+          id={keygen._()}
         />
       </div>
     )

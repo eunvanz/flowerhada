@@ -33,14 +33,14 @@ class CommentModal extends React.Component {
     const imageInput = document.getElementById('image')
     const file = imageInput.files[0]
     const finalizeSubmit = () => {
-      this.props.close()
-      this.props.afterSubmit()
       this.setState({
         title: '',
         content: '',
         image: '',
         process: false
       })
+      this.props.close()
+      this.props.afterSubmit()
     }
     const doActionComment = () => {
       const data = new URLSearchParams()

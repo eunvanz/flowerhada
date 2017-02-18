@@ -2,6 +2,9 @@ import React from 'react'
 import LessonItem from '../LessonItem'
 
 class ItemList extends React.Component {
+  componentDidMount () {
+    window.scrollTo(0, 0)
+  }
   render () {
     const renderItems = () => {
       const returnComponent = []

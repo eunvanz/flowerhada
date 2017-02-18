@@ -1,16 +1,18 @@
 import React from 'react'
 import MainBanner from './MainBanner'
-import { setInlineScripts, clearInlineScripts } from 'common/util'
+import { setInlineScripts } from 'common/util'
 import HomeCard from './HomeCard'
 import ItemList from 'components/ItemList'
 import ActionBlock from 'components/ActionBlock'
-import $ from 'jquery'
 import { ROOT } from 'common/constants'
+import Loading from 'components/Loading'
+import Button from 'components/Button'
 
 class HomeView extends React.Component {
   constructor (props) {
     super(props)
     this.displayName = 'HomeView'
+    this._handleOnClickMoreLesson = this._handleOnClickMoreLesson.bind(this)
   }
   componentDidMount () {
     this.props.fetchMainBanners()
@@ -36,12 +38,27 @@ class HomeView extends React.Component {
   componentWillUnmount () {
     window.dispatchEvent(new Event('popstate'))
   }
+  _handleOnClickMoreLesson () {
+    this.context.router.push('/item-list/lesson/all')
+  }
   render () {
+    const renderBanner = () => {
+      if (this.props.mainBanners.length > 0) {
+        return <MainBanner mainBanners={this.props.mainBanners} />
+      } else {
+        return <Loading text='배너를 불러오는 중..' />
+      }
+    }
+    const renderLessons = () => {
+      if (this.props.lessons) {
+        return <ItemList items={this.props.lessons} itemType='lesson' />
+      } else {
+        return <Loading text='레슨 목록을 불러오는 중..' />
+      }
+    }
     return (
       <div>
-        {this.props.mainBanners.length > 0 &&
-          <MainBanner mainBanners={this.props.mainBanners} />
-        }
+        {renderBanner()}
         <section className='light-gray-bg pv-30 clearfix'>
           <div className='container'>
             <div className='row'>
@@ -51,7 +68,8 @@ class HomeView extends React.Component {
                 </h2>
                 <div className='separator' />
                 <p className='large text-center'>
-                  언제나 예쁘고 싱싱한 꽃처럼 살 수 없을까요? <span className='text-default'>hada</span>와 함께라면 가능합니다.<br /><span className='text-default'>hada</span>는 꽃으로 할 수 있는 풍성한 경험을 일상속으로 전달해드립니다.
+                  언제나 예쁘고 싱싱한 꽃처럼 살 수 없을까요? <span className='text-default'>hada</span>와 함께라면 가능합니다.
+                  <br /><span className='text-default'>hada</span>는 꽃으로 할 수 있는 풍성한 경험을 일상속으로 전달해드립니다.
                 </p>
               </div>
               <HomeCard
@@ -95,13 +113,19 @@ class HomeView extends React.Component {
                   <i className='fa fa-plus' />
                 </button></h3>
                 <hr />
-                {
-                  this.props.lessons &&
-                  <ItemList
-                    items={this.props.lessons}
-                    itemType='lesson'
-                  />
-                }
+                {renderLessons()}
+                <Button
+                  className='btn-block'
+                  onClick={this._handleOnClickMoreLesson}
+                  process={false}
+                  square
+                  color='gray'
+                  textComponent={
+                    <span>
+                      <i className='text-default fa fa-plus' /> 더 많은 레슨 보기
+                    </span>
+                  }
+                />
               </div>
             </div>
           </div>
@@ -139,6 +163,10 @@ class HomeView extends React.Component {
       </div>
     )
   }
+}
+
+HomeView.contextTypes = {
+  router: React.PropTypes.object
 }
 
 HomeView.propTypes = {

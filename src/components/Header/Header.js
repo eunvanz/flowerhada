@@ -3,8 +3,7 @@ import { IndexLink, Link } from 'react-router'
 import { connect } from 'react-redux'
 import { removeUser, fetchUser } from 'store/user'
 import { removeAuthUser, receiveAuthUser } from 'store/authUser'
-import { address, phone, email, facebook, instagram } from '../../common/constants'
-import { ROOT } from 'common/constants'
+import { address, phone, email, facebook, instagram, ROOT } from 'common/constants'
 
 const mapStateToProps = state => ({
   user: state.user,
@@ -233,7 +232,7 @@ class Header extends React.Component {
                         <div className='navbar-collapse collapse' id='navbar-collapse-1' aria-expanded='true'>
                           <ul className='nav navbar-nav'>
                             <li className='dropdown'>
-                              <Link to='/lessons' className='dropdown-toggle' data-toggle='dropdown'>
+                              <Link to='/item-list/lesson/all' className='dropdown-toggle' data-toggle='dropdown'>
                                 플라워레슨
                               </Link>
                               <ul className='dropdown-menu'>

@@ -11,6 +11,8 @@ import CommentModal from 'components/CommentModal'
 import keygen from 'keygenerator'
 import Button from 'components/Button'
 import RecentItem from 'components/RecentItem'
+import Alert from 'components/Alert'
+import Loading from 'components/Loading'
 
 class ItemView extends React.Component {
   constructor (props) {
@@ -22,7 +24,8 @@ class ItemView extends React.Component {
       tabActivated: 'review',
       commentModal: { show: false, type: 'review' },
       reviews: { curPage: 0, perPage: 5, isLoading: false },
-      inquiries: { curPage: 0, perPage: 5, isLoading: false }
+      inquiries: { curPage: 0, perPage: 5, isLoading: false },
+      loading: { isLoading: true, text: '상품정보를 불러오는 중..' }
     }
     this._handleOnClickShowMap = this._handleOnClickShowMap.bind(this)
     this._handleOnClickHideMap = this._handleOnClickHideMap.bind(this)
@@ -41,6 +44,7 @@ class ItemView extends React.Component {
   componentDidUpdate (prevProps, prevState) {
     if (this.props.params !== prevProps.params) {
       this._loadItemInfo()
+      window.scrollTo(0, 0)
     }
   }
   componentWillUnmount () {
@@ -54,6 +58,7 @@ class ItemView extends React.Component {
   _loadItemInfo () {
     const type = this.props.params.type
     if (type === 'lesson') {
+      this.setState({ loading: { isLoading: true, text: '레슨 정보를 불러오는 중..' } })
       this.props.fetchLesson(this.props.params.id)
       .then(() => {
         this.props.fetchReviewsByGroupName(this.props.item.groupName,
@@ -62,6 +67,9 @@ class ItemView extends React.Component {
       .then(() => {
         this.props.fetchInquiriesByGroupName(this.props.item.groupName,
           this.state.reviews.curPage, this.state.reviews.perPage)
+      })
+      .then(() => {
+        this.props.fetchRelatedItems(this.props.item, type)
       })
       .then(() => {
         this.setState({ totalAmount: this.props.item.price })
@@ -76,6 +84,7 @@ class ItemView extends React.Component {
           discountedPrice: this.props.item.discountedPrice
         }
         setRecentItemToLocalStorage(recentItem)
+        this.setState({ loading: { isLoading: false } })
       })
     }
   }
@@ -244,6 +253,43 @@ class ItemView extends React.Component {
         /* eslint-enable */
       }
     }
+    const renderPrice = () => {
+      if (item.expired) {
+        return <Alert type='warning' text='신청 기간이 지난 레슨입니다. 다음 번엔 좀 더 서두르세요!' />
+      } else if (item.soldOut) {
+        return <Alert type='warning' text='일시적으로 품절된 상품입니다. 다음 번엔 좀 더 서두르세요!' />
+      } else if (type === 'lesson' && item.maxParty <= item.currParty) {
+        return <Alert type='warning' text='인원이 모두 차버렸네요. 다른 레슨을 찾아보세요.' />
+      } else {
+        /* eslint-disable */
+        return (
+          <div>
+            <div className='row grid-space-10'>
+              <div className='col-md-12'>
+                <form role='form' className='form-inline text-right'>
+                  {renderOptions()}
+                </form>
+              </div>
+            </div>
+            <div className='light-gray-bg p-20 bordered clearfix'>
+              <span className='product price'>
+                <i className='icon-tag pr-10' />￦<span className='text-default'>{numeral(this.state.totalAmount).format('0,0')}</span>
+              </span>
+              <div className='product elements-list pull-right clearfix'>
+                <Button className='margin-clear' animated
+                  textComponent={<span>장바구니에 담기 <i className='fa fa-shopping-cart' /></span>}
+                  style={{ marginRight: '3px' }}
+                />
+                <Button className='margin-clear' animated color='dark'
+                  textComponent={<span>바로구매 <i className='fa fa-credit-card-alt' /></span>}
+                />
+              </div>
+            </div>
+          </div>
+        )
+        /* eslint-enable */
+      }
+    }
     const renderProductSection = () => {
       if (item) {
         /* eslint-disable */
@@ -264,27 +310,7 @@ class ItemView extends React.Component {
                       <h2>{item.title}</h2>
                       <p>{item.detail}<LinkButton onClick={this._handleOnClickAddToWishList} textComponent={<span>위시리스트 담기 <i className='fa fa-heart' /></span>} /></p>
                       {renderSpecs()}
-                      <div className='row grid-space-10'>
-                        <div className='col-md-12'>
-                          <form role='form' className='form-inline text-right'>
-                            {renderOptions()}
-                          </form>
-                        </div>
-                      </div>
-                      <div className='light-gray-bg p-20 bordered clearfix'>
-                        <span className='product price'>
-                          <i className='icon-tag pr-10' />￦{numeral(this.state.totalAmount).format('0,0')}
-                        </span>
-                        <div className='product elements-list pull-right clearfix'>
-                          <Button className='margin-clear' animated
-                            textComponent={<span>장바구니에 담기 <i className='fa fa-shopping-cart' /></span>}
-                            style={{ marginRight: '3px' }}
-                          />
-                          <Button className='margin-clear' animated color='dark'
-                            textComponent={<span>바로구매 <i className='fa fa-credit-card-alt' /></span>}
-                          />
-                        </div>
-                      </div>
+                      {renderPrice()}
                     </div>
                     {
                       type === 'lesson' &&
@@ -342,7 +368,21 @@ class ItemView extends React.Component {
       const recentItems = JSON.parse(localStorage.getItem('recentItems'))
       if (recentItems) {
         recentItems.reverse()
-        returnComponent = recentItems.map(item => {
+        returnComponent = recentItems.map(elem => {
+          if (elem.id !== item.id) {
+            return (
+              <RecentItem key={keygen._()} item={elem} />
+            )
+          }
+        })
+      }
+      return returnComponent
+    }
+    const renderRelatedItems = () => {
+      let returnComponent = <div className='text-center'>관련된 상품이 없습니다.</div>
+      const relatedItems = this.props.relatedItems
+      if (relatedItems && relatedItems.length > 0) {
+        returnComponent = relatedItems.map(item => {
           return (
             <RecentItem key={keygen._()} item={item} />
           )
@@ -428,6 +468,11 @@ class ItemView extends React.Component {
               }
               <div className='col-md-4 col-lg-3 col-lg-offset-1'>
                 <div className='sidebar'>
+                  <div className='bolck clearfix' style={{ marginBottom: '40px' }}>
+                    <h3 className='title'>관련된 상품</h3>
+                    <div className='separator-2'></div>
+                    {renderRelatedItems()}
+                  </div>
                   <div className='bolck clearfix'>
                     <h3 className='title'>최근 본 상품</h3>
                     <div className='separator-2'></div>
@@ -469,11 +514,24 @@ class ItemView extends React.Component {
         </section>
       )
     }
+    const renderPage = () => {
+      if (!this.state.loading.isLoading) {
+        return (
+          <div>
+            {renderProductSection()}
+            {renderPolicySection()}
+            {renderTabSection()}
+          </div>
+        )
+      } else {
+        return (
+          <Loading text={`${this.state.text}`} />
+        )
+      }
+    }
     return (
       <div>
-        {renderProductSection()}
-        {renderPolicySection()}
-        {renderTabSection()}
+        {renderPage()}
         <ActionBlock
           title='우리동네로 call hada'
           desc='내게 맞는 레슨이 없다고 좌절하지 마세요. 여러분이 원하는 지역과 시간대로 레슨을 개설해드립니다.'
@@ -499,7 +557,9 @@ ItemView.propTypes = {
   inquiries: React.PropTypes.object,
   user: React.PropTypes.object,
   appendReviewsByGroupName: React.PropTypes.func,
-  appendInquiriesByGroupName: React.PropTypes.func
+  appendInquiriesByGroupName: React.PropTypes.func,
+  relatedItems: React.PropTypes.array,
+  fetchRelatedItems: React.PropTypes.func
 }
 
 export default ItemView

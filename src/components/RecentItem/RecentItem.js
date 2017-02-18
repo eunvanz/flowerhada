@@ -19,7 +19,9 @@ class RecentItem extends React.Component {
             <Link to={`/item/${item.type}/${item.id}`}>{item.title}</Link>
           </h5>
           <p className='margin-clear'>
-            <small>{item.type === 'lesson' ? '플라워레슨 > ' : '꽃다발 > '}{item.mainCategory}</small>
+            <small>
+              {item.type === 'lesson' ? '플라워레슨' : '꽃다발'} <i className='fa fa-angle-right' /> {item.mainCategory}
+            </small>
           </p>
           <p className='price'>￦{numeral(item.price).format('0,0')}</p>
         </div>

@@ -1,4 +1,4 @@
-import { getAllLessons, getLesson } from 'common/LessonService'
+import { getAllLessons, getLesson, getLessonByMainCategory } from 'common/LessonService'
 
 // ------------------------------------
 // Constants
@@ -49,9 +49,19 @@ export const fetchLesson = id => {
   }
 }
 
+export const fetchLessonsByMainCategory = mainCategory => {
+  return dispatch => {
+    return getLessonByMainCategory(mainCategory)
+    .then(res => {
+      return dispatch(receiveLessons(res.data))
+    })
+  }
+}
+
 export const actions = {
   fetchLessons,
-  fetchLesson
+  fetchLesson,
+  fetchLessonsByMainCategory
 }
 
 // ------------------------------------

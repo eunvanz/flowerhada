@@ -1,15 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router'
-import { imgRouteMainBanner } from '../../common/constants'
-// import { setInlineScripts } from '../../common/util'
+import { imgRouteMainBanner } from 'common/constants'
 
 class MainBanner extends React.Component {
-  // componentWillUnmount () {
-  //   const scripts = [
-  //     'template/js/inline-home-view.js'
-  //   ]
-  //   setInlineScripts(scripts)
-  // }
   render () {
     return (
       <div className='banner clearfix'>
@@ -24,7 +17,8 @@ class MainBanner extends React.Component {
                 >
                   {/* main image */}
                   {/* <img src={`${imgRouteMainBanner}/AF1QipMI_BgNCwN4VEtpJzhCq2fzapiGR0WAixQp8VBy`} */}
-                  <img src='http://cafefiles.naver.net/20140521_63/shinfree78_1400661041690NpSUb_JPEG/Poppy-wedding-bouquet.jpg'
+                  <img
+                    src='http://cafefiles.naver.net/20140521_63/shinfree78_1400661041690NpSUb_JPEG/Poppy-wedding-bouquet.jpg'
                     alt='웨딩부케' data-bgposition='center top'
                     data-bgrepeat='no-repeat' data-bgfit='cover'
                   />

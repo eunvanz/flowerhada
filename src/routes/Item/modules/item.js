@@ -1,4 +1,5 @@
 import { getCommentByGroupName } from 'common/CommentService'
+import { getLessonByGroupName } from 'common/LessonService'
 
 // ------------------------------------
 // Constants
@@ -12,6 +13,7 @@ export const RECEIVE_INQUIRIES = 'RECEIVE_INQUIRIES'
 export const CLEAR_INQUIRIES = 'CLEAR_INQUIRIES'
 export const APPEND_INQUIRIES = 'APPEND_INQUIRIES'
 export const RECEIVE_RECENT_ITEMS = 'RECEIVE_RECENT_ITEMS'
+export const RECEIVE_RELATED_ITEMS = 'RECEIVE_RELATED_ITEMS'
 
 // ------------------------------------
 // Actions
@@ -20,6 +22,13 @@ export function receiveRecentItems (recentItems = null) {
   return {
     type: RECEIVE_RECENT_ITEMS,
     payload: { recentItems }
+  }
+}
+
+export function receiveRelatedItems (relatedItems = null) {
+  return {
+    type: RECEIVE_RELATED_ITEMS,
+    payload: { relatedItems }
   }
 }
 
@@ -115,11 +124,26 @@ export const appendInquiriesByGroupName = (groupName, curPage, perPage) => {
   }
 }
 
+export const fetchRelatedItems = (item, type) => {
+  let service = null
+  if (type === 'lesson') service = getLessonByGroupName
+  return dispatch => {
+    return service(item.groupName)
+    .then(res => {
+      const data = res.data.filter(elem => {
+        return item.id !== elem.id
+      })
+      return dispatch(receiveRelatedItems(data))
+    })
+  }
+}
+
 export const actions = {
   fetchReviewsByGroupName,
   clearReviews,
   fetchInquiriesByGroupName,
-  clearInquiries
+  clearInquiries,
+  fetchRelatedItems
 }
 
 // ------------------------------------
@@ -157,13 +181,16 @@ const ACTION_HANDLERS = {
     })
     action.payload.inquiries.content = state.inquiries.content
     return Object.assign({}, state, action.payload)
+  },
+  [RECEIVE_RELATED_ITEMS] : (state, action) => {
+    return Object.assign({}, state, action.payload)
   }
 }
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
-const initialState = { reviews: null, inquiries: null }
+const initialState = { reviews: null, inquiries: null, relatedItems: null }
 export default function counterReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
 

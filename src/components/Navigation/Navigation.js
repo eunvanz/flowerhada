@@ -12,7 +12,7 @@ class Navigation extends React.Component {
       for (let i = 0; i < tabTitles.length; i++) {
         returnComponent.push(
           <li className={currentRouteName.indexOf(tabLinks[i]) !== -1 ? 'active' : ''} key={i}>
-            <Link to={tabLinks[i]}><i className={tabIcons[i]} />{tabTitles[i]}</Link>
+            <Link to={tabLinks[i]} style={{ cursor: 'pointer' }}><i className={tabIcons[i]} /> {tabTitles[i]}</Link>
           </li>
         )
       }

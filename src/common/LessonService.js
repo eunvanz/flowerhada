@@ -20,3 +20,11 @@ export const getAllLessons = () => {
 export const getLesson = id => {
   return axios.get(`${API_BASE_URL}/lessons/${id}`)
 }
+
+export const getLessonByMainCategory = mainCategory => {
+  return axios.get(`${API_BASE_URL}/lessons/main-category/${mainCategory}`)
+}
+
+export const getLessonByGroupName = groupName => {
+  return axios.get(`${API_BASE_URL}/lessons/group-name/${groupName}`)
+}
