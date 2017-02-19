@@ -1,5 +1,6 @@
 import { getCommentByGroupName } from 'common/CommentService'
 import { getLessonByGroupName } from 'common/LessonService'
+import { getProductByRelationName } from 'common/ProductService'
 
 // ------------------------------------
 // Constants
@@ -127,6 +128,7 @@ export const appendInquiriesByGroupName = (groupName, curPage, perPage) => {
 export const fetchRelatedItems = (item, type) => {
   let service = null
   if (type === 'lesson') service = getLessonByGroupName
+  else if (type === 'product') service = getProductByRelationName
   return dispatch => {
     return service(item.groupName)
     .then(res => {

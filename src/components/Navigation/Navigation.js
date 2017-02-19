@@ -3,7 +3,7 @@ import { Link } from 'react-router'
 
 class Navigation extends React.Component {
   render () {
-    const currentRouteName = location.pathname
+    const currentRouteName = decodeURIComponent(location.pathname)
     const _renderTabs = () => {
       const tabTitles = this.props.tabTitles
       const tabIcons = this.props.tabIcons

@@ -4,49 +4,49 @@ import { API_BASE_URL } from 'common/serverConfig'
 // ------------------------------------
 // Constants
 // ------------------------------------
-export const RECEIVE_LESSONS = 'RECEIVE_LESSONS'
-export const CLEAR_LESSONS = 'CLEAR_LESSONS'
+export const RECEIVE_PRODUCT = 'RECEIVE_PRODUCT'
+export const CLEAR_PRODUCT = 'CLEAR_PRODUCT'
 
 // ------------------------------------
 // Actions
 // ------------------------------------
 
-export function receiveLesson (lessons = []) {
+export function receiveProduct (product = null) {
   return {
-    type: RECEIVE_LESSONS,
-    payload: lessons
+    type: RECEIVE_PRODUCT,
+    payload: product
   }
 }
 
-export const fetchLessons = (id) => {
+export const fetchProduct = (id) => {
   return (dispatch) => {
-    return axios.get(`${API_BASE_URL}/lessons/`)
+    return axios.get(`${API_BASE_URL}/products/${id}`)
     .then(res => {
-      return dispatch(receiveLesson(res.data))
+      return dispatch(receiveProduct(res.data))
     })
   }
 }
 
-export function clearLessons () {
+export function clearProduct () {
   return {
-    type: CLEAR_LESSONS,
-    payload: []
+    type: CLEAR_PRODUCT,
+    payload: null
   }
 }
 
 export const actions = {
-  fetchLessons,
-  clearLessons
+  fetchProduct,
+  clearProduct
 }
 
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [RECEIVE_LESSONS] : (state, action) => {
+  [RECEIVE_PRODUCT] : (state, action) => {
     return action.payload
   },
-  [CLEAR_LESSONS] : (state, action) => {
+  [CLEAR_PRODUCT] : (state, action) => {
     return action.payload
   }
 }

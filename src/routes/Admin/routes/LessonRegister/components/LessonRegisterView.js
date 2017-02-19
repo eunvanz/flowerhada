@@ -15,7 +15,7 @@ class LessonListView extends React.Component {
     super(props)
     this.state = {
       title: '',
-      desc: '',
+      detail: '',
       mainCategory: '',
       subCategory: '',
       oneday: '',

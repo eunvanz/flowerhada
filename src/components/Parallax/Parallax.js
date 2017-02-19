@@ -5,7 +5,7 @@ class Parallax extends React.Component {
     /* eslint-disable */
     return (
       <div className='section pv-40 parallax dark-translucent-bg'
-        style={{ backgroundImage: 'url(http://digitalhint.net/wp-content/uploads/2016/04/flower-basket-on-a-table-flower-hd-wallpaper-1920x1080-7960.jpg)' }}>
+        style={{ backgroundImage: `url(${this.props.backgroundImage})` }}>
         <div className='container'>
           <div className='row'>
             <div className='col-md-12'>
@@ -27,7 +27,8 @@ class Parallax extends React.Component {
 
 Parallax.propTypes = {
   title: PropTypes.object.isRequired,
-  description: PropTypes.object.isRequired
+  description: PropTypes.object.isRequired,
+  backgroundImage: PropTypes.string.isRequired
 }
 
 export default Parallax

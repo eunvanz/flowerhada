@@ -152,7 +152,7 @@ export const setRecentItemToLocalStorage = item => {
     // 기존 array에 id가 존재할 경우에는 기존걸 삭제하고 새로 받은걸 0번으로 세팅한다.
     let existIndex = -1
     for (let i = 0; i < recentItems.length; i++) {
-      if (recentItems[i].id === item.id) {
+      if (recentItems[i].id === item.id && recentItems[i].type === item.type) {
         existIndex = i
         break
       }
@@ -165,4 +165,8 @@ export const setRecentItemToLocalStorage = item => {
     }
     localStorage.setItem('recentItems', JSON.stringify(recentItems))
   }
+}
+
+export const removeEmptyIndex = arr => {
+  return arr.filter(elem => elem !== '')
 }

@@ -5,6 +5,8 @@ import MainBannerRegister from './MainBannerRegister'
 import AdminHome from './AdminHome'
 import LessonList from './LessonList'
 import LessonRegister from './LessonRegister'
+import ProductList from './ProductList'
+import ProductRegister from './ProductRegister'
 
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
@@ -17,7 +19,9 @@ export const createRoutes = (store) => ({
     MainBannerRegister(store),
     MainBannerList(store),
     LessonList(store),
-    LessonRegister(store)
+    LessonRegister(store),
+    ProductList(store),
+    ProductRegister(store)
   ]
 })
 

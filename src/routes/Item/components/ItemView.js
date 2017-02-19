@@ -13,10 +13,16 @@ import Button from 'components/Button'
 import RecentItem from 'components/RecentItem'
 import Alert from 'components/Alert'
 import Loading from 'components/Loading'
+import TextField from 'components/TextField'
+import ImageCarousel from 'components/ImageCarousel'
+import Parallax from 'components/Parallax'
+import DatePicker from 'components/DatePicker'
 
 class ItemView extends React.Component {
   constructor (props) {
     super(props)
+    let date = new Date()
+    date = new Date(date.valueOf() + (24 * 60 * 60 * 1000))
     this.state = {
       showMap: false,
       quantity: 1,
@@ -25,7 +31,10 @@ class ItemView extends React.Component {
       commentModal: { show: false, type: 'review' },
       reviews: { curPage: 0, perPage: 5, isLoading: false },
       inquiries: { curPage: 0, perPage: 5, isLoading: false },
-      loading: { isLoading: true, text: '상품정보를 불러오는 중..' }
+      loading: { isLoading: true, text: '상품 정보를 불러오는 중..' },
+      receiveDate: date.toISOString(),
+      receiveTime: '오전 10시 ~ 오전 12시',
+      option: '선택안함'
     }
     this._handleOnClickShowMap = this._handleOnClickShowMap.bind(this)
     this._handleOnClickHideMap = this._handleOnClickHideMap.bind(this)
@@ -37,56 +46,78 @@ class ItemView extends React.Component {
     this._handleOnSubmitComplete = this._handleOnSubmitComplete.bind(this)
     this._handleOnClickMoreList = this._handleOnClickMoreList.bind(this)
     this._loadItemInfo = this._loadItemInfo.bind(this)
+    this._unselectItem = this._unselectItem.bind(this)
+    this._isValidPage = this._isValidPage.bind(this)
+    this._handleOnChangeDate = this._handleOnChangeDate.bind(this)
+    this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
   }
   componentDidMount () {
-    this._loadItemInfo()
+    window.scrollTo(0, 0)
+    if (this._isValidPage()) {
+      this._loadItemInfo()
+    } else {
+      this.context.router.push('/not-found')
+    }
   }
   componentDidUpdate (prevProps, prevState) {
     if (this.props.params !== prevProps.params) {
+      this._unselectItem()
       this._loadItemInfo()
       window.scrollTo(0, 0)
     }
   }
   componentWillUnmount () {
-    const type = this.props.params.type
-    if (type === 'lesson') {
-      this.props.unselectLesson()
-    }
+    this._unselectItem(this.props.params.type)
     this.props.clearInquiries()
     this.props.clearReviews()
   }
+  _isValidPage () {
+    const { type } = this.props.params
+    if (type !== 'product' && type !== 'lesson') {
+      return false
+    }
+    return true
+  }
+  _unselectItem () {
+    this.props.unselectLesson()
+    this.props.unselectProduct()
+  }
   _loadItemInfo () {
     const type = this.props.params.type
-    if (type === 'lesson') {
-      this.setState({ loading: { isLoading: true, text: '레슨 정보를 불러오는 중..' } })
-      this.props.fetchLesson(this.props.params.id)
-      .then(() => {
-        this.props.fetchReviewsByGroupName(this.props.item.groupName,
-          this.state.reviews.curPage, this.state.reviews.perPage)
-      })
-      .then(() => {
-        this.props.fetchInquiriesByGroupName(this.props.item.groupName,
-          this.state.reviews.curPage, this.state.reviews.perPage)
-      })
-      .then(() => {
-        this.props.fetchRelatedItems(this.props.item, type)
-      })
-      .then(() => {
-        this.setState({ totalAmount: this.props.item.price })
-        const recentItem = {
-          id: this.props.item.id,
-          type: 'lesson',
-          mainCategory: this.props.item.mainCategory,
-          subCategory: this.props.item.subCategory,
-          title: this.props.item.title,
-          titleImg: this.props.item.titleImg,
-          price: this.props.item.price,
-          discountedPrice: this.props.item.discountedPrice
-        }
-        setRecentItemToLocalStorage(recentItem)
-        this.setState({ loading: { isLoading: false } })
-      })
-    }
+    let fetchItem = this.props.fetchProduct
+    if (type === 'lesson') fetchItem = this.props.fetchLesson
+    this.setState({ loading: { isLoading: true, text: `${type === 'lesson' ? '레슨' : '상품'} 정보를 불러오는 중..` } })
+    fetchItem(this.props.params.id)
+    .then(() => {
+      if (!this.props.item) {
+        this.context.router.push('/not-found')
+        return
+      }
+      this.props.fetchReviewsByGroupName(this.props.item.groupName,
+        this.state.reviews.curPage, this.state.reviews.perPage)
+    })
+    .then(() => {
+      this.props.fetchInquiriesByGroupName(this.props.item.groupName,
+        this.state.reviews.curPage, this.state.reviews.perPage)
+    })
+    .then(() => {
+      this.props.fetchRelatedItems(this.props.item, type)
+    })
+    .then(() => {
+      this.setState({ totalAmount: this.props.item.price })
+      const recentItem = {
+        id: this.props.item.id,
+        type: type,
+        mainCategory: this.props.item.mainCategory,
+        subCategory: this.props.item.subCategory,
+        title: this.props.item.title,
+        titleImg: this.props.item.titleImg,
+        price: this.props.item.price,
+        discountedPrice: this.props.item.discountedPrice
+      }
+      setRecentItemToLocalStorage(recentItem)
+      this.setState({ loading: { isLoading: false } })
+    })
   }
   _handleOnClickShowMap () {
     this.setState({ showMap: true })
@@ -95,8 +126,9 @@ class ItemView extends React.Component {
     this.setState({ showMap: false })
   }
   _handleOnChangeQuantity (e) {
-    const quantity = e.target.value
+    let quantity = e.target.value
     const item = this.props.item
+    if (quantity < 1) quantity = 1
     this.setState({ quantity, totalAmount: item.price * quantity })
   }
   _handleOnClickTab (e) {
@@ -136,6 +168,17 @@ class ItemView extends React.Component {
       this.setState({ [commentType]:
         Object.assign({}, this.state[commentType], { isLoading: false }) })
     })
+  }
+  _handleOnChangeDate (value, formattedValue) {
+    let receiveDate = value
+    const today = new Date().toISOString()
+    if (value < today) receiveDate = today
+    this.setState({ receiveDate: receiveDate })
+  }
+  _handleOnChangeInput (e) {
+    const id = e.target.id
+    const value = e.target.value
+    this.setState({ [id]: value })
   }
   render () {
     const { type } = this.props.params
@@ -186,8 +229,22 @@ class ItemView extends React.Component {
         )
       }
     }
+    const renderTimeOptions = () => {
+      // TODO 추후 당일 배송 혹은 익일 배송을 위한 로직 필요
+      const returnComponent = []
+      returnComponent.push(
+        <option key={keygen._()} value='오전 10시 ~ 오전 12시'>오전 10시 ~ 오전 12시</option>
+      )
+      returnComponent.push(
+        <option key={keygen._()} value='오후 2시 ~ 오후 4시'>오후 2시 ~ 오후 4시</option>
+      )
+      returnComponent.push(
+        <option key={keygen._()} value='저녁 6시 ~ 저녁 8시'>저녁 6시 ~ 저녁 8시</option>
+      )
+      return returnComponent
+    }
     const renderSpecs = () => {
-      if (type === 'lesson') {
+      if (item.lessonDate || item.lessonDays && type === 'lesson') {
         /* eslint-disable */
         return (
           <table className='table' style={{ marginBottom: '0px' }}>
@@ -225,6 +282,43 @@ class ItemView extends React.Component {
           </table>
         )
         /* eslint-enable */
+      } else if (type === 'product') {
+        return (
+          <table className='table' style={{ marginBottom: '0px' }}>
+            <tbody>
+              <tr>
+                <td className='text-right' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령일</strong></td>
+                <td>
+                  <DatePicker
+                    id='receiveDate'
+                    onChange={this._handleOnChangeDate}
+                    value={this.state.receiveDate}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td className='text-right' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령시간</strong></td>
+                <td>
+                  <select className='form-control' id='receiveTime' style={{ width: '200px' }}
+                    value={this.state.receiveTime} onChange={this._handleOnChangeInput}>
+                    {renderTimeOptions()}
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td className='text-right' style={{ width: '120px', paddingTop: '18px' }}><strong>옵션</strong></td>
+                <td>
+                  <select className='form-control' id='option' style={{ width: '200px' }}
+                    value={this.state.option} onChange={this._handleOnChangeInput}>
+                    <option value='선택안함'>선택안함</option>
+                    <option value='편지추가'>편지추가 (무료)</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        )
+        /* eslint-enable */
       }
     }
     const renderLessonQuantity = () => {
@@ -247,6 +341,15 @@ class ItemView extends React.Component {
               <select className='form-control' id='quantity' value={this.state.quantity} onChange={this._handleOnChangeQuantity}>
                 {renderLessonQuantity()}
               </select>
+            </div>
+          </div>
+        )
+      } else if (type === 'product') {
+        return (
+          <div>
+            <div className='form-group'>
+              {`￦${numeral(item.price).format('0,0')} * `}
+              <TextField style={{ width: '50px', paddingRight: '5px', paddingLeft: '5px' }} type='number' id='quantity' value={this.state.quantity} onChange={this._handleOnChangeQuantity} /> 개
             </div>
           </div>
         )
@@ -290,21 +393,33 @@ class ItemView extends React.Component {
         /* eslint-enable */
       }
     }
+    const renderImages = () => {
+      let returnComponent = null
+      if (type === 'lesson') {
+        returnComponent = (
+          <div className='tab-content clear-style'>
+            <img src={item.titleImg} />
+          </div>
+        )
+      } else if (type === 'product' && item.images) {
+        returnComponent = <ImageCarousel images={JSON.parse(item.images)} />
+      }
+      return returnComponent
+    }
     const renderProductSection = () => {
-      if (item) {
-        /* eslint-disable */
-        return (
+      /* eslint-disable */
+      return (
+        <div>
+          <Parallax title={<span>{item.title}</span>} description={<span>{item.detail}</span>} backgroundImage={item.titleImg} />
           <section className='main-container'>
             <div className='container'>
               <div className='row'>
                 <div className='main col-md-12'>
-                  <h1 className='page-title'>레슨정보</h1>
+                  <h1 className='page-title'>{type === 'lesson' ? '레슨정보' : '상품정보'}</h1>
                   <div className='separator-2' />
                   <div className='row'>
-                    <div className='col-md-6'>
-                      <div className='tab-content clear-style'>
-                        <img src={item.titleImg} />
-                      </div>
+                    <div className='col-md-6' style={{ marginBottom: '40px' }}>
+                      {renderImages()}
                     </div>
                     <div className='col-md-6'>
                       <h2>{item.title}</h2>
@@ -338,11 +453,9 @@ class ItemView extends React.Component {
               </div>
             </div>
           </section>
-        )
-        /* eslint-enable */
-      } else {
-        return <div>loading...</div>
-      }
+        </div>
+      )
+      /* eslint-enable */
     }
     const renderReviews = () => {
       let returnComponent = null
@@ -366,10 +479,10 @@ class ItemView extends React.Component {
       let returnComponent = <div className='text-center'>최근 본 상품이 없습니다.</div>
       const localStorage = window.localStorage
       const recentItems = JSON.parse(localStorage.getItem('recentItems'))
-      if (recentItems) {
+      if (recentItems.length > 1) {
         recentItems.reverse()
         returnComponent = recentItems.map(elem => {
-          if (elem.id !== item.id) {
+          if (!(elem.id === item.id && elem.type === type)) {
             return (
               <RecentItem key={keygen._()} item={elem} />
             )
@@ -382,10 +495,12 @@ class ItemView extends React.Component {
       let returnComponent = <div className='text-center'>관련된 상품이 없습니다.</div>
       const relatedItems = this.props.relatedItems
       if (relatedItems && relatedItems.length > 0) {
-        returnComponent = relatedItems.map(item => {
-          return (
-            <RecentItem key={keygen._()} item={item} />
-          )
+        returnComponent = relatedItems.map(elem => {
+          if (!(elem.id === item.id && elem.type === type)) {
+            return (
+              <RecentItem key={keygen._()} item={elem} />
+            )
+          }
         })
       }
       return returnComponent
@@ -532,16 +647,22 @@ class ItemView extends React.Component {
     return (
       <div>
         {renderPage()}
-        <ActionBlock
-          title='우리동네로 call hada'
-          desc='내게 맞는 레슨이 없다고 좌절하지 마세요. 여러분이 원하는 지역과 시간대로 레슨을 개설해드립니다.'
-          link='/apply-lesson'
-          btnTxt='출장레슨 신청'
-          btnIcon='fa fa-pencil-square-o pl-20'
-        />
+        { type === 'lesson' &&
+          <ActionBlock
+            title='우리동네로 call hada'
+            desc='내게 맞는 레슨이 없다고 좌절하지 마세요. 여러분이 원하는 지역과 시간대로 레슨을 개설해드립니다.'
+            link='/apply-lesson'
+            btnTxt='출장레슨 신청'
+            btnIcon='fa fa-pencil-square-o pl-20'
+          />
+        }
       </div>
     )
   }
+}
+
+ItemView.contextTypes = {
+  router: React.PropTypes.object
 }
 
 ItemView.propTypes = {
@@ -559,7 +680,9 @@ ItemView.propTypes = {
   appendReviewsByGroupName: React.PropTypes.func,
   appendInquiriesByGroupName: React.PropTypes.func,
   relatedItems: React.PropTypes.array,
-  fetchRelatedItems: React.PropTypes.func
+  fetchRelatedItems: React.PropTypes.func,
+  fetchProduct: React.PropTypes.func,
+  unselectProduct: React.PropTypes.func
 }
 
 export default ItemView

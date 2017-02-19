@@ -1,15 +1,21 @@
 import { connect } from 'react-redux'
-import { fetchLessons, fetchLessonsByMainCategory } from 'store/lesson'
+import { fetchLessons, fetchLessonsByMainCategory, clearLessons } from 'store/lesson'
+import { fetchProductsByMainCategory, clearProducts, fetchProductsBySubCategory } from 'store/product'
 
 import ItemListView from '../components/ItemListView'
 
 const mapDispatchToProps = {
   fetchLessons,
-  fetchLessonsByMainCategory
+  fetchLessonsByMainCategory,
+  fetchProductsByMainCategory,
+  fetchProductsBySubCategory,
+  clearLessons,
+  clearProducts
 }
 
 const mapStateToProps = (state) => ({
-  items: state.lesson.lessonList
+  lessonList: state.lesson.lessonList,
+  productList: state.product.productList
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ItemListView)

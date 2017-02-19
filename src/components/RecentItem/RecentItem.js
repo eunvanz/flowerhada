@@ -6,7 +6,7 @@ class RecentItem extends React.Component {
   render () {
     const { item } = this.props
     return (
-      <div className='media margin-clear'>
+      <div className='media' style={{ marginBottom: '10px' }}>
         <div className='media-left'>
           <div className='overlay-container'>
             <img className='media-object' src={item.titleImg} style={{ maxWidth: '100px', cursor: 'pointer' }} />
@@ -20,10 +20,10 @@ class RecentItem extends React.Component {
           </h5>
           <p className='margin-clear'>
             <small>
-              {item.type === 'lesson' ? '플라워레슨' : '꽃다발'} <i className='fa fa-angle-right' /> {item.mainCategory}
+              {item.type === 'lesson' ? '플라워레슨' : item.mainCategory} <i className='fa fa-angle-right' /> {item.type === 'lesson' ? item.mainCategory : item.subCategory}
             </small>
           </p>
-          <p className='price'>￦{numeral(item.price).format('0,0')}</p>
+          <p className='price' style={{ marginBottom: '0px' }}>￦{numeral(item.price).format('0,0')}</p>
         </div>
       </div>
     )

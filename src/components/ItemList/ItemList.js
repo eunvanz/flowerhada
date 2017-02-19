@@ -1,5 +1,5 @@
 import React from 'react'
-import LessonItem from '../LessonItem'
+import ProductItem from '../ProductItem'
 
 class ItemList extends React.Component {
   componentDidMount () {
@@ -8,11 +8,13 @@ class ItemList extends React.Component {
   render () {
     const renderItems = () => {
       const returnComponent = []
-      if (this.props.itemType === 'lesson') {
-        const lessons = this.props.items
-        for (const lesson of lessons) {
-          returnComponent.push(<LessonItem key={lesson.id} lesson={lesson} />)
-        }
+      const items = this.props.items
+      for (const item of items) {
+        returnComponent.push(<ProductItem key={item.id} item={item} type={this.props.itemType} />)
+      }
+      if (returnComponent.length === 0) {
+        return <div className='text-center'
+          style={{ height: '100px', top: '50px', position: 'relative' }}>현재 판매중인 상품이 없습니다.</div>
       }
       return returnComponent
     }

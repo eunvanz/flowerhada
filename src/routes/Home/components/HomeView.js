@@ -13,11 +13,15 @@ class HomeView extends React.Component {
     super(props)
     this.displayName = 'HomeView'
     this._handleOnClickMoreLesson = this._handleOnClickMoreLesson.bind(this)
+    this._handleOnClickMoreFlowers = this._handleOnClickMoreFlowers.bind(this)
   }
   componentDidMount () {
     this.props.fetchMainBanners()
     .then(() => {
       return this.props.fetchLessons()
+    })
+    .then(() => {
+      return this.props.fetchProducts()
     })
     .then(() => {
       const scripts = [
@@ -41,6 +45,9 @@ class HomeView extends React.Component {
   _handleOnClickMoreLesson () {
     this.context.router.push('/item-list/lesson/all')
   }
+  _handleOnClickMoreFlowers () {
+    this.context.router.push('/item-list/flower/all')
+  }
   render () {
     const renderBanner = () => {
       if (this.props.mainBanners.length > 0) {
@@ -54,6 +61,14 @@ class HomeView extends React.Component {
         return <ItemList items={this.props.lessons} itemType='lesson' />
       } else {
         return <Loading text='레슨 목록을 불러오는 중..' />
+      }
+    }
+    const renderFlowers = () => {
+      if (this.props.products) {
+        return <ItemList
+          items={this.props.products.filter(product => product.mainCategory === '꽃다발')} itemType='product' />
+      } else {
+        return <Loading text='꽃다발 목록을 불러오는 중..' />
       }
     }
     return (
@@ -108,7 +123,8 @@ class HomeView extends React.Component {
             <div className='row'>
               <div className='col-md-12'>
                 <h3>플라워레슨
-                <button className='pull-right btn btn-animated btn-default-transparent btn-sm'>
+                <button className='pull-right btn btn-animated btn-default-transparent btn-sm'
+                  onClick={this._handleOnClickMoreLesson}>
                   더 보기
                   <i className='fa fa-plus' />
                 </button></h3>
@@ -130,21 +146,34 @@ class HomeView extends React.Component {
             </div>
           </div>
         </section>
-        {/* <section className='section white-bg clearfix'>
+        <section className='section white-bg clearfix'>
           <div className='container'>
             <div className='row'>
               <div className='col-md-12'>
                 <h3>꽃다발
-                <button className='pull-right btn btn-animated btn-default-transparent btn-sm'>
+                <button onClick={this._handleOnClickMoreFlowers}
+                  className='pull-right btn btn-animated btn-default-transparent btn-sm'>
                   더 보기
                   <i className='fa fa-plus' />
                 </button></h3>
                 <hr />
-                <ItemList />
+                {renderFlowers()}
+                <Button
+                  className='btn-block'
+                  onClick={this._handleOnClickMoreFlowers}
+                  process={false}
+                  square
+                  color='gray'
+                  textComponent={
+                    <span>
+                      <i className='text-default fa fa-plus' /> 더 많은 꽃다발 보기
+                    </span>
+                  }
+                />
               </div>
             </div>
           </div>
-        </section> */}
+        </section>
         {/* <section className='section white-bg clearfix'>
           <div className='container'>
             <div className='row'>
@@ -173,7 +202,9 @@ HomeView.propTypes = {
   fetchMainBanners: React.PropTypes.func.isRequired,
   mainBanners: React.PropTypes.array.isRequired,
   lessons: React.PropTypes.array.isRequired,
-  fetchLessons: React.PropTypes.func.isRequired
+  fetchLessons: React.PropTypes.func.isRequired,
+  products: React.PropTypes.array.isRequired,
+  fetchProducts: React.PropTypes.func.isRequired
 }
 
 export default HomeView

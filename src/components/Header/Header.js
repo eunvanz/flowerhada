@@ -237,26 +237,26 @@ class Header extends React.Component {
                               </Link>
                               <ul className='dropdown-menu'>
                                 <li>
-                                  <Link to='/lessons/hobby'>취미반</Link>
+                                  <Link to='/item-list/lesson/취미반'>취미반</Link>
                                 </li>
                                 <li>
-                                  <Link to='/lessons/business'>창업반</Link>
+                                  <Link to='/item-list/lesson/창업반'>창업반</Link>
                                 </li>
                                 <li>
-                                  <Link to='/lessons/oneday'>원데이레슨</Link>
+                                  <Link to='/item-list/lesson/원데이레슨'>원데이레슨</Link>
                                 </li>
                               </ul>
                             </li>
                             <li className='dropdown'>
-                              <Link to='/lessons' className='dropdown-toggle' data-toggle='dropdown'>
+                              <Link to='/item-list/flower/all' className='dropdown-toggle' data-toggle='dropdown'>
                                 꽃다발
                               </Link>
                               <ul className='dropdown-menu'>
                                 <li>
-                                  <Link to='/lessons/hobby'>단체꽃다발</Link>
+                                  <Link to='/item-list/flower/단체꽃다발'>단체꽃다발</Link>
                                 </li>
                                 <li>
-                                  <Link to='/lessons/business'>이벤트꽃다발</Link>
+                                  <Link to='/item-list/flower/이벤트꽃다발'>이벤트꽃다발</Link>
                                 </li>
                               </ul>
                             </li>

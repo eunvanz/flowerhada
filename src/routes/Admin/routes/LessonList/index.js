@@ -19,6 +19,6 @@ export default (store) => ({
       cb(null, LessonList)
 
     /* Webpack named bundle   */
-    }, 'lessonList')
+    }, 'lesson-list')
   }
 })

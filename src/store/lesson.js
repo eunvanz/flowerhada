@@ -5,12 +5,11 @@ import { getAllLessons, getLesson, getLessonByMainCategory } from 'common/Lesson
 // ------------------------------------
 export const RECEIVE_LESSONS = 'RECEIVE_LESSONS'
 export const SELECT_LESSON = 'SELECT_LESSON'
-export const UNSELECT_LESSON = 'UNSELECT_LESSON'
 
 // ------------------------------------
 // Actions
 // ------------------------------------
-export function receiveLessons (lessons = []) {
+export function receiveLessons (lessons = null) {
   return {
     type    : RECEIVE_LESSONS,
     payload : { lessonList: lessons }
@@ -25,9 +24,8 @@ export function selectLesson (lesson = null) {
 }
 
 export function unselectLesson () {
-  return {
-    type: UNSELECT_LESSON,
-    payload: { selected: null }
+  return dispatch => {
+    return dispatch(selectLesson(null))
   }
 }
 
@@ -58,10 +56,18 @@ export const fetchLessonsByMainCategory = mainCategory => {
   }
 }
 
+export const clearLessons = () => {
+  return dispatch => {
+    return dispatch(receiveLessons(null))
+  }
+}
+
 export const actions = {
   fetchLessons,
   fetchLesson,
-  fetchLessonsByMainCategory
+  fetchLessonsByMainCategory,
+  unselectLesson,
+  clearLessons
 }
 
 // ------------------------------------
@@ -69,21 +75,18 @@ export const actions = {
 // ------------------------------------
 const ACTION_HANDLERS = {
   [RECEIVE_LESSONS] : (state, action) => {
-    return Object.assign({}, ...state, action.payload)
+    return Object.assign({}, state, action.payload)
   },
   [SELECT_LESSON] : (state, action) => {
-    return Object.assign({}, ...state, action.payload)
-  },
-  [UNSELECT_LESSON] : (state, action) => {
-    return Object.assign({}, ...state, action.payload)
+    return Object.assign({}, state, action.payload)
   }
 }
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
-const initialState = { lessonList: [], selected: null }
-export default function userReducer (state = initialState, action) {
+const initialState = { lessonList: null, selected: null }
+export default function lessonReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
 
   return handler ? handler(state, action) : state
