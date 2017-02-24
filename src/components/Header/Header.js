@@ -4,17 +4,22 @@ import { connect } from 'react-redux'
 import { removeUser, fetchUser } from 'store/user'
 import { removeAuthUser, receiveAuthUser } from 'store/authUser'
 import { address, phone, email, facebook, instagram, ROOT } from 'common/constants'
+import { fetchCartsByUserId, clearCarts } from 'store/cart'
+import WishList from 'components/WishList'
 
 const mapStateToProps = state => ({
   user: state.user,
-  authUser: state.authUser
+  authUser: state.authUser,
+  cartList: state.cart.cartList
 })
 
 const mapDispatchToProps = {
   removeUser,
   removeAuthUser,
   fetchUser,
-  receiveAuthUser
+  receiveAuthUser,
+  fetchCartsByUserId,
+  clearCarts
 }
 
 class Header extends React.Component {
@@ -29,6 +34,9 @@ class Header extends React.Component {
     if (authUser) { // 세션에 authUser가 있을 경우 store에 세팅하고 db에서 user 가져옴
       this.props.receiveAuthUser(authUser)
       this.props.fetchUser(authUser.email)
+      .then(() => {
+        this.props.fetchCartsByUserId(this.props.user.id)
+      })
     }
   }
   _handleOnClickLogout () {
@@ -36,9 +44,11 @@ class Header extends React.Component {
     sessionStorage.removeItem('authUser')
     this.props.removeUser()
     this.props.removeAuthUser()
+    this.props.clearCarts()
     this.context.router.push('/')
   }
   render () {
+    const { cartList } = this.props
     return (
       <div className='header-container'>
         <div className='header-top dark'>
@@ -146,6 +156,48 @@ class Header extends React.Component {
                   <div className='header-dropdown-buttons visible-xs'>
                     <div className='btn-group dropdown'>
                       <button type='button' className='btn dropdown-toggle' data-toggle='dropdown'>
+                        <i className='fa fa-star' />
+                        <span className='cart-count default-bg'>12</span>
+                      </button>
+                      <ul className='dropdown-menu dropdown-menu-right dropdown-animation'>
+                        <li>
+                          <table className='table table-hover'>
+                            <thead>
+                              <tr>
+                                <th className='quantity'>수량</th>
+                                <th className='product'>상품</th>
+                                <th className='amount'>합계</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td className='quantity'>2 x</td>
+                                <td className='product'>
+                                  <Link to='/'>
+                                    유러피안 웨딩부케
+                                  </Link>
+                                </td>
+                                <td className='amout'>50만원</td>
+                              </tr>
+                              <tr>
+                                <td className='total-quantity' colSpan='2'>총 2개의 아이템</td>
+                                <td className='total-amount'>50만원</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                          <div className='panel-body text-right'>
+                            <Link to='/cart' className='btn btn-group btn-gray btn-sm'>
+                              자세히보기
+                            </Link>
+                            <Link to='/checkout' className='btn btn-group btn-gray btn-sm'>
+                              결제하기
+                            </Link>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+                    {/* <div className='btn-group dropdown'>
+                      <button type='button' className='btn dropdown-toggle' data-toggle='dropdown'>
                         <i className='icon-search' />
                       </button>
                       <ul className='dropdown-menu dropdown-menu-right dropdown-animation'>
@@ -158,7 +210,7 @@ class Header extends React.Component {
                           </form>
                         </li>
                       </ul>
-                    </div>
+                    </div> */}
                     <div className='btn-group dropdown'>
                       <button type='button' className='btn dropdown-toggle' data-toggle='dropdown'>
                         <i className='icon-basket-1' />
@@ -237,6 +289,9 @@ class Header extends React.Component {
                               </Link>
                               <ul className='dropdown-menu'>
                                 <li>
+                                  <Link to='/item-list/lesson/all'>전체</Link>
+                                </li>
+                                <li>
                                   <Link to='/item-list/lesson/취미반'>취미반</Link>
                                 </li>
                                 <li>
@@ -253,6 +308,9 @@ class Header extends React.Component {
                               </Link>
                               <ul className='dropdown-menu'>
                                 <li>
+                                  <Link to='/item-list/flower/all'>전체</Link>
+                                </li>
+                                <li>
                                   <Link to='/item-list/flower/단체꽃다발'>단체꽃다발</Link>
                                 </li>
                                 <li>
@@ -261,11 +319,11 @@ class Header extends React.Component {
                               </ul>
                             </li>
                             <li>
-                              <Link to='/lessons' className='dropdown-toggle' data-toggle='dropdown'>
+                              <Link to='/item-list/wedding/all'>
                                 웨딩
                               </Link>
                             </li>
-                            <li>
+                            {/* <li>
                               <Link to='/lessons' className='dropdown-toggle' data-toggle='dropdown'>
                                 이벤트
                               </Link>
@@ -274,7 +332,7 @@ class Header extends React.Component {
                               <Link to='/lessons' className='dropdown-toggle' data-toggle='dropdown'>
                                 갤러리
                               </Link>
-                            </li>
+                            </li> */}
                             <li className='dropdown'>
                               <Link to='/lessons' className='dropdown-toggle' data-toggle='dropdown'>
                                 hada STORY
@@ -310,6 +368,16 @@ class Header extends React.Component {
                           </ul>
                           <div className='header-dropdown-buttons hidden-xs'>
                             <div className='btn-group dropdown'>
+                              <button type='button' className='btn dropdown-toggle' data-toggle='dropdown'
+                                id='wishListBtn'>
+                                <i className='fa fa-heart' />
+                                <span className='cart-count default-bg'>
+                                  {!cartList ? '0' : cartList.length}
+                                </span>
+                              </button>
+                              <WishList items={cartList.filter(cart => cart.type === '위시리스트')} />
+                            </div>
+                            {/* <div className='btn-group dropdown'>
                               <button type='button' className='btn dropdown-toggle' data-toggle='dropdown'>
                                 <i className='icon-search' />
                               </button>
@@ -323,7 +391,7 @@ class Header extends React.Component {
                                   </form>
                                 </li>
                               </ul>
-                            </div>
+                            </div> */}
                             <div className='btn-group dropdown'>
                               <button type='button' className='btn dropdown-toggle' data-toggle='dropdown'>
                                 <i className='icon-basket-1' />
@@ -387,7 +455,10 @@ Header.propTypes = {
   removeAuthUser: PropTypes.func.isRequired,
   authUser: PropTypes.object,
   receiveAuthUser: PropTypes.func.isRequired,
-  fetchUser: PropTypes.func.isRequired
+  fetchUser: PropTypes.func.isRequired,
+  fetchCartsByUserId: PropTypes.func.isRequired,
+  clearCarts: PropTypes.func.isRequired,
+  cartList: PropTypes.array
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header)

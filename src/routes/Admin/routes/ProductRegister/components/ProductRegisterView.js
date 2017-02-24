@@ -22,6 +22,7 @@ class ProductListView extends React.Component {
       groupName: '',
       relationName: '',
       soldout: false,
+      activated: true,
       mode: this.props.params.id === 'register' ? 'register' : 'update'
     }
     this._handleOnChangeCheckbox = this._handleOnChangeCheckbox.bind(this)
@@ -184,6 +185,12 @@ class ProductListView extends React.Component {
             onChange={this._handleOnChangeCheckbox}
             checked={this.state.soldout ? 'checked' : ''}
             label='판매종료'
+          />
+          <Checkbox
+            id='activated'
+            onChange={this._handleOnChangeCheckbox}
+            checked={this.state.activated ? 'checked' : ''}
+            label='노출'
           />
           <label htmlFor='content'>내용</label>
           <textarea id='content' defaultValue={this.state.content} />

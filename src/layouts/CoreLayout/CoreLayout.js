@@ -71,6 +71,10 @@ class CoreLayout extends React.Component {
             {
               'rel': 'stylesheet',
               'href': `${ROOT}/template/css/custom.css`
+            },
+            {
+              'rel': 'stylesheet',
+              'href': `https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css`
             }
           ]}
         />

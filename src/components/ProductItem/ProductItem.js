@@ -2,10 +2,48 @@ import React from 'react'
 import { Link } from 'react-router'
 import { getDiscountPercentage, convertDateToString, extractDaysFromLessonDays } from 'common/util'
 import numeral from 'numeral'
+import { postCart, deleteCart } from 'common/CartService'
+import { fetchCartsByUserId } from 'store/cart'
+import { connect } from 'react-redux'
+
+const mapStateToProps = state => ({
+  user: state.user,
+  cartList: state.cart.cartList
+})
+
+const mapDispatchToProps = {
+  fetchCartsByUserId
+}
 
 class ProductItem extends React.Component {
+  constructor (props) {
+    super(props)
+    this._handleOnClickAddToWishList = this._handleOnClickAddToWishList.bind(this)
+    this._handleOnClickRemoveFromWishList = this._handleOnClickRemoveFromWishList.bind(this)
+  }
+  _handleOnClickAddToWishList () {
+    const cart = new URLSearchParams()
+    cart.append('userId', this.props.user.id)
+    if (this.props.type === 'lesson') {
+      cart.append('lessonId', this.props.item.id)
+    } else {
+      cart.append('productId', this.props.item.id)
+    }
+    cart.append('type', '위시리스트')
+    postCart(cart)
+    .then(() => {
+      return this.props.fetchCartsByUserId(this.props.user.id)
+    })
+  }
+  _handleOnClickRemoveFromWishList () {
+    const { item, user, type } = this.props
+    deleteCart(user.id, type, item.id)
+    .then(() => {
+      return this.props.fetchCartsByUserId(this.props.user.id)
+    })
+  }
   render () {
-    const item = this.props.item
+    const { item, cartList, type } = this.props
     const renderPrice = () => {
       let returnComponent = null
       if (item.discountedPrice &&
@@ -39,7 +77,7 @@ class ProductItem extends React.Component {
       }
     }
     const renderCategory = () => {
-      if (this.props.type === 'flower') {
+      if (this.props.type === 'product' && item.subCategory) {
         return (
           <p className='margin-clear'>
             <small>
@@ -83,6 +121,24 @@ class ProductItem extends React.Component {
         )
       }
     }
+    const renderWishListButton = () => {
+      if (cartList && cartList.filter(cart => {
+        if (type === 'lesson') return cart.lessonId === item.id && cart.type === '위시리스트'
+        else return cart.productId === item.id && cart.type === '위시리스트'
+      }).length > 0) {
+        return (
+          <a style={{ cursor: 'pointer' }} onClick={this._handleOnClickRemoveFromWishList}>
+            <i className='fa fa-times pr-10' /> 위시리스트에서 제거
+          </a>
+        )
+      } else {
+        return (
+          <a style={{ cursor: 'pointer' }} onClick={this._handleOnClickAddToWishList}>
+            <i className='fa fa-heart-o pr-10' /> 위시리스트에 담기
+          </a>
+        )
+      }
+    }
     return (
       <div className='col-md-4 masonry-grid-item'>
         <div className='listing-item white-bg bordered mb-20'>
@@ -94,9 +150,7 @@ class ProductItem extends React.Component {
             {renderDiscountBadge()}
             <div className='overlay-to-top links'>
               <span className='small'>
-                <Link to='/'>
-                  <i className='fa fa-heart-o pr-10' /> 위시리스트에 담기
-                </Link>
+                {renderWishListButton()}
               </span>
             </div>
           </div>
@@ -124,7 +178,10 @@ class ProductItem extends React.Component {
 
 ProductItem.propTypes = {
   item: React.PropTypes.object.isRequired,
-  type: React.PropTypes.string.isRequired
+  type: React.PropTypes.string.isRequired,
+  user: React.PropTypes.object,
+  fetchCartsByUserId: React.PropTypes.func.isRequired,
+  cartList: React.PropTypes.array
 }
 
-export default ProductItem
+export default connect(mapStateToProps, mapDispatchToProps)(ProductItem)

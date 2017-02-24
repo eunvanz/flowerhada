@@ -10,7 +10,8 @@ class ItemList extends React.Component {
       const returnComponent = []
       const items = this.props.items
       for (const item of items) {
-        returnComponent.push(<ProductItem key={item.id} item={item} type={this.props.itemType} />)
+        returnComponent
+        .push(<ProductItem key={item.id} item={item} type={this.props.itemType} />)
       }
       if (returnComponent.length === 0) {
         return <div className='text-center'

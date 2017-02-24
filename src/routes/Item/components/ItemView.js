@@ -22,19 +22,20 @@ class ItemView extends React.Component {
   constructor (props) {
     super(props)
     let date = new Date()
-    date = new Date(date.valueOf() + (24 * 60 * 60 * 1000))
+    date = new Date(date.valueOf() + (24 * 60 * 60 * 1000 * 2))
     this.state = {
       showMap: false,
       quantity: 1,
-      totalAmount: 0,
+      option1: { name: '선택안함', price: 0 },
+      option2: { name: '선택안함', price: 0 },
+      option3: { name: '선택안함', price: 0 },
       tabActivated: 'review',
       commentModal: { show: false, type: 'review' },
       reviews: { curPage: 0, perPage: 5, isLoading: false },
       inquiries: { curPage: 0, perPage: 5, isLoading: false },
       loading: { isLoading: true, text: '상품 정보를 불러오는 중..' },
       receiveDate: date.toISOString(),
-      receiveTime: '오전 10시 ~ 오전 12시',
-      option: '선택안함'
+      receiveTime: '오전 10시 ~ 오전 12시'
     }
     this._handleOnClickShowMap = this._handleOnClickShowMap.bind(this)
     this._handleOnClickHideMap = this._handleOnClickHideMap.bind(this)
@@ -50,6 +51,7 @@ class ItemView extends React.Component {
     this._isValidPage = this._isValidPage.bind(this)
     this._handleOnChangeDate = this._handleOnChangeDate.bind(this)
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
+    this._initializeState = this._initializeState.bind(this)
   }
   componentDidMount () {
     window.scrollTo(0, 0)
@@ -62,6 +64,7 @@ class ItemView extends React.Component {
   componentDidUpdate (prevProps, prevState) {
     if (this.props.params !== prevProps.params) {
       this._unselectItem()
+      this._initializeState()
       this._loadItemInfo()
       window.scrollTo(0, 0)
     }
@@ -70,6 +73,24 @@ class ItemView extends React.Component {
     this._unselectItem(this.props.params.type)
     this.props.clearInquiries()
     this.props.clearReviews()
+  }
+  _initializeState () {
+    let date = new Date()
+    date = new Date(date.valueOf() + (24 * 60 * 60 * 1000 * 2))
+    this.setState({
+      showMap: false,
+      quantity: 1,
+      option1: { name: '선택안함', price: 0 },
+      option2: { name: '선택안함', price: 0 },
+      option3: { name: '선택안함', price: 0 },
+      tabActivated: 'review',
+      commentModal: { show: false, type: 'review' },
+      reviews: { curPage: 0, perPage: 5, isLoading: false },
+      inquiries: { curPage: 0, perPage: 5, isLoading: false },
+      loading: { isLoading: true, text: '상품 정보를 불러오는 중..' },
+      receiveDate: date.toISOString(),
+      receiveTime: '오전 10시 ~ 오전 12시'
+    })
   }
   _isValidPage () {
     const { type } = this.props.params
@@ -93,6 +114,7 @@ class ItemView extends React.Component {
         this.context.router.push('/not-found')
         return
       }
+      this.setState({ itemPrice: this.props.item.price })
       this.props.fetchReviewsByGroupName(this.props.item.groupName,
         this.state.reviews.curPage, this.state.reviews.perPage)
     })
@@ -104,7 +126,6 @@ class ItemView extends React.Component {
       this.props.fetchRelatedItems(this.props.item, type)
     })
     .then(() => {
-      this.setState({ totalAmount: this.props.item.price })
       const recentItem = {
         id: this.props.item.id,
         type: type,
@@ -127,9 +148,8 @@ class ItemView extends React.Component {
   }
   _handleOnChangeQuantity (e) {
     let quantity = e.target.value
-    const item = this.props.item
     if (quantity < 1) quantity = 1
-    this.setState({ quantity, totalAmount: item.price * quantity })
+    this.setState({ quantity })
   }
   _handleOnClickTab (e) {
     const type = e.target.dataset.type
@@ -171,14 +191,17 @@ class ItemView extends React.Component {
   }
   _handleOnChangeDate (value, formattedValue) {
     let receiveDate = value
-    const today = new Date().toISOString()
-    if (value < today) receiveDate = today
+    const today = new Date()
+    const theDayAfterTomorrow = new Date(today.valueOf() + (24 * 60 * 60 * 1000 * 2)).toISOString()
+    if (value < theDayAfterTomorrow) receiveDate = theDayAfterTomorrow
     this.setState({ receiveDate: receiveDate })
   }
   _handleOnChangeInput (e) {
     const id = e.target.id
     const value = e.target.value
-    this.setState({ [id]: value })
+    const name = value.split(':')[0]
+    const price = Number(value.split(':')[1])
+    this.setState({ [id]: { name, price } })
   }
   render () {
     const { type } = this.props.params
@@ -282,7 +305,7 @@ class ItemView extends React.Component {
           </table>
         )
         /* eslint-enable */
-      } else if (type === 'product') {
+      } else if (item.mainCategory === '꽃다발') {
         return (
           <table className='table' style={{ marginBottom: '0px' }}>
             <tbody>
@@ -308,10 +331,11 @@ class ItemView extends React.Component {
               <tr>
                 <td className='text-right' style={{ width: '120px', paddingTop: '18px' }}><strong>옵션</strong></td>
                 <td>
-                  <select className='form-control' id='option' style={{ width: '200px' }}
-                    value={this.state.option} onChange={this._handleOnChangeInput}>
-                    <option value='선택안함'>선택안함</option>
-                    <option value='편지추가'>편지추가 (무료)</option>
+                  <select className='form-control' id='option1' style={{ width: '200px' }}
+                    value={this.state.option1.name + ':' + this.state.option1.price}
+                    onChange={this._handleOnChangeInput}>
+                    <option value='선택안함:0'>선택안함</option>
+                    <option value='편지추가:0'>편지추가 (무료)</option>
                   </select>
                 </td>
               </tr>
@@ -319,6 +343,65 @@ class ItemView extends React.Component {
           </table>
         )
         /* eslint-enable */
+      } else if (item.subCategory === '부케') {
+        return (
+          <table className='table' style={{ marginBottom: '0px' }}>
+            <tbody>
+              <tr>
+                <td className='text-right' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령일</strong></td>
+                <td>
+                  <DatePicker
+                    id='receiveDate'
+                    onChange={this._handleOnChangeDate}
+                    value={this.state.receiveDate}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td className='text-right' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령시간</strong></td>
+                <td>
+                  <select className='form-control' id='receiveTime' style={{ width: '200px' }}
+                    value={this.state.receiveTime} onChange={this._handleOnChangeInput}>
+                    {renderTimeOptions()}
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td className='text-right' style={{ width: '120px', paddingTop: '18px' }}><strong>코사지</strong></td>
+                <td>
+                  <select className='form-control' id='option1' style={{ width: '200px' }}
+                    value={this.state.option1.name + ':' + this.state.option1.price}
+                    onChange={this._handleOnChangeInput}>
+                    <option value='선택안함:0'>선택안함</option>
+                    <option value='코사지1:8000'>코사지1 (+8,000)</option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td className='text-right' style={{ width: '120px', paddingTop: '18px' }}><strong>부토니에</strong></td>
+                <td>
+                  <select className='form-control' id='option2' style={{ width: '200px' }}
+                    value={this.state.option2.name + ':' + this.state.option2.price}
+                    onChange={this._handleOnChangeInput}>
+                    <option value='선택안함:0'>선택안함</option>
+                    <option value='부토니에1:8000' data-price={8000}>부토니에1 (+8,000)</option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td className='text-right' style={{ width: '120px', paddingTop: '18px' }}><strong>플라워샤워</strong></td>
+                <td>
+                  <select className='form-control option' id='option3' style={{ width: '200px' }}
+                    value={this.state.option3.name + ':' + this.state.option3.price}
+                    onChange={this._handleOnChangeInput}>
+                    <option value='선택안함:0'>선택안함</option>
+                    <option value='플라워샤워:8000' data-price={8000}>플라워샤워 (+8,000)</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        )
       }
     }
     const renderLessonQuantity = () => {
@@ -331,13 +414,20 @@ class ItemView extends React.Component {
       }
       return returnComponent
     }
+    const getItemPrice = () => {
+      return (this.props.item.discountedPrice === 0 ? this.props.item.price : this.props.item.discountedPrice) +
+        this.state.option1.price + this.state.option2.price + this.state.option3.price
+    }
+    const getTotalPrice = () => {
+      return getItemPrice() * this.state.quantity
+    }
     const renderOptions = () => {
       if (type === 'lesson') {
         /* eslint-disable */
         return (
           <div>
             <div className='form-group'>
-              {`￦${numeral(item.price).format('0,0')} * `}
+              {`￦${numeral(getItemPrice()).format('0,0')} `}<i className='fa fa-times-circle' />{' '}
               <select className='form-control' id='quantity' value={this.state.quantity} onChange={this._handleOnChangeQuantity}>
                 {renderLessonQuantity()}
               </select>
@@ -348,7 +438,7 @@ class ItemView extends React.Component {
         return (
           <div>
             <div className='form-group'>
-              {`￦${numeral(item.price).format('0,0')} * `}
+              {`￦${numeral(getItemPrice()).format('0,0')} `}<i className='fa fa-times-circle' />{' '}
               <TextField style={{ width: '50px', paddingRight: '5px', paddingLeft: '5px' }} type='number' id='quantity' value={this.state.quantity} onChange={this._handleOnChangeQuantity} /> 개
             </div>
           </div>
@@ -376,7 +466,7 @@ class ItemView extends React.Component {
             </div>
             <div className='light-gray-bg p-20 bordered clearfix'>
               <span className='product price'>
-                <i className='icon-tag pr-10' />￦<span className='text-default'>{numeral(this.state.totalAmount).format('0,0')}</span>
+                <i className='icon-tag pr-10' />￦<span className='text-default'>{numeral(getTotalPrice()).format('0,0')}</span>
               </span>
               <div className='product elements-list pull-right clearfix'>
                 <Button className='margin-clear' animated
@@ -511,7 +601,7 @@ class ItemView extends React.Component {
         <section className='pv-30'>
           <div className='container'>
             <div className='row'>
-              <div className='col-md-8'>
+              <div className='col-md-8' style={{ marginBottom: '80px' }}>
                 <ul className='nav nav-tabs style-4' role='tabList'>
                   <li className={this.state.tabActivated === 'review' ? 'active' : null}>
                     <a style={{ cursor: 'pointer' }} onClick={this._handleOnClickTab} data-type='review'>

@@ -26,7 +26,8 @@ const webpackConfig = {
       images: 'static/images',
       store: 'store',
       routes: 'routes',
-      containers: 'containers'
+      containers: 'containers',
+      template: 'static/template'
     }
   },
   module : {}
@@ -140,6 +141,11 @@ webpackConfig.module.loaders = [{
   test   : /\.json$/,
   loader : 'json'
 }]
+
+webpackConfig.module.loaders.push({
+  test: /template\/.+\.(jsx|js)$/,
+  loader: 'imports?jQuery=jquery,$=jquery,this=>window'
+})
 
 // ------------------------------------
 // Style Loaders

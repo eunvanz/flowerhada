@@ -16,6 +16,7 @@ class ProductListView extends React.Component {
             <td>{product.mainCategory}</td>
             <td>{product.subCategory}</td>
             <td>{product.soldout ? '품절' : '판매중'}</td>
+            <td>{product.activated ? '활성' : '비활성'}</td>
           </tr>
         )
       })
@@ -31,6 +32,7 @@ class ProductListView extends React.Component {
               <th>카테고리</th>
               <th>서브카테고리</th>
               <th>상태</th>
+              <th>노출</th>
             </tr>
           </thead>
           <tbody>

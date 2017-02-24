@@ -1,6 +1,7 @@
 import { connect } from 'react-redux'
-import { fetchAuthUser } from '../../../store/authUser'
-import { fetchUser } from '../../../store/user'
+import { fetchAuthUser } from 'store/authUser'
+import { fetchUser } from 'store/user'
+import { fetchCartsByUserId } from 'store/cart'
 
 /*  This is a container component. Notice it does not contain any JSX,
     nor does it import React. This component is **only** responsible for
@@ -15,11 +16,13 @@ import login from '../components/login'
 
 const mapDispatchToProps = {
   fetchAuthUser,
-  fetchUser
+  fetchUser,
+  fetchCartsByUserId
 }
 
 const mapStateToProps = (state) => ({
-  authUser: state.authUser
+  authUser: state.authUser,
+  user: state.user
 })
 
 /*  Note: mapStateToProps is where you should use `reselect` to create selectors, ie:

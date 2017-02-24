@@ -49,7 +49,7 @@ class HomeCard extends React.Component {
           <p>
             {this.props.content}
           </p>
-          <Link to={`/${this.props.link}`}>
+          <Link to={`${this.props.link}`}>
             더 보기 <i className='pl-5 fa fa-angle-double-right' />
           </Link>
         </div>

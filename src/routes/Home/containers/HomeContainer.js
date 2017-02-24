@@ -14,7 +14,8 @@ const mapDispatchToProps = {
 const mapStateToProps = (state) => ({
   mainBanners : state.home.mainBanners,
   lessons: state.lesson.lessonList,
-  products: state.product.productList
+  products: state.product.productList,
+  user: state.user
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeView)

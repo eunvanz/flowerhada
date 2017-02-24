@@ -14,6 +14,7 @@ class HomeView extends React.Component {
     this.displayName = 'HomeView'
     this._handleOnClickMoreLesson = this._handleOnClickMoreLesson.bind(this)
     this._handleOnClickMoreFlowers = this._handleOnClickMoreFlowers.bind(this)
+    this._handleOnClickMoreWeddings = this._handleOnClickMoreWeddings.bind(this)
   }
   componentDidMount () {
     this.props.fetchMainBanners()
@@ -48,6 +49,9 @@ class HomeView extends React.Component {
   _handleOnClickMoreFlowers () {
     this.context.router.push('/item-list/flower/all')
   }
+  _handleOnClickMoreWeddings () {
+    this.context.router.push('/item-list/wedding/all')
+  }
   render () {
     const renderBanner = () => {
       if (this.props.mainBanners.length > 0) {
@@ -71,6 +75,14 @@ class HomeView extends React.Component {
         return <Loading text='꽃다발 목록을 불러오는 중..' />
       }
     }
+    const renderWeddings = () => {
+      if (this.props.products) {
+        return <ItemList
+          items={this.props.products.filter(product => product.mainCategory === '웨딩')} itemType='product' />
+      } else {
+        return <Loading text='웨딩상품 목록을 불러오는 중..' />
+      }
+    }
     return (
       <div>
         {renderBanner()}
@@ -92,21 +104,21 @@ class HomeView extends React.Component {
                 img='flower-scissors.jpg'
                 actionName='플라워레슨'
                 content='꽃은 시든 일상에 생기를 불어넣어 줍니다. 플라워레슨으로 일상에 생기를 불어넣어보세요.'
-                link='lessons'
+                link='/item-list/lesson/all'
               />
               <HomeCard
                 title='꽃다발'
                 img='flower-bunch.jpg'
                 actionName='꽃다발'
                 content='뜻깊은 이벤트에 꽃이 빠질 수 없겠죠? 톤 & 매너에 맞는 꽃다발로 마음을 전달하세요.'
-                link='bunch'
+                link='/item-list/flower/all'
               />
               <HomeCard
                 title='웨딩'
                 img='wedding-bouquet.jpg'
                 actionName='웨딩'
                 content='꽃이 없는 웨딩은 앙꼬 없는 찐빵. hada가 제안하는 웨딩솔루션으로 결혼식을 화사하게 밝혀보세요.'
-                link='lessons/business'
+                link='/item-list/wedding/all'
               />
             </div>
           </div>
@@ -174,7 +186,7 @@ class HomeView extends React.Component {
             </div>
           </div>
         </section>
-        {/* <section className='section white-bg clearfix'>
+        <section className='section white-bg clearfix'>
           <div className='container'>
             <div className='row'>
               <div className='col-md-12'>
@@ -184,11 +196,23 @@ class HomeView extends React.Component {
                   <i className='fa fa-plus' />
                 </button></h3>
                 <hr />
-                <ItemList />
+                {renderWeddings()}
+                <Button
+                  className='btn-block'
+                  onClick={this._handleOnClickMoreWeddings}
+                  process={false}
+                  square
+                  color='gray'
+                  textComponent={
+                    <span>
+                      <i className='text-default fa fa-plus' /> 더 많은 웨딩상품 보기
+                    </span>
+                  }
+                />
               </div>
             </div>
           </div>
-        </section> */}
+        </section>
       </div>
     )
   }
@@ -201,10 +225,11 @@ HomeView.contextTypes = {
 HomeView.propTypes = {
   fetchMainBanners: React.PropTypes.func.isRequired,
   mainBanners: React.PropTypes.array.isRequired,
-  lessons: React.PropTypes.array.isRequired,
+  lessons: React.PropTypes.array,
   fetchLessons: React.PropTypes.func.isRequired,
-  products: React.PropTypes.array.isRequired,
-  fetchProducts: React.PropTypes.func.isRequired
+  products: React.PropTypes.array,
+  fetchProducts: React.PropTypes.func.isRequired,
+  user: React.PropTypes.object
 }
 
 export default HomeView

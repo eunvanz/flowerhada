@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router'
 import backgroundImage from '../assets/images/background.jpg'
-import { setInlineScripts } from '../../../common/util'
+import { setInlineScripts } from 'common/util'
 import validator from 'validator'
 import $ from 'jquery'
 
@@ -22,7 +22,8 @@ class Login extends React.Component {
   componentDidMount () {
     const scripts = [
       'template/plugins/waypoints/jquery.waypoints.min.js',
-      'template/js/template.js'
+      'template/js/template.js',
+      'template/js/naverLogin_implicit-1.0.2.js'
     ]
     setInlineScripts(scripts)
     $('#inputPassword').keypress((e) => {
@@ -54,6 +55,9 @@ class Login extends React.Component {
     })
     .then(() => {
       return this.props.fetchUser(this.props.authUser.data.email)
+    })
+    .then(() => {
+      return this.props.fetchCartsByUserId(this.props.user.id)
     })
     .then(() => {
       this.context.router.push('/')
@@ -172,7 +176,9 @@ class Login extends React.Component {
 Login.propTypes = {
   authUser: React.PropTypes.object,
   fetchAuthUser: React.PropTypes.func.isRequired,
-  fetchUser: React.PropTypes.func.isRequired
+  fetchUser: React.PropTypes.func.isRequired,
+  fetchCartsByUserId: React.PropTypes.func.isRequired,
+  user: React.PropTypes.object
 }
 
 Login.contextTypes = {
