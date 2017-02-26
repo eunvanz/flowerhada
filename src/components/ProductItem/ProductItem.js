@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router'
 import { getDiscountPercentage, convertDateToString, extractDaysFromLessonDays } from 'common/util'
 import numeral from 'numeral'
-import { postCart, deleteCart } from 'common/CartService'
+import { postCart, deleteCartByUserIdAndItemTypeAndItemIdAndCartType } from 'common/CartService'
 import { fetchCartsByUserId } from 'store/cart'
 import { connect } from 'react-redux'
 
@@ -22,6 +22,10 @@ class ProductItem extends React.Component {
     this._handleOnClickRemoveFromWishList = this._handleOnClickRemoveFromWishList.bind(this)
   }
   _handleOnClickAddToWishList () {
+    if (!this.props.user) {
+      this.context.router.push('/login')
+      return
+    }
     const cart = new URLSearchParams()
     cart.append('userId', this.props.user.id)
     if (this.props.type === 'lesson') {
@@ -37,7 +41,7 @@ class ProductItem extends React.Component {
   }
   _handleOnClickRemoveFromWishList () {
     const { item, user, type } = this.props
-    deleteCart(user.id, type, item.id)
+    deleteCartByUserIdAndItemTypeAndItemIdAndCartType(user.id, type, item.id, '위시리스트')
     .then(() => {
       return this.props.fetchCartsByUserId(this.props.user.id)
     })
@@ -174,6 +178,10 @@ class ProductItem extends React.Component {
       </div>
     )
   }
+}
+
+ProductItem.contextTypes = {
+  router: React.PropTypes.object.isRequired
 }
 
 ProductItem.propTypes = {

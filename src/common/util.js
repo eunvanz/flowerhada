@@ -170,3 +170,19 @@ export const setRecentItemToLocalStorage = item => {
 export const removeEmptyIndex = arr => {
   return arr.filter(elem => elem !== '')
 }
+
+export const convertNumberAmountToTextAmount = amount => {
+  const amountString = amount.toString()
+  const amountStringLength = amountString.length
+  let first = ''
+  let second = ''
+  if (amountStringLength < 5) {
+    first = '0'
+    second = amountString.slice(0, amountString.indexOf('0'))
+  } else {
+    first = amountString.slice(0, -4)
+    second = amountString.slice(-4)
+    second = second.slice(0, second.indexOf('0'))
+  }
+  return `${first}${second.length > 0 ? '.' : ''}${second}`
+}

@@ -9,8 +9,12 @@ export const putCart = (cart, id) => {
   return axios.put(`${API_BASE_URL}/carts/${id}`, cart)
 }
 
-export const deleteCart = (userId, type, itemId) => {
-  return axios.delete(`${API_BASE_URL}/carts/user/${userId}/${type}/${itemId}`)
+export const deleteCartByUserIdAndItemTypeAndItemIdAndCartType = (userId, itemType, itemId, cartType) => {
+  return axios.delete(`${API_BASE_URL}/carts/user/${userId}/${itemType}/${itemId}/${cartType}`)
+}
+
+export const deleteCartById = id => {
+  return axios.delete(`${API_BASE_URL}/carts/${id}`)
 }
 
 export const getCartsByUserId = userId => {

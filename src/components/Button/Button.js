@@ -3,7 +3,7 @@ import React, { PropTypes } from 'react'
 class Button extends React.Component {
   render () {
     const color = () => {
-      let result = this.props.link ? ' link-' : ' btn-'
+      let result = this.props.link ? ' text-' : ' btn-'
       switch (this.props.color) {
         case 'white': {
           result += 'default-transparent'
@@ -19,6 +19,22 @@ class Button extends React.Component {
         }
         case 'dark': {
           result += 'dark'
+          break
+        }
+        case 'primary': {
+          result += 'primary'
+          break
+        }
+        case 'info': {
+          result += 'info'
+          break
+        }
+        case 'warning': {
+          result += 'warning'
+          break
+        }
+        case 'danger': {
+          result += 'danger'
           break
         }
         default: {
@@ -59,7 +75,7 @@ class Button extends React.Component {
         className={`${this.props.link ? '' : 'btn'}${this.props.square ? ' square' : ''}
         ${this.props.circle ? ' radius-50' : ''}${color()}${size()}${animated()} ${this.props.className}`}
         onClick={this.props.onClick}
-        style={this.props.style}
+        style={{ ...this.props.style, cursor: 'pointer' }}
       >
         {this.props.process ? <span>처리중... <i className='fa fa-spinner fa-pulse' /></span> : this.props.textComponent}
       </a>

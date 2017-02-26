@@ -6,6 +6,7 @@ import { removeAuthUser, receiveAuthUser } from 'store/authUser'
 import { address, phone, email, facebook, instagram, ROOT } from 'common/constants'
 import { fetchCartsByUserId, clearCarts } from 'store/cart'
 import WishList from 'components/WishList'
+import CartWindow from 'components/CartWindow'
 
 const mapStateToProps = state => ({
   user: state.user,
@@ -155,46 +156,13 @@ class Header extends React.Component {
                 <div className='header-left clearfix'>
                   <div className='header-dropdown-buttons visible-xs'>
                     <div className='btn-group dropdown'>
-                      <button type='button' className='btn dropdown-toggle' data-toggle='dropdown'>
+                      <button type='button' id='wishListBtnSm' className='btn dropdown-toggle' data-toggle='dropdown'>
                         <i className='fa fa-star' />
-                        <span className='cart-count default-bg'>12</span>
+                        <span className='cart-count default-bg'>
+                          {!cartList ? '0' : cartList.filter(cart => cart.type === '위시리스트').length}
+                        </span>
                       </button>
-                      <ul className='dropdown-menu dropdown-menu-right dropdown-animation'>
-                        <li>
-                          <table className='table table-hover'>
-                            <thead>
-                              <tr>
-                                <th className='quantity'>수량</th>
-                                <th className='product'>상품</th>
-                                <th className='amount'>합계</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                <td className='quantity'>2 x</td>
-                                <td className='product'>
-                                  <Link to='/'>
-                                    유러피안 웨딩부케
-                                  </Link>
-                                </td>
-                                <td className='amout'>50만원</td>
-                              </tr>
-                              <tr>
-                                <td className='total-quantity' colSpan='2'>총 2개의 아이템</td>
-                                <td className='total-amount'>50만원</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                          <div className='panel-body text-right'>
-                            <Link to='/cart' className='btn btn-group btn-gray btn-sm'>
-                              자세히보기
-                            </Link>
-                            <Link to='/checkout' className='btn btn-group btn-gray btn-sm'>
-                              결제하기
-                            </Link>
-                          </div>
-                        </li>
-                      </ul>
+                      <WishList buttonIdToBind='wishListBtnSm' items={cartList && cartList.filter(cart => cart.type === '위시리스트')} />
                     </div>
                     {/* <div className='btn-group dropdown'>
                       <button type='button' className='btn dropdown-toggle' data-toggle='dropdown'>
@@ -212,46 +180,13 @@ class Header extends React.Component {
                       </ul>
                     </div> */}
                     <div className='btn-group dropdown'>
-                      <button type='button' className='btn dropdown-toggle' data-toggle='dropdown'>
+                      <button type='button' className='btn dropdown-toggle cart-btn' data-toggle='dropdown'>
                         <i className='icon-basket-1' />
-                        <span className='cart-count default-bg'>12</span>
+                        <span className='cart-count default-bg'>
+                          {!cartList ? '0' : cartList.filter(cart => cart.type === '장바구니').length}
+                        </span>
                       </button>
-                      <ul className='dropdown-menu dropdown-menu-right dropdown-animation cart'>
-                        <li>
-                          <table className='table table-hover'>
-                            <thead>
-                              <tr>
-                                <th className='quantity'>수량</th>
-                                <th className='product'>상품</th>
-                                <th className='amount'>합계</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                <td className='quantity'>2 x</td>
-                                <td className='product'>
-                                  <Link to='/'>
-                                    유러피안 웨딩부케
-                                  </Link>
-                                </td>
-                                <td className='amout'>50만원</td>
-                              </tr>
-                              <tr>
-                                <td className='total-quantity' colSpan='2'>총 2개의 아이템</td>
-                                <td className='total-amount'>50만원</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                          <div className='panel-body text-right'>
-                            <Link to='/cart' className='btn btn-group btn-gray btn-sm'>
-                              자세히보기
-                            </Link>
-                            <Link to='/checkout' className='btn btn-group btn-gray btn-sm'>
-                              결제하기
-                            </Link>
-                          </div>
-                        </li>
-                      </ul>
+                      <CartWindow items={cartList && cartList.filter(cart => cart.type === '장바구니')} />
                     </div>
                   </div>
                   <div id='logo' className='logo'>
@@ -372,10 +307,11 @@ class Header extends React.Component {
                                 id='wishListBtn'>
                                 <i className='fa fa-heart' />
                                 <span className='cart-count default-bg'>
-                                  {!cartList ? '0' : cartList.length}
+                                  {!cartList ? '0' : cartList.filter(cart => cart.type === '위시리스트').length}
                                 </span>
                               </button>
-                              <WishList items={cartList.filter(cart => cart.type === '위시리스트')} />
+                              <WishList buttonIdToBind='wishListBtn'
+                                items={cartList && cartList.filter(cart => cart.type === '위시리스트')} />
                             </div>
                             {/* <div className='btn-group dropdown'>
                               <button type='button' className='btn dropdown-toggle' data-toggle='dropdown'>
@@ -393,46 +329,13 @@ class Header extends React.Component {
                               </ul>
                             </div> */}
                             <div className='btn-group dropdown'>
-                              <button type='button' className='btn dropdown-toggle' data-toggle='dropdown'>
+                              <button type='button' className='btn dropdown-toggle cart-btn' data-toggle='dropdown'>
                                 <i className='icon-basket-1' />
-                                <span className='cart-count default-bg'>12</span>
+                                <span className='cart-count default-bg'>
+                                  {!cartList ? '0' : cartList.filter(cart => cart.type === '장바구니').length}
+                                </span>
                               </button>
-                              <ul className='dropdown-menu dropdown-menu-right dropdown-animation cart'>
-                                <li>
-                                  <table className='table table-hover'>
-                                    <thead>
-                                      <tr>
-                                        <th className='quantity'>수량</th>
-                                        <th className='product'>상품</th>
-                                        <th className='amount'>합계</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      <tr>
-                                        <td className='quantity'>2 x</td>
-                                        <td className='product'>
-                                          <Link to='/'>
-                                            유러피안 웨딩부케
-                                          </Link>
-                                        </td>
-                                        <td className='amout'>50만원</td>
-                                      </tr>
-                                      <tr>
-                                        <td className='total-quantity' colSpan='2'>총 2개의 아이템</td>
-                                        <td className='total-amount'>50만원</td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                  <div className='panel-body text-right'>
-                                    <Link to='/cart' className='btn btn-group btn-gray btn-sm'>
-                                      자세히보기
-                                    </Link>
-                                    <Link to='/checkout' className='btn btn-group btn-gray btn-sm'>
-                                      결제하기
-                                    </Link>
-                                  </div>
-                                </li>
-                              </ul>
+                              <CartWindow items={cartList && cartList.filter(cart => cart.type === '장바구니')} />
                             </div>
                           </div>
                         </div>
@@ -447,6 +350,10 @@ class Header extends React.Component {
       </div>
     )
   }
+}
+
+Header.contextType = {
+  router: PropTypes.object.isRequired
 }
 
 Header.propTypes = {

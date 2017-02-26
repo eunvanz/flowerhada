@@ -1,6 +1,7 @@
 import { connect } from 'react-redux'
 import { fetchLesson, unselectLesson } from 'store/lesson'
 import { fetchProduct, unselectProduct } from 'store/product'
+import { fetchCartsByUserId } from 'store/cart'
 import { fetchReviewsByGroupName, clearReviews,
   fetchInquiriesByGroupName, clearInquiries,
   appendReviewsByGroupName, appendInquiriesByGroupName, fetchRelatedItems } from '../modules/item'
@@ -18,7 +19,8 @@ const mapDispatchToProps = {
   appendInquiriesByGroupName,
   fetchRelatedItems,
   fetchProduct,
-  unselectProduct
+  unselectProduct,
+  fetchCartsByUserId
 }
 
 const mapStateToProps = (state) => ({
@@ -26,7 +28,8 @@ const mapStateToProps = (state) => ({
   reviews: state.item.reviews,
   inquiries: state.item.inquiries,
   user: state.user,
-  relatedItems: state.item.relatedItems
+  relatedItems: state.item.relatedItems,
+  carts: state.cart.cartList
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ItemView)

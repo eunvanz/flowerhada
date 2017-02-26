@@ -21,9 +21,9 @@ class Login extends React.Component {
   }
   componentDidMount () {
     const scripts = [
-      'template/plugins/waypoints/jquery.waypoints.min.js',
-      'template/js/template.js',
-      'template/js/naverLogin_implicit-1.0.2.js'
+      '/template/plugins/waypoints/jquery.waypoints.min.js',
+      '/template/js/template.js',
+      '/template/js/naverLogin_implicit-1.0.2-min.js'
     ]
     setInlineScripts(scripts)
     $('#inputPassword').keypress((e) => {
@@ -86,6 +86,9 @@ class Login extends React.Component {
     $('label').css('color', '#777777')
   }
   render () {
+    if (this.props.user) {
+      this.context.router.push('/')
+    }
     return (
       <div className='main-container dark-translucent-bg'
         style={{ backgroundImage: 'url(' + backgroundImage + ')' }}

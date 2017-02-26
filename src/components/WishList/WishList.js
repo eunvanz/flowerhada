@@ -26,13 +26,13 @@ class WishList extends React.Component {
     // })
   }
   _onClickPrevButton () {
-    $('#wishListBtn').click()
+    $(`#${this.props.buttonIdToBind}`).click()
     let page = this.state.curPage - 1
     if (page < 1) page = Math.ceil(this.props.items.length / this.state.perPage)
     this.setState({ curPage: page })
   }
   _onClickNextButton () {
-    $('#wishListBtn').click()
+    $(`#${this.props.buttonIdToBind}`).click()
     let page = this.state.curPage + 1
     if (page > Math.ceil(this.props.items.length / this.state.perPage)) page = 1
     this.setState({ curPage: page })
@@ -40,7 +40,7 @@ class WishList extends React.Component {
   render () {
     const { items } = this.props
     const { curPage, perPage } = this.state
-    const currentItems = items.slice((curPage - 1) * perPage, (curPage - 1) * perPage + perPage)
+    const currentItems = items ? items.slice((curPage - 1) * perPage, (curPage - 1) * perPage + perPage) : null
     const renderWishList = () => {
       return currentItems.map(item => {
         item.product ? item.product.type = 'product' : item.lesson.type = 'lesson'
@@ -64,14 +64,14 @@ class WishList extends React.Component {
         { items && items.length > this.state.perPage &&
           <div className='row'>
             <div className='col-xs-4'>
-              <Button size='sm' color='dark-bordered' onClick={this._onClickPrevButton}
+              <Button size='sm' color='gray' onClick={this._onClickPrevButton}
                 textComponent={<span><i className='fa fa-chevron-left pr-10' /> 이전</span>} />
             </div>
             <div className='col-xs-4 text-center' style={{ paddingTop: '10px' }}>
               <small>{this.state.curPage}/{Math.ceil(items.length / this.state.perPage)}</small>
             </div>
             <div className='col-xs-4 text-right'>
-              <Button size='sm' color='dark-bordered' className='pull-right' onClick={this._onClickNextButton}
+              <Button size='sm' color='gray' className='pull-right' onClick={this._onClickNextButton}
                 textComponent={<span>다음 <i className='fa fa-chevron-right pr-10'
                   style={{ paddingLeft: '10px', paddingRight: '0px' }} /></span>} />
             </div>
@@ -83,7 +83,8 @@ class WishList extends React.Component {
 }
 
 WishList.propTypes = {
-  items: PropTypes.array
+  items: PropTypes.array,
+  buttonIdToBind: PropTypes.string.isRequired
 }
 
 export default WishList

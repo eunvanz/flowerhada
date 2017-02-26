@@ -17,6 +17,7 @@ import TextField from 'components/TextField'
 import ImageCarousel from 'components/ImageCarousel'
 import Parallax from 'components/Parallax'
 import DatePicker from 'components/DatePicker'
+import { deleteCartByUserIdAndItemTypeAndItemIdAndCartType, postCart } from 'common/CartService'
 
 class ItemView extends React.Component {
   constructor (props) {
@@ -52,6 +53,10 @@ class ItemView extends React.Component {
     this._handleOnChangeDate = this._handleOnChangeDate.bind(this)
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
     this._initializeState = this._initializeState.bind(this)
+    this._handleOnClickRemoveFromWishList = this._handleOnClickRemoveFromWishList.bind(this)
+    this._getItemPrice = this._getItemPrice.bind(this)
+    this._getTotalPrice = this._getTotalPrice.bind(this)
+    this._handleOnClickAddToCart = this._handleOnClickAddToCart.bind(this)
   }
   componentDidMount () {
     window.scrollTo(0, 0)
@@ -162,7 +167,30 @@ class ItemView extends React.Component {
     paneToHide.removeClass('active')
   }
   _handleOnClickAddToWishList () {
-    return
+    const { user, item, params, fetchCartsByUserId } = this.props
+    if (!user) {
+      this.context.router.push('/login')
+      return
+    }
+    const wishList = new URLSearchParams()
+    wishList.append('userId', user.id)
+    if (params.type === 'lesson') {
+      wishList.append('lessonId', item.id)
+    } else {
+      wishList.append('productId', item.id)
+    }
+    wishList.append('type', '위시리스트')
+    postCart(wishList)
+    .then(() => {
+      return fetchCartsByUserId(user.id)
+    })
+  }
+  _handleOnClickRemoveFromWishList () {
+    const { item, user, params } = this.props
+    deleteCartByUserIdAndItemTypeAndItemIdAndCartType(user.id, params.type, item.id, '위시리스트')
+    .then(() => {
+      return this.props.fetchCartsByUserId(this.props.user.id)
+    })
   }
   _handleOnClickWriteComment () {
     this.setState({ commentModal: { show: true, type: this.state.tabActivated } })
@@ -202,6 +230,39 @@ class ItemView extends React.Component {
     const name = value.split(':')[0]
     const price = Number(value.split(':')[1])
     this.setState({ [id]: { name, price } })
+  }
+  _getItemPrice = () => {
+    return (this.props.item.discountedPrice === 0 ? this.props.item.price : this.props.item.discountedPrice) +
+      this.state.option1.price + this.state.option2.price + this.state.option3.price
+  }
+  _getTotalPrice = () => {
+    return this._getItemPrice() * this.state.quantity
+  }
+  _handleOnClickAddToCart () {
+    const { user, params, item, fetchCartsByUserId } = this.props
+    const cart = new URLSearchParams()
+    cart.append('userId', user.id)
+    if (params.type === 'lesson') {
+      cart.append('lessonId', item.id)
+    } else {
+      cart.append('productId', item.id)
+    }
+    cart.append('quantity', this.state.quantity)
+    cart.append('type', '장바구니')
+    const options = []
+    options.push(this.state.option1)
+    options.push(this.state.option2)
+    options.push(this.state.option3)
+    cart.append('options', JSON.stringify(options))
+    cart.append('totalAmount', this._getTotalPrice())
+    cart.append('itemPrice', this._getItemPrice())
+    postCart(cart)
+    .then(() => {
+      return fetchCartsByUserId(user.id)
+    })
+    .then(() => {
+      $('.cart-btn').click()
+    })
   }
   render () {
     const { type } = this.props.params
@@ -414,20 +475,13 @@ class ItemView extends React.Component {
       }
       return returnComponent
     }
-    const getItemPrice = () => {
-      return (this.props.item.discountedPrice === 0 ? this.props.item.price : this.props.item.discountedPrice) +
-        this.state.option1.price + this.state.option2.price + this.state.option3.price
-    }
-    const getTotalPrice = () => {
-      return getItemPrice() * this.state.quantity
-    }
     const renderOptions = () => {
       if (type === 'lesson') {
         /* eslint-disable */
         return (
           <div>
             <div className='form-group'>
-              {`￦${numeral(getItemPrice()).format('0,0')} `}<i className='fa fa-times-circle' />{' '}
+              {`￦${numeral(this._getItemPrice()).format('0,0')} `}<i className='fa fa-times-circle' />{' '}
               <select className='form-control' id='quantity' value={this.state.quantity} onChange={this._handleOnChangeQuantity}>
                 {renderLessonQuantity()}
               </select>
@@ -438,7 +492,7 @@ class ItemView extends React.Component {
         return (
           <div>
             <div className='form-group'>
-              {`￦${numeral(getItemPrice()).format('0,0')} `}<i className='fa fa-times-circle' />{' '}
+              {`￦${numeral(this._getItemPrice()).format('0,0')} `}<i className='fa fa-times-circle' />{' '}
               <TextField style={{ width: '50px', paddingRight: '5px', paddingLeft: '5px' }} type='number' id='quantity' value={this.state.quantity} onChange={this._handleOnChangeQuantity} /> 개
             </div>
           </div>
@@ -466,10 +520,10 @@ class ItemView extends React.Component {
             </div>
             <div className='light-gray-bg p-20 bordered clearfix'>
               <span className='product price'>
-                <i className='icon-tag pr-10' />￦<span className='text-default'>{numeral(getTotalPrice()).format('0,0')}</span>
+                <i className='icon-tag pr-10' />￦<span className='text-default'>{numeral(this._getTotalPrice()).format('0,0')}</span>
               </span>
               <div className='product elements-list pull-right clearfix'>
-                <Button className='margin-clear' animated
+                <Button className='margin-clear' animated onClick={this._handleOnClickAddToCart}
                   textComponent={<span>장바구니에 담기 <i className='fa fa-shopping-cart' /></span>}
                   style={{ marginRight: '3px' }}
                 />
@@ -496,6 +550,17 @@ class ItemView extends React.Component {
       }
       return returnComponent
     }
+    const renderWishListButton = () => {
+      const { carts } = this.props
+      if (carts && carts.filter(cart => {
+        if (type === 'lesson') return cart.lessonId === item.id && cart.type === '위시리스트'
+        else return cart.productId === item.id && cart.type === '위시리스트'
+      }).length > 0) {
+        return <Button link size='sm' onClick={this._handleOnClickRemoveFromWishList} color='danger' textComponent={<span>위시리스트에서 제거 <i className='fa fa-times' /></span>} /> // eslint-disable-line
+      } else {
+        return <Button link size='sm' onClick={this._handleOnClickAddToWishList} color='default' textComponent={<span>위시리스트 담기 <i className='fa fa-heart' /></span>} /> // eslint-disable-line
+      }
+    }
     const renderProductSection = () => {
       /* eslint-disable */
       return (
@@ -513,7 +578,7 @@ class ItemView extends React.Component {
                     </div>
                     <div className='col-md-6'>
                       <h2>{item.title}</h2>
-                      <p>{item.detail}<LinkButton onClick={this._handleOnClickAddToWishList} textComponent={<span>위시리스트 담기 <i className='fa fa-heart' /></span>} /></p>
+                      <p>{item.detail}{renderWishListButton()}</p>
                       {renderSpecs()}
                       {renderPrice()}
                     </div>
@@ -772,7 +837,9 @@ ItemView.propTypes = {
   relatedItems: React.PropTypes.array,
   fetchRelatedItems: React.PropTypes.func,
   fetchProduct: React.PropTypes.func,
-  unselectProduct: React.PropTypes.func
+  unselectProduct: React.PropTypes.func,
+  fetchCartsByUserId: React.PropTypes.func.isRequired,
+  carts: React.PropTypes.array
 }
 
 export default ItemView
