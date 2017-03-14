@@ -7,6 +7,8 @@ import MessageModal from '../../../components/MessageModal'
 import validator from 'validator'
 import $ from 'jquery'
 import Loading from '../../../components/Loading'
+import PhoneNumberInput from 'components/PhoneNumberInput'
+import keygen from 'keygenerator'
 
 class SignUp extends React.Component {
   constructor (props) {
@@ -18,7 +20,8 @@ class SignUp extends React.Component {
       passwordConfirm: '',
       name: '',
       isAgreed: false,
-      showMessagePopup: false
+      showMessagePopup: false,
+      phone: ['010', '', '']
     }
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
     this._handleOnClickSubmit = this._handleOnClickSubmit.bind(this)
@@ -30,6 +33,8 @@ class SignUp extends React.Component {
     this._checkNameField = this._checkNameField.bind(this)
     this._showErrorMessage = this._showErrorMessage.bind(this)
     this._convertSuccessForm = this._convertSuccessForm.bind(this)
+    this._checkPhoneField = this._checkPhoneField.bind(this)
+    this._handleOnChangePhone = this._handleOnChangePhone.bind(this)
   }
   componentDidMount () {
     const scripts = [
@@ -45,6 +50,12 @@ class SignUp extends React.Component {
   _handleOnChangeInput (e) {
     e.preventDefault()
     this.setState({ [e.target.name]: e.target.value })
+  }
+  _handleOnChangePhone (e) {
+    const { index } = e.target.dataset
+    const phone = this.state.phone
+    phone[index] = e.target.value
+    this.setState({ phone })
   }
   _handleOnChangeAgreed (e) {
     this.setState({ isAgreed: e.target.checked })
@@ -156,6 +167,20 @@ class SignUp extends React.Component {
       return true
     }
   }
+  _checkPhoneField () {
+    const phone = this.state.phone
+    let message = ''
+    if (validator.isEmpty(phone[1]) || validator.isEmpty(phone[2])) message = '휴대폰 번호를 입력해주세요.'
+    else if (!validator.isNumeric(phone[1] + phone[2])) message = '휴대폰 번호는 숫자만 입력해주세요.'
+    if (message !== '') {
+      this._showErrorMessage($('#formGroupPhone'), $('#formGroupPhone i'), $('#formGroupPhone .message'), message)
+      return false
+    } else {
+      this._convertSuccessForm($('#formGroupPhone'), $('#formGroupPhone i'),
+        $('#formGroupPhone .message'))
+      return true
+    }
+  }
   _showErrorMessage (formGroupElement, iconElement, messageElement, message) {
     formGroupElement.attr('class', 'form-group has-error has-feedback')
     iconElement.attr('class', 'fa fa-times form-control-feedback')
@@ -247,7 +272,7 @@ class SignUp extends React.Component {
                     </div>
                   </div>
                   <div className='form-group has-feedback' id='formGroupName'>
-                    <label htmlFor='inputEmail' className='col-sm-3 control-label'>
+                    <label htmlFor='inputName' className='col-sm-3 control-label'>
                       이름 <span className='text-danger small'>*</span>
                     </label>
                     <div className='col-sm-8'>
@@ -255,6 +280,21 @@ class SignUp extends React.Component {
                         onBlur={this._checkNameField}
                         name='name' placeholder='실명을 기입해주세요.' required />
                       <i className='fa fa-user form-control-feedback' />
+                      <div className='text-right small message' />
+                    </div>
+                  </div>
+                  <div className='form-group has-feedback' id='formGroupPhone'>
+                    <label htmlFor='inputPhone' className='col-sm-3 control-label'>
+                      휴대폰 번호 <span className='text-danger small'>*</span>
+                    </label>
+                    <div className='col-sm-8'>
+                      <PhoneNumberInput
+                        valueStart={this.state.phone[0]}
+                        valueMid={this.state.phone[1]}
+                        valueEnd={this.state.phone[2]}
+                        onChange={this._handleOnChangePhone}
+                        onBlur={this._checkPhoneField}
+                      />
                       <div className='text-right small message' />
                     </div>
                   </div>
@@ -287,6 +327,7 @@ class SignUp extends React.Component {
           message={'이용약관과 개인정보수집에 동의해주세요.'}
           confirmBtnTxt={'확인'}
           onConfirmClick={this._handleOnClickMessageClose}
+          id={keygen._()}
         />
       </div>
     )

@@ -15,7 +15,7 @@ class ItemList extends React.Component {
       }
       if (returnComponent.length === 0) {
         return <div className='text-center'
-          style={{ height: '100px', top: '50px', position: 'relative' }}>현재 판매중인 상품이 없습니다.</div>
+          style={{ height: '100px', top: '50px', position: 'relative' }}><i className='fa fa-exclamation-triangle' /> 현재 판매중인 상품이 없습니다.</div>
       }
       return returnComponent
     }

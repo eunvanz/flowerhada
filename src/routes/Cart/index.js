@@ -1,7 +1,5 @@
-import { injectReducer } from 'store/reducers'
-
 export default (store) => ({
-  path : 'main-banner/:id',
+  path: 'cart/:type',
   /*  Async getComponent is only invoked when route matches   */
   getComponent (nextState, cb) {
     /*  Webpack - use 'require.ensure' to create a split point
@@ -9,16 +7,16 @@ export default (store) => ({
     require.ensure([], (require) => {
       /*  Webpack - use require callback to define
           dependencies for bundling   */
-      const MainBannerRegister = require('./containers/MainBannerRegisterContainer').default
-      const reducer = require('./modules/mainBannerRegister').default
+      const Cart = require('./containers/CartContainer').default
+      // const reducer = require('./modules/login').default
 
       /*  Add the reducer to the store on key 'counter'  */
-      injectReducer(store, { key: 'mainBannerRegister', reducer })
+      // injectReducer(store, { key: 'login', reducer })
 
       /*  Return getComponent   */
-      cb(null, MainBannerRegister)
+      cb(null, Cart)
 
     /* Webpack named bundle   */
-    }, 'main-banner-register')
+    }, 'cart')
   }
 })

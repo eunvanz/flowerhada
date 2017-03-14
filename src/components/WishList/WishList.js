@@ -17,13 +17,10 @@ class WishList extends React.Component {
     this._onClickNextButton = this._onClickNextButton.bind(this)
     this._onClickPrevButton = this._onClickPrevButton.bind(this)
   }
-  componentDidMount () {
-    // $('#wishList').owlCarousel({
-    //   singleItem: true,
-    //   navigation: true,
-    //   pagination: true,
-    //   autoPlay: false
-    // })
+  componentWillUpdate (nextProps, nextState) {
+    if (this.state.curPage !== 1 && nextProps.items.length <= this.state.perPage) {
+      this.setState({ curPage: 1 })
+    }
   }
   _onClickPrevButton () {
     $(`#${this.props.buttonIdToBind}`).click()

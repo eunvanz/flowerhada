@@ -19,6 +19,6 @@ export default (store) => ({
       cb(null, MainBannerList)
 
     /* Webpack named bundle   */
-    }, 'mainBannerList')
+    }, 'main-banner-list')
   }
 })

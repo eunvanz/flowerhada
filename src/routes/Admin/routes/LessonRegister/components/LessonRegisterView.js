@@ -238,6 +238,7 @@ class LessonListView extends React.Component {
     const postCode = document.getElementById('postCode')
     const address = document.getElementById('address')
     const currentScroll = Math.max(document.body.scrollTop, document.documentElement.scrollTop)
+    const view = this
     new window.daum.Postcode({
       oncomplete: function (data) {
         // 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
@@ -274,6 +275,12 @@ class LessonListView extends React.Component {
             latitude.value = lat
             longitude.value = lng
           }
+        })
+        view.setState({
+          postCode: postCode.value,
+          address: address.value,
+          latitude: latitude.value,
+          longitude: longitude.value
         })
 
         // iframe을 넣은 element를 안보이게 한다.

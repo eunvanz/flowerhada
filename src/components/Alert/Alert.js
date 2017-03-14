@@ -15,7 +15,7 @@ class Alert extends React.Component {
       }
     }
     return (
-      <div className={`alert alert-icon alert-${this.props.type}`} role='alert'>
+      <div className={`alert alert-icon alert-${this.props.type} ${this.props.className ? this.props.className : ''}`} role='alert'>
         <i className={`fa fa-${getIcon()}`} />
         {this.props.text}
       </div>
@@ -25,7 +25,8 @@ class Alert extends React.Component {
 
 Alert.propTypes = {
   type: PropTypes.string.isRequired,
-  text: PropTypes.string.isRequired
+  text: PropTypes.string.isRequired,
+  className: PropTypes.string
 }
 
 export default Alert

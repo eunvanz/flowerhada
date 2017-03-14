@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react'
 import keygen from 'keygenerator'
-import { setInlineScripts } from 'common/util'
+import { setInlineScripts, clearInlineScripts } from 'common/util'
 // import $ from 'jquery'
 // import 'template/plugins/magnific-popup/jquery.magnific-popup.min.js'
 // import Slider from 'react-slick'
@@ -101,6 +101,15 @@ class ImageCarousel extends React.Component {
   //       sync2.trigger('owl.goTo', num - 1)
   //     }
   //   }
+  }
+  componentDidUpdate (prevProps, prevState) {
+    if (prevState.index !== this.state.index) {
+      const scripts = ['/template/js/inline-image-carousel.js']
+      setInlineScripts(scripts)
+    }
+  }
+  componentWillUnmount () {
+    clearInlineScripts()
   }
   _handleOnClickThumbnail (e) {
     this.setState({

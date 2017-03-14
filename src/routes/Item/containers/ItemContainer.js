@@ -2,6 +2,7 @@ import { connect } from 'react-redux'
 import { fetchLesson, unselectLesson } from 'store/lesson'
 import { fetchProduct, unselectProduct } from 'store/product'
 import { fetchCartsByUserId } from 'store/cart'
+import { receiveOrderItem } from 'store/order'
 import { fetchReviewsByGroupName, clearReviews,
   fetchInquiriesByGroupName, clearInquiries,
   appendReviewsByGroupName, appendInquiriesByGroupName, fetchRelatedItems } from '../modules/item'
@@ -20,7 +21,8 @@ const mapDispatchToProps = {
   fetchRelatedItems,
   fetchProduct,
   unselectProduct,
-  fetchCartsByUserId
+  fetchCartsByUserId,
+  receiveOrderItem
 }
 
 const mapStateToProps = (state) => ({

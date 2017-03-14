@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react'
-import { IndexLink, Link } from 'react-router'
+import { IndexLink, Link, browserHistory } from 'react-router'
 import { connect } from 'react-redux'
 import { removeUser, fetchUser } from 'store/user'
 import { removeAuthUser, receiveAuthUser } from 'store/authUser'
@@ -46,7 +46,7 @@ class Header extends React.Component {
     this.props.removeUser()
     this.props.removeAuthUser()
     this.props.clearCarts()
-    this.context.router.push('/')
+    browserHistory.push('/')
   }
   render () {
     const { cartList } = this.props

@@ -1,8 +1,10 @@
 import numeral from 'numeral'
 
 export const clearInlineScripts = () => {
-  while (document.body.childElementCount !== 6) {
-    document.body.removeChild(document.body.lastChild)
+  const scriptElements = document.body.getElementsByTagName('SCRIPT')
+  while (scriptElements.length > 11) {
+    const length = scriptElements.length
+    document.body.removeChild(scriptElements[length - 1])
   }
 }
 
@@ -185,4 +187,12 @@ export const convertNumberAmountToTextAmount = amount => {
     second = second.slice(0, second.indexOf('0'))
   }
   return `${first}${second.length > 0 ? '.' : ''}${second}`
+}
+
+export const dividePhoneNumber = phoneNumber => {
+  return phoneNumber ? phoneNumber.split('-') : null
+}
+
+export const assemblePhoneNumber = phoneNumberArr => {
+  return `${phoneNumberArr[0]}-${phoneNumberArr[1]}-${phoneNumberArr[2]}`
 }

@@ -7,6 +7,7 @@ import Admin from './Admin'
 import Item from './Item'
 import ItemList from './ItemList'
 import NotFound from './NotFound'
+import Cart from './Cart'
 
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
@@ -21,6 +22,7 @@ export const createRoutes = (store) => ({
     Admin(store),
     Item(store),
     ItemList(store),
+    Cart(store),
     NotFound(store)
   ]
 })

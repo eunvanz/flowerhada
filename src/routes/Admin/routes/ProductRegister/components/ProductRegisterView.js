@@ -23,6 +23,7 @@ class ProductListView extends React.Component {
       relationName: '',
       soldout: false,
       activated: true,
+      deliveryType: '퀵',
       mode: this.props.params.id === 'register' ? 'register' : 'update'
     }
     this._handleOnChangeCheckbox = this._handleOnChangeCheckbox.bind(this)
@@ -77,6 +78,7 @@ class ProductListView extends React.Component {
     product.append('content', window.tinymce.get('content').getContent())
     product.append('titleImg', $('#titleImg').val())
     product.append('images', JSON.stringify(removeEmptyIndex(this.state.images)))
+    product.append('deliveryType', this.state.deliveryType)
     let action = putProduct
     if (this.state.mode === 'register') action = postProduct
     action(product, this.props.params.id)
@@ -192,6 +194,15 @@ class ProductListView extends React.Component {
             checked={this.state.activated ? 'checked' : ''}
             label='노출'
           />
+          <div className='form-group'>
+            <label htmlFor='groupName'>배송타입</label>
+            <select id='deliveryType' className='form-control'
+              onChange={this._handleOnChangeInput} value={this.state.deliveryType}
+            >
+              <option value='퀵'>퀵</option>
+              <option value='택배'>택배</option>
+            </select>
+          </div>
           <label htmlFor='content'>내용</label>
           <textarea id='content' defaultValue={this.state.content} />
           <button type='button' className='btn btn-default' style={{ marginRight: '3px' }}

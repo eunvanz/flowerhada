@@ -18,7 +18,7 @@ class Button extends React.Component {
           break
         }
         case 'dark': {
-          result += 'dark'
+          result = this.props.link ? 'link-dark' : result + 'dark'
           break
         }
         case 'primary': {
@@ -71,11 +71,12 @@ class Button extends React.Component {
     return (
       <a
         id={this.props.id}
-        href={this.props.href}
+        href={!this.props.disabled ? this.props.href : null}
         className={`${this.props.link ? '' : 'btn'}${this.props.square ? ' square' : ''}
         ${this.props.circle ? ' radius-50' : ''}${color()}${size()}${animated()} ${this.props.className}`}
-        onClick={this.props.onClick}
+        onClick={!this.props.disabled ? this.props.onClick : null}
         style={{ ...this.props.style, cursor: 'pointer' }}
+        disabled={this.props.disabled}
       >
         {this.props.process ? <span>처리중... <i className='fa fa-spinner fa-pulse' /></span> : this.props.textComponent}
       </a>
@@ -96,7 +97,8 @@ Button.propTypes = {
   circle: PropTypes.bool,
   className: PropTypes.string,
   id: PropTypes.string,
-  process: PropTypes.bool
+  process: PropTypes.bool,
+  disabled: PropTypes.bool
 }
 
 export default Button

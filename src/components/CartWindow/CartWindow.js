@@ -29,9 +29,9 @@ class CartWindow extends React.Component {
               <table className='table table-hover'>
                 <thead>
                   <tr>
-                    <th className='quantity'>수량</th>
+                    <th className='quantity' style={{ width: '60px' }}>수량</th>
                     <th className='product'>상품</th>
-                    <th className='amount'>합계</th>
+                    <th className='amount' style={{ width: '100px' }}>합계</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -51,18 +51,18 @@ class CartWindow extends React.Component {
                 </tbody>
               </table>
               <div className='panel-body text-right'>
-                <Link to='/cart' className='btn btn-group btn-gray btn-sm'>
+                <Link to='/cart/saved' className='btn btn-group btn-gray btn-sm'>
                   자세히보기
                 </Link>
-                <Link to='/checkout' className='btn btn-group btn-gray btn-sm'>
-                  결제하기
+                <Link to='/cart/checkout' className='btn btn-group btn-gray btn-sm'>
+                  주문하기
                 </Link>
               </div>
             </div>
           }
           {(!items || items.length === 0) &&
             <div className='text-center' style={{ margin: '20px' }}>
-              <i className='fa fa-exclamation-triangle' /> 장바구니가 비어있습니다.
+              <i className='fa fa-exclamation-circle' /> 장바구니가 비어있습니다.
             </div>
           }
         </li>

@@ -1,12 +1,22 @@
 import React from 'react'
 import MainBanner from './MainBanner'
-import { setInlineScripts } from 'common/util'
+import { setInlineScripts, clearInlineScripts } from 'common/util'
 import HomeCard from './HomeCard'
 import ItemList from 'components/ItemList'
 import ActionBlock from 'components/ActionBlock'
 import { ROOT } from 'common/constants'
 import Loading from 'components/Loading'
 import Button from 'components/Button'
+// import 'template/plugins/jquery.themepunch.tools.min.js'
+// import 'template/plugins/rs-plugin/js/jquery.themepunch.revolution.min.js'
+// import 'template/plugins/owl-carousel/owl.carousel.js'
+// import 'template/plugins/jquery.browser.js'
+// import 'template/plugins/SmoothScroll.js'
+// import 'template/plugins/waypoints/jquery.waypoints.min.js'
+// import 'template/plugins/magnific-popup/jquery.magnific-popup.min.js'
+// import 'template/plugins/isotope/isotope.pkgd.min.js'
+// import 'template/js/template.js'
+// import 'template/js/inline-home-view.js'
 
 class HomeView extends React.Component {
   constructor (props) {
@@ -42,6 +52,7 @@ class HomeView extends React.Component {
   }
   componentWillUnmount () {
     window.dispatchEvent(new Event('popstate'))
+    clearInlineScripts()
   }
   _handleOnClickMoreLesson () {
     this.context.router.push('/item-list/lesson/all')

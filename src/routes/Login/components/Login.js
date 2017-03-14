@@ -60,7 +60,7 @@ class Login extends React.Component {
       return this.props.fetchCartsByUserId(this.props.user.id)
     })
     .then(() => {
-      this.context.router.push('/')
+      this.context.router.goBack()
     })
     .catch(() => {
       this._showErrorMessage('이메일 혹은 비밀번호가 잘못되었습니다.')

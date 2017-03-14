@@ -20,3 +20,7 @@ export const login = (userInfo) => {
 export const getUserByEmail = email => {
   return axios.get(`${API_BASE_URL}/users?email=${email}`)
 }
+
+export const updateUserPoint = (id, point) => {
+  return axios.put(`${API_BASE_URL}/users/${id}/point/${point}`)
+}

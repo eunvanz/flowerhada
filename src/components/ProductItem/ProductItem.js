@@ -1,10 +1,13 @@
 import React from 'react'
 import { Link } from 'react-router'
-import { getDiscountPercentage, convertDateToString, extractDaysFromLessonDays } from 'common/util'
+import { getDiscountPercentage } from 'common/util'
 import numeral from 'numeral'
 import { postCart, deleteCartByUserIdAndItemTypeAndItemIdAndCartType } from 'common/CartService'
 import { fetchCartsByUserId } from 'store/cart'
 import { connect } from 'react-redux'
+import Button from 'components/Button'
+import LessonDateInfo from 'components/LessonDateInfo'
+import $ from 'jquery'
 
 const mapStateToProps = state => ({
   user: state.user,
@@ -99,47 +102,67 @@ class ProductItem extends React.Component {
         )
       }
     }
-    const renderDateInfo = () => {
-      let returnComponent = null
-      if (item.oneday) {
-        /* eslint-disable */
-        returnComponent = (
-          <span>오는 <span className='text-default'>{convertDateToString(item.lessonDate)}</span>에 진행되는 <span className='text-default'>원데이레슨</span></span>
-        )
-      } else {
-        returnComponent = (
-          <span>
-            오는 <span className='text-default'>{convertDateToString(item.lessonDate)}</span>부터 <span className='text-default'>{`${item.weekType} ${extractDaysFromLessonDays(item.lessonDays)}요일`}</span>에 <span className='text-default'>{item.weekLong}주간</span> 진행
-          </span>
-        )
-        /* eslint-enable */
-      }
-      return returnComponent
-    }
+    // const renderDateInfo = () => {
+    //   let returnComponent = null
+    //   if (item.oneday) {
+    //     /* eslint-disable */
+    //     returnComponent = (
+    //       <span>오는 <span className='text-default'>{convertDateToString(item.lessonDate)}</span>에 진행되는 <span className='text-default'>원데이레슨</span></span>
+    //     )
+    //   } else {
+    //     returnComponent = (
+    //       <span>
+    //         오는 <span className='text-default'>{convertDateToString(item.lessonDate)}</span>부터 <span className='text-default'>{`${item.weekType} ${extractDaysFromLessonDays(item.lessonDays)}요일`}</span>에 <span className='text-default'>{item.weekLong}주간</span> 진행
+    //       </span>
+    //     )
+    //     /* eslint-enable */
+    //   }
+    //   return returnComponent
+    // }
     const renderTag = () => {
       if (this.props.type === 'lesson') {
         return (
           <p className='small'>
-            {renderDateInfo()}
+            <LessonDateInfo lesson={item} />
           </p>
         )
       }
     }
+    // const renderWishListButton = () => {
+    //   if (cartList && cartList.filter(cart => {
+    //     if (type === 'lesson') return cart.lessonId === item.id && cart.type === '위시리스트'
+    //     else return cart.productId === item.id && cart.type === '위시리스트'
+    //   }).length > 0) {
+    //     return (
+    //       <a style={{ cursor: 'pointer' }} onClick={this._handleOnClickRemoveFromWishList}>
+    //         <i className='fa fa-times pr-10' /> 위시리스트에서 제거
+    //       </a>
+    //     )
+    //   } else {
+    //     return (
+    //       <a style={{ cursor: 'pointer' }} onClick={this._handleOnClickAddToWishList}>
+    //         <i className='fa fa-heart-o pr-10' /> 위시리스트에 담기
+    //       </a>
+    //     )
+    //   }
+    // }
     const renderWishListButton = () => {
       if (cartList && cartList.filter(cart => {
         if (type === 'lesson') return cart.lessonId === item.id && cart.type === '위시리스트'
         else return cart.productId === item.id && cart.type === '위시리스트'
       }).length > 0) {
         return (
-          <a style={{ cursor: 'pointer' }} onClick={this._handleOnClickRemoveFromWishList}>
-            <i className='fa fa-times pr-10' /> 위시리스트에서 제거
-          </a>
+          <Button className='pull-right' animated color='white' style={{ margin: '0px' }}
+            onClick={this._handleOnClickRemoveFromWishList} size='sm'
+            textComponent={<span>위시리스트에서 제거 <i className='fa fa-times' /></span>}
+          />
         )
       } else {
         return (
-          <a style={{ cursor: 'pointer' }} onClick={this._handleOnClickAddToWishList}>
-            <i className='fa fa-heart-o pr-10' /> 위시리스트에 담기
-          </a>
+          <Button className='pull-right' animated color='white' style={{ margin: '0px' }}
+            onClick={this._handleOnClickAddToWishList} size='sm'
+            textComponent={<span>위시리스트에 담기 <i className='fa fa-heart-o' /></span>}
+          />
         )
       }
     }
@@ -152,11 +175,11 @@ class ProductItem extends React.Component {
               <i className='fa fa-search-plus' />
             </Link>
             {renderDiscountBadge()}
-            <div className='overlay-to-top links'>
+            {/* <div className='overlay-to-top links'>
               <span className='small'>
                 {renderWishListButton()}
               </span>
-            </div>
+            </div> */}
           </div>
           <div className='body'>
             {renderCategory()}
@@ -169,9 +192,10 @@ class ProductItem extends React.Component {
             {renderTag()}
             <div className='elements-list clearfix'>
               {renderPrice()}
-              <button className='pull-right margin-clear btn btn-sm btn-default-transparent btn-animated'>
+              {/* <button className='pull-right margin-clear btn btn-sm btn-default-transparent btn-animated'>
                 장바구니에 담기 <i className='fa fa-shopping-cart' />
-              </button>
+              </button> */}
+              {renderWishListButton()}
             </div>
           </div>
         </div>

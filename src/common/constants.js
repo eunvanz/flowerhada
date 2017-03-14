@@ -10,3 +10,5 @@ export const instagram = 'http://instagram.com/flowerhada'
 
 export const DAUM_MAP_API = 'ff33ac36150f399f4df840801b0a6b7c'
 export const IMGUR_CLIENT_ID = 'Client-ID 3573e0629638cc1'
+
+export const orderStatus = ['주문확인중', '배송준비중', '배송완료', '주문취소']

@@ -3,6 +3,8 @@ import CustomModal from 'components/CustomModal'
 import TextField from 'components/TextField'
 import { postCommentImage, postComment, putComment } from 'common/CommentService'
 import Button from 'components/Button'
+import { Tooltip } from 'react-bootstrap'
+import numeral from 'numeral'
 
 class CommentModal extends React.Component {
   constructor (props) {
@@ -73,6 +75,15 @@ class CommentModal extends React.Component {
     }
   }
   render () {
+    const renderImageTooltip = () => {
+      if (this.props.type === 'review' && this.props.imagePoint) {
+        return (
+          <Tooltip placement='right' className='in' id='imagePointInfo' style={{ display: 'inline' }}>
+            <span className='text-default'>+{numeral(this.props.imagePoint).format('0,0')}P</span> 추가적립
+          </Tooltip>
+        )
+      }
+    }
     const renderBody = () => {
       return (
         <div className='row'>
@@ -95,7 +106,9 @@ class CommentModal extends React.Component {
                 (<span className='text-default'>{this.state.content.length}</span>/1000)
               </div>
               <p />
-              <label>이미지첨부</label>
+              <label>이미지첨부
+                {renderImageTooltip()}
+              </label>
               <input type='file' id='image' accept='image/*' />
             </form>
           </div>
@@ -138,7 +151,8 @@ CommentModal.propTypes = {
   userId: React.PropTypes.number,
   afterSubmit: React.PropTypes.func.isRequired,
   parentId: React.PropTypes.number,
-  id: React.PropTypes.string.isRequired
+  id: React.PropTypes.string.isRequired,
+  imagePoint: React.PropTypes.number
 }
 
 export default CommentModal
