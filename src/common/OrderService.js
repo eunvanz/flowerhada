@@ -13,6 +13,10 @@ export const postOrder = order => {
   return axios.post(`${API_BASE_URL}/orders`, order)
 }
 
+export const postOrderTransaction = order => {
+  return axios.post(`${API_BASE_URL}/orders/transaction`, order)
+}
+
 export const updateOrder = (order, id) => {
   return axios.post(`${API_BASE_URL}/orders/${id}`, order)
 }

@@ -6,7 +6,7 @@ import TextField from 'components/TextField'
 import numeral from 'numeral'
 import { deleteCartById, putCart, postCart } from 'common/CartService'
 import LessonDateInfo from 'components/LessonDateInfo'
-import { postOrder } from 'common/OrderService'
+import { postOrderTransaction } from 'common/OrderService'
 import { Tooltip } from 'react-bootstrap'
 import Alert from 'components/Alert'
 import { dividePhoneNumber, assemblePhoneNumber } from 'common/util'
@@ -161,6 +161,123 @@ class CartView extends React.Component {
       let items = carts
       if (type === 'direct') items = [orderItem]
       const title = `${items[0].lesson ? items[0].lesson.title : items[0].product.title}${items.length > 1 ? `외 ${items.length - 1}건` : ''}` // eslint-disable-line
+
+      const orderTransaction = {}
+      orderTransaction.userId = this.props.user.id
+      // Order post
+      const order = {}
+      order.paymentMethod = this.state.paymentMethod
+      order.pointSpent = this.state.pointSpent
+      order.totalAmount = this._getTotalPrice() - this.state.pointSpent
+      order.userId = this.props.user.id
+      order.status = items[0].product ? '주문접수' : '등록접수'
+      if (items[0].product) {
+        order.receiver = this.state.receiver
+        order.receiverPhoneNumber = JSON.stringify(this.state.receiverPhoneNumber)
+        order.postCode = this.state.postCode
+        order.address = this.state.address
+        order.restAddress = this.state.restAddress
+        order.sender = this.state.sender
+        order.letterMessage = this.state.letterletterMessage
+        order.transportMessage = this.state.transportMessage
+      } else {
+        order.studentNames = JSON.stringify(this.state.studentNames)
+        order.studentPhoneNumbers = JSON.stringify(this.state.studentPhoneNumbers)
+      }
+      orderTransaction.order = order
+
+      // cart status 및 type 변경
+      if (type === 'checkout') {
+        orderTransaction.cartUpdateType = 'update'
+        // 장바구니의 type과 status 변경
+        let idx = 0
+        const carts = this.props.carts.map(cart => {
+          const updatedCart = {}
+          updatedCart.userId = cart.userId
+          if (cart.lessonId) {
+            updatedCart.lessonId = cart.lessonId
+          } else {
+            updatedCart.productId = cart.productId
+            updatedCart.receiveDate = cart.receiveDate
+            updatedCart.receiveTime = cart.receiveTime
+            updatedCart.receiveArea = cart.receiveArea
+          }
+          updatedCart.quantity = this.state.quantity[idx++]
+          updatedCart.type = '구매목록'
+          updatedCart.status = cart.LessonId ? '등록접수' : '주문접수'
+          updatedCart.options = cart.options
+          updatedCart.totalAmount = cart.itemPrice * this.state.quantity
+          updatedCart.itemPrice = cart.itemPrice
+          updatedCart.id = cart.id
+          return updatedCart
+        })
+        orderTransaction.carts = carts
+      } else if (type === 'direct') {
+        // orderItem을 cart에 등록
+        orderTransaction.cartUpdateType = 'create'
+        const { orderItem } = this.props
+        const cart = {}
+        cart.userId = this.props.user.id
+        if (orderItem.lessonId) {
+          cart.lessonId = orderItem.lessonId
+        } else {
+          cart.productId = orderItem.productId
+          cart.receiveDate = orderItem.receiveDate
+          cart.receiveTime = orderItem.receiveTime
+          cart.receiveArea = orderItem.receiveArea
+        }
+        cart.quantity = this.state.quantity[0]
+        cart.type = '구매목록'
+        cart.status = orderItem.LessonId ? '등록접수' : '주문접수'
+        cart.options = orderItem.options
+        cart.totalAmount = orderItem.itemPrice * this.state.quantity
+        cart.itemPrice = orderItem.itemPrice
+        orderTransaction.carts = [cart]
+      }
+
+      // 최근배송주소 저장
+      if (items[0].product) {
+        const { recentAddress } = this.state
+        // 최근배송주소에서 배송지를 선택했을 경우 선택한 배송지의 사용일자를 기록
+        const address = recentAddress.filter(address =>
+          address.address === this.state.address && address.restAddress === this.state.restAddress)
+        if (address.length > 0) {
+          orderTransaction.addressUpdateType = 'update'
+          const addressHistory = {}
+          addressHistory.userId = this.props.user.id
+          addressHistory.postCode = address[0].postCode
+          addressHistory.address = address[0].address
+          addressHistory.restAddress = address[0].restAddress
+          addressHistory.id = address[0].id
+          orderTransaction.addressHistory = addressHistory
+        } else {
+          orderTransaction.addressUpdateType = 'create'
+          const addressHistory = {}
+          addressHistory.userId = this.props.user.id
+          addressHistory.postCode = this.state.postCode
+          addressHistory.address = this.state.address
+          addressHistory.restAddress = this.state.restAddress
+          orderTransaction.addressHistory = addressHistory
+        }
+      }
+
+      // 포인트 사용내역 기록
+      if (this.state.pointSpent > 0) {
+        const spentPointHistory = {}
+        spentPointHistory.userId = this.props.user.id
+        spentPointHistory.amount = this.state.pointSpent * -1
+        spentPointHistory.action = '상품구매사용'
+        orderTransaction.spentPointHistory = spentPointHistory
+      }
+      // 포인트 적립
+      const earnedPointHistory = {}
+      earnedPointHistory.userId = this.props.user.id
+      earnedPointHistory.amount = this._getTotalPrice() * 0.01
+      earnedPointHistory.action = '상품구매적립'
+      orderTransaction.earnedPointHistory = earnedPointHistory
+
+      this.props.receiveOrderTransaction(orderTransaction)
+
       if (this._isValid()) {
         const settings = {
           pg: 'html5_inicis',
@@ -176,137 +293,16 @@ class CartView extends React.Component {
         const view = this
         window.IMP.request_pay(settings, function (rsp) {
           if (rsp.success) {
-            // Order post
-            const order = new URLSearchParams()
-            order.append('uid', rsp.imp_uid)
-            order.append('paymentMethod', view.state.paymentMethod)
-            order.append('pointSpent', view.state.pointSpent)
-            order.append('totalAmount', view._getTotalPrice() - view.state.pointSpent)
-            order.append('userId', view.props.user.id)
-            order.append('status', items.product ? '주문접수' : '등록접수')
-            if (items[0].product) {
-              order.append('receiver', view.state.receiver)
-              order.append('receiverPhoneNumber', JSON.stringify(view.state.receiverPhoneNumber))
-              order.append('postCode', view.state.postCode)
-              order.append('address', view.state.address)
-              order.append('restAddress', view.state.restAddress)
-              order.append('sender', view.state.sender)
-              order.append('letterMessage', view.state.letterletterMessage)
-            } else {
-              order.append('studentNames', JSON.stringify(view.state.studentNames))
-              order.append('studentPhoneNumbers', JSON.stringify(view.state.studentPhoneNumbers))
-            }
-            let deleteFlag = false
-            postOrder(order)
-            .then(res => {
-              // cart status 및 type 변경
-              const { type } = view.props.params
-              if (type === 'checkout') {
-                // 장바구니의 type과 status 변경
-                const { carts } = view.props
-                const proms = carts.map(cart => {
-                  const updatedCart = new URLSearchParams()
-                  updatedCart.append('userId', cart.userId)
-                  if (cart.lessonId) {
-                    updatedCart.append('lessonId', cart.lessonId)
-                  } else {
-                    updatedCart.append('productId', cart.productId)
-                    updatedCart.append('receiveDate', cart.receiveDate)
-                    updatedCart.append('receiveTime', cart.receiveTime)
-                    updatedCart.append('receiveArea', cart.receiveArea)
-                  }
-                  updatedCart.append('quantity', view.state.quantity)
-                  updatedCart.append('type', '구매목록')
-                  updatedCart.append('status', cart.LessonId ? '등록접수' : '주문접수')
-                  updatedCart.append('options', cart.options)
-                  updatedCart.append('totalAmount', cart.itemPrice * view.state.quantity)
-                  updatedCart.append('itemPrice', cart.itemPrice)
-                  updatedCart.append('orderId', res.data.id)
-                  return putCart(updatedCart, cart.id)
-                })
-                Promise.all(proms)
-              } else if (type === 'direct') {
-                // orderItem을 cart에 등록
-                const { orderItem } = view.props
-                const cart = new URLSearchParams()
-                cart.append('userId', view.props.user.id)
-                if (orderItem.lessonId) {
-                  cart.append('lessonId', orderItem.lessonId)
-                } else {
-                  cart.append('productId', orderItem.productId)
-                  cart.append('receiveDate', orderItem.receiveDate)
-                  cart.append('receiveTime', orderItem.receiveTime)
-                  cart.append('receiveArea', orderItem.receiveArea)
-                }
-                cart.append('quantity', view.state.quantity)
-                cart.append('type', '구매목록')
-                cart.append('status', orderItem.LessonId ? '등록접수' : '주문접수')
-                cart.append('options', orderItem.options)
-                cart.append('totalAmount', orderItem.itemPrice * view.state.quantity)
-                cart.append('itemPrice', orderItem.itemPrice)
-                cart.append('orderId', res.data.id)
-                return postCart(cart)
-              }
-            })
+            orderTransaction.order.uid = rsp.imp_uid
+            postOrderTransaction(orderTransaction)
             .then(() => {
-              // 최근배송주소 저장
-              if (items[0].product) {
-                const { recentAddress } = view.state
-                // 최근배송주소에서 배송지를 선택했을 경우 선택한 배송지의 사용일자를 기록
-                const address = recentAddress.filter(address =>
-                  address.address === view.state.address && address.restAddress === view.state.restAddress)
-                if (address.length > 0) {
-                  return refreshAddressHistory(address[0].id)
-                } else {
-                  deleteFlag = true
-                  const addressHistory = new URLSearchParams()
-                  addressHistory.append('userId', view.props.user.id)
-                  addressHistory.append('postCode', view.state.postCode)
-                  addressHistory.append('address', view.state.address)
-                  addressHistory.append('restAddress', view.state.restAddress)
-                  return postAddressHistory(addressHistory)
-                }
-              } else {
-                return Promise.resolve()
-              }
-            })
-            .then(() => {
-              // 최근 배송지가 5개 이상이 됐을 경우 가장 마지막에 있는 최근배송지 삭제
-              if (deleteFlag && view.state.recentAddress.length >= 5) {
-                return deleteAddressHistory(view.state.recentAddress[4].id)
-              } else {
-                return Promise.resolve()
-              }
-            })
-            .then(() => {
-              // 포인트 사용내역 기록
-              if (view.state.pointSpent > 0) {
-                const pointHistory = new URLSearchParams()
-                pointHistory.append('userId', view.props.user.id)
-                pointHistory.append('amount', view.state.pointSpent * -1)
-                pointHistory.append('action', '상품구매사용')
-                return postPointHistory(pointHistory)
-              } else {
-                return Promise.resolve()
-              }
-            })
-            .then(() => {
-              // 포인트 적립
-              const pointHistory = new URLSearchParams()
-              pointHistory.append('userId', view.props.user.id)
-              pointHistory.append('amount', view._getTotalPrice() * 0.01)
-              pointHistory.append('action', '상품구매적립')
-              return postPointHistory(pointHistory)
-            })
-            .then(() => {
-              return updateUserPoint(view.props.user.id, view.state.pointSpent * -1)
-            })
-            .then(() => {
-              // TODO 이메일 발송
               return view.props.fetchCartsByUserId(view.props.user.id)
             })
             .then(() => {
               view.context.router.push('/')
+            })
+            .catch(() => {
+              alert('에러발생')
             })
           } else {
             view._showMessageModal('결제에 실패했습니다. - ' + rsp.error_msg + '.')
@@ -934,7 +930,8 @@ CartView.propTypes = {
   user: PropTypes.object,
   fetchCartsByUserId: PropTypes.func.isRequired,
   params: PropTypes.object,
-  orderItem: PropTypes.object
+  orderItem: PropTypes.object,
+  receiveOrderTransaction: PropTypes.func.isRequired
 }
 
 export default CartView

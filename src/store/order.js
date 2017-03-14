@@ -6,6 +6,8 @@ import { getOrdersByUserId, getOrderById } from 'common/OrderService'
 export const RECEIVE_ORDERS = 'RECEIVE_ORDERS'
 export const SELECT_ORDER = 'SELECT_ORDER'
 export const RECEIVE_ORDER_ITEM = 'RECEIVE_ORDER_ITEM'
+export const RECEIVE_ORDER_TRANSACTION = 'RECEIVE_ORDER_TRANSACTION'
+export const CLEAR_ORDER_TRANSACTION = 'CLEAR_ORDER_TRANSACTION'
 
 // ------------------------------------
 // Actions
@@ -28,6 +30,20 @@ export function receiveOrderItem (orderItem = null) {
   return {
     type    : RECEIVE_ORDER_ITEM,
     payload : { orderItem }
+  }
+}
+
+export function receiveOrderTransaction (orderTransaction = null) {
+  return {
+    type    : RECEIVE_ORDER_TRANSACTION,
+    payload : { orderTransaction }
+  }
+}
+
+export function clearOrderTransaction () {
+  return {
+    type    : CLEAR_ORDER_TRANSACTION,
+    payload : { orderTransaction: null }
   }
 }
 
@@ -88,13 +104,19 @@ const ACTION_HANDLERS = {
   },
   [RECEIVE_ORDER_ITEM] : (state, action) => {
     return Object.assign({}, state, action.payload)
+  },
+  [RECEIVE_ORDER_TRANSACTION] : (state, action) => {
+    return Object.assign({}, state, action.payload)
+  },
+  [CLEAR_ORDER_TRANSACTION] : (state, action) => {
+    return Object.assign({}, state, action.payload)
   }
 }
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
-const initialState = { orderList: null, selected: null, orderItem: null }
+const initialState = { orderList: null, selected: null, orderItem: null, orderTransaction: null }
 export default function orderReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
 
