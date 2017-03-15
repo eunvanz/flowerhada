@@ -74,7 +74,7 @@ class Button extends React.Component {
         href={!this.props.disabled ? this.props.href : null}
         className={`${this.props.link ? '' : 'btn'}${this.props.square ? ' square' : ''}
         ${this.props.circle ? ' radius-50' : ''}${color()}${size()}${animated()} ${this.props.className}`}
-        onClick={!this.props.disabled ? this.props.onClick : null}
+        onClick={!this.props.disabled && !this.props.process ? this.props.onClick : null}
         style={{ ...this.props.style, cursor: 'pointer' }}
         disabled={this.props.disabled}
       >

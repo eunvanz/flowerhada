@@ -8,6 +8,7 @@ import Item from './Item'
 import ItemList from './ItemList'
 import NotFound from './NotFound'
 import Cart from './Cart'
+import OrderComplete from './OrderComplete'
 
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
@@ -23,6 +24,8 @@ export const createRoutes = (store) => ({
     Item(store),
     ItemList(store),
     Cart(store),
+    OrderComplete(store),
+    // 이곳에 추가해야 함
     NotFound(store)
   ]
 })

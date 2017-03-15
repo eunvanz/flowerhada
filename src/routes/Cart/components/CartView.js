@@ -4,7 +4,7 @@ import { Link } from 'react-router'
 import Button from 'components/Button'
 import TextField from 'components/TextField'
 import numeral from 'numeral'
-import { deleteCartById, putCart, postCart } from 'common/CartService'
+import { deleteCartById } from 'common/CartService'
 import LessonDateInfo from 'components/LessonDateInfo'
 import { postOrderTransaction } from 'common/OrderService'
 import { Tooltip } from 'react-bootstrap'
@@ -13,10 +13,8 @@ import { dividePhoneNumber, assemblePhoneNumber } from 'common/util'
 import MessageModal from 'components/MessageModal'
 import PhoneNumberInput from 'components/PhoneNumberInput'
 import CustomModal from 'components/CustomModal'
-import { getAddressHistoryByUserId, refreshAddressHistory,
-  deleteAddressHistory, postAddressHistory } from 'common/AddressHistoryService'
-import { postPointHistory } from 'common/PointHistoryService'
-import { updateUserPoint } from 'common/UserService'
+import { getAddressHistoryByUserId } from 'common/AddressHistoryService'
+import { ROOT } from 'common/constants'
 
 class CartView extends React.Component {
   constructor (props) {
@@ -33,7 +31,7 @@ class CartView extends React.Component {
       restAddress: '',
       studentNames: [],
       studentPhoneNumbers: [],
-      sender: '',
+      sender: this.props.user ? this.props.user.name : '',
       letterMessage: '',
       transportMessage: '',
       paymentMethod: 'card',
@@ -41,7 +39,9 @@ class CartView extends React.Component {
       messageModal: { show: false, message: '' },
       showRecentAddress: false,
       recentAddress: [],
-      same: false
+      same: false,
+      orderProcess: false,
+      anonymous: false
     }
     this._handleOnClickDelete = this._handleOnClickDelete.bind(this)
     this._handleOnChangeQuantity = this._handleOnChangeQuantity.bind(this)
@@ -92,7 +92,7 @@ class CartView extends React.Component {
     }
   }
   shouldComponentUpdate (nextProps, nextState) {
-    if (nextProps.carts.length < 1 && this.props.params.type !== 'direct') return false
+    // if (nextProps.carts && nextProps.carts.length < 1 && this.props.params.type !== 'direct') return false
     return true
   }
   _initialize () {
@@ -156,6 +156,7 @@ class CartView extends React.Component {
     if (this.state.mode === '장바구니') {
       this.setState({ mode: '주문하기' })
     } else {
+      this.setState({ orderProcess: true })
       const { carts, orderItem } = this.props
       const { type } = this.props.params
       let items = carts
@@ -178,7 +179,8 @@ class CartView extends React.Component {
         order.address = this.state.address
         order.restAddress = this.state.restAddress
         order.sender = this.state.sender
-        order.letterMessage = this.state.letterletterMessage
+        order.senderPhoneNumber = JSON.stringify(this.state.senderPhoneNumber)
+        order.letterMessage = this.state.letterMessage.replace(/\n/g, '<br>')
         order.transportMessage = this.state.transportMessage
       } else {
         order.studentNames = JSON.stringify(this.state.studentNames)
@@ -187,7 +189,7 @@ class CartView extends React.Component {
       orderTransaction.order = order
 
       // cart status 및 type 변경
-      if (type === 'checkout') {
+      if (type === 'checkout' || type === 'saved') {
         orderTransaction.cartUpdateType = 'update'
         // 장바구니의 type과 status 변경
         let idx = 0
@@ -196,17 +198,19 @@ class CartView extends React.Component {
           updatedCart.userId = cart.userId
           if (cart.lessonId) {
             updatedCart.lessonId = cart.lessonId
+            updatedCart.lesson = cart.lesson
           } else {
             updatedCart.productId = cart.productId
             updatedCart.receiveDate = cart.receiveDate
             updatedCart.receiveTime = cart.receiveTime
             updatedCart.receiveArea = cart.receiveArea
+            updatedCart.product = cart.product
           }
-          updatedCart.quantity = this.state.quantity[idx++]
+          updatedCart.quantity = this.state.quantity[idx]
           updatedCart.type = '구매목록'
           updatedCart.status = cart.LessonId ? '등록접수' : '주문접수'
           updatedCart.options = cart.options
-          updatedCart.totalAmount = cart.itemPrice * this.state.quantity
+          updatedCart.totalAmount = cart.itemPrice * this.state.quantity[idx++]
           updatedCart.itemPrice = cart.itemPrice
           updatedCart.id = cart.id
           return updatedCart
@@ -220,11 +224,13 @@ class CartView extends React.Component {
         cart.userId = this.props.user.id
         if (orderItem.lessonId) {
           cart.lessonId = orderItem.lessonId
+          cart.lesson = orderItem.lesson
         } else {
           cart.productId = orderItem.productId
           cart.receiveDate = orderItem.receiveDate
           cart.receiveTime = orderItem.receiveTime
           cart.receiveArea = orderItem.receiveArea
+          cart.product = orderItem.product
         }
         cart.quantity = this.state.quantity[0]
         cart.type = '구매목록'
@@ -288,7 +294,7 @@ class CartView extends React.Component {
           buyer_name: this.props.user.name,
           buyer_email: this.props.user.email,
           buyer_tel: assemblePhoneNumber(this.props.user.phone),
-          m_redirect_url: 'http://localhost:3000' // TODO
+          m_redirect_url: `http://${ROOT}/order-complete`
         }
         const view = this
         window.IMP.request_pay(settings, function (rsp) {
@@ -298,15 +304,16 @@ class CartView extends React.Component {
             .then(() => {
               return view.props.fetchCartsByUserId(view.props.user.id)
             })
-            .then(() => {
-              view.context.router.push('/')
-            })
             .catch(() => {
-              alert('에러발생')
+              view.setState({ orderProcess: false })
+              alert('처리 중 오류가 발생했습니다.')
+            })
+            .then(() => {
+              view.context.router.push('/order-complete')
             })
           } else {
+            view.setState({ orderProcess: false })
             view._showMessageModal('결제에 실패했습니다. - ' + rsp.error_msg + '.')
-            console.log(view.state.messageModal)
           }
         })
       }
@@ -488,7 +495,7 @@ class CartView extends React.Component {
           return <span key={keygen._()}>
             {option.name}
             {option.price === 0 ? '' : `(+${numeral(option.price).format('0,0')}원)`}
-            {((optionsArray[seq + 1].name !== '선택안함') && (seq !== optionsArray.length - 1)) || (cart.receiveDate || cart.receiveArea) ? ' / ' : ''}
+            {((optionsArray[seq].name !== '선택안함') && (seq !== optionsArray.length - 1)) || (cart.receiveDate || cart.receiveArea) ? ' / ' : ''}
           </span>
         }
       })
@@ -526,7 +533,8 @@ class CartView extends React.Component {
             </td>
             <td className='remove'>
               {this.state.mode === '장바구니' &&
-                <Button size='sm' onClick={this._handleOnClickDelete} textComponent={<span id={cart.id}>삭제</span>}
+                <Button size='sm' onClick={this._handleOnClickDelete} id={`${cart.id}`}
+                  textComponent={<span id={cart.id}>삭제</span>}
                   disabled={this.state.mode !== '장바구니'} />
               }
             </td>
@@ -556,7 +564,7 @@ class CartView extends React.Component {
           <td className='total-quantity' colSpan='3'>
             포인트 사용
             <Tooltip placement='right' className='in' id='availablePoint' style={{ display: 'inline', zIndex: '99' }}>
-              보유포인트 <span className='text-default'>{user.point}P</span>
+              보유포인트 <span className='text-default'>{numeral(user.point).format('0,0')}P</span>
             </Tooltip>
           </td>
           <td colSpan='2' className='form-inline text-right'>
@@ -599,6 +607,7 @@ class CartView extends React.Component {
               color='dark'
               animated
               onClick={this._handleOnClickCheckout}
+              process={this.state.orderProcess}
               textComponent={<span>{this.state.mode === '장바구니' ? '주문하기' : '결제하기'} <i className={this.state.mode === '장바구니' ? 'fa fa-pencil-square-o' : 'fa fa-credit-card-alt'} /></span>}
             />
           </div>
@@ -617,21 +626,21 @@ class CartView extends React.Component {
       })
     }
     const renderReceiverForm = () => {
-      if (items[0].product) {
+      if (items[0] && items[0].product) {
         return (
           <div className='row'>
             <div className='col-lg-3'>
-              <h3 className='title'>수신인 정보</h3>
+              <h3 className='title'>받으시는 분 정보</h3>
             </div>
             <div className='col-lg-8 col-lg-offset-1'>
               <div className='form-group'>
                 <label htmlFor='receiver' className='col-md-2 control-label'>
                   수신인 이름<small className='text-default'>*</small>
                 </label>
-                <div className='col-md-4'>
+                <div className='col-md-10 form-inline'>
                   <input type='text' className='form-control' id='receiver' placeholder='실명을 입력해주세요.'
                     value={this.state.receiver} onChange={this._handleOnChangeInput} />
-                  <label>
+                  <label style={{ marginLeft: '5px' }}>
                     <input type='checkbox' checked={this.state.same}
                       onChange={this._handleOnChangeSameReceiver} /> 발신인과 동일
                   </label>
@@ -733,7 +742,7 @@ class CartView extends React.Component {
       return returnComponent
     }
     const renderStudentsForm = () => {
-      if (items[0].lesson) {
+      if (items[0] && items[0].lesson) {
         return (
           <div className='row'>
             <div className='col-lg-3'>
@@ -768,20 +777,22 @@ class CartView extends React.Component {
       }
     }
     const renderSenderForm = () => {
-      if (items[0].product) {
+      if (items[0] && items[0].product) {
         return (
           <div className='row'>
             <div className='col-lg-3'>
-              <h3 className='title'>발신인 정보</h3>
+              <h3 className='title'>보내시는 분 정보</h3>
             </div>
             <div className='col-lg-8 col-lg-offset-1'>
               <div className='form-group'>
                 <label htmlFor='sender' className='col-md-2 control-label'>
                   발신인 이름
                 </label>
-                <div className='col-md-4'>
-                  <input type='text' className='form-control' id='sender' placeholder='작성하지 않으면 익명으로 발신'
-                    value={this.state.sender} onChange={this._handleOnChangeInput} />
+                <div className='col-md-10 form-inline'>
+                  <input type='text' className='form-control' id='sender'
+                    value={this.state.anonymous ? '익명' : this.state.sender} onChange={this._handleOnChangeInput} />
+                  <input type='checkbox' checked={this.state.anonymous} style={{ marginLeft: '5px' }}
+                    onChange={() => this.setState({ anonymous: !this.state.anonymous })} /> 익명으로 보내기
                 </div>
               </div>
               <div className='form-group'>
