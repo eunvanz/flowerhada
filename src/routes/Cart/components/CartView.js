@@ -6,7 +6,7 @@ import TextField from 'components/TextField'
 import numeral from 'numeral'
 import { deleteCartById } from 'common/CartService'
 import LessonDateInfo from 'components/LessonDateInfo'
-import { postOrderTransaction } from 'common/OrderService'
+import { postOrderTransaction, cancelPayment } from 'common/OrderService'
 import { Tooltip } from 'react-bootstrap'
 import Alert from 'components/Alert'
 import { dividePhoneNumber, assemblePhoneNumber } from 'common/util'
@@ -15,6 +15,7 @@ import PhoneNumberInput from 'components/PhoneNumberInput'
 import CustomModal from 'components/CustomModal'
 import { getAddressHistoryByUserId } from 'common/AddressHistoryService'
 import { ROOT } from 'common/constants'
+import { postError } from 'common/ErrorService'
 
 class CartView extends React.Component {
   constructor (props) {
@@ -275,12 +276,6 @@ class CartView extends React.Component {
         spentPointHistory.action = '상품구매사용'
         orderTransaction.spentPointHistory = spentPointHistory
       }
-      // 포인트 적립
-      const earnedPointHistory = {}
-      earnedPointHistory.userId = this.props.user.id
-      earnedPointHistory.amount = this._getTotalPrice() * 0.01
-      earnedPointHistory.action = '상품구매적립'
-      orderTransaction.earnedPointHistory = earnedPointHistory
 
       this.props.receiveOrderTransaction(orderTransaction)
 
@@ -300,16 +295,41 @@ class CartView extends React.Component {
         window.IMP.request_pay(settings, function (rsp) {
           if (rsp.success) {
             orderTransaction.order.uid = rsp.imp_uid
+            if (view.state.paymentMethod === 'card') {
+              orderTransaction.order.applyNum = rsp.apply_num
+            } else if (view.state.paymentMethod === 'vbank') {
+              orderTransaction.order.vbankNum = rsp.vbank_num
+              orderTransaction.order.vbankName = rsp.vbank_name
+              orderTransaction.order.vbankHolder = rsp.vbank_holder
+              orderTransaction.order.vbankDate = rsp.vbank_date
+            }
+            console.log('orderTransaction', orderTransaction)
             postOrderTransaction(orderTransaction)
             .then(() => {
               return view.props.fetchCartsByUserId(view.props.user.id)
             })
-            .catch(() => {
-              view.setState({ orderProcess: false })
-              alert('처리 중 오류가 발생했습니다.')
+            .then(() => {
+              return view.props.fetchUser(view.props.user.email)
             })
             .then(() => {
               view.context.router.push('/order-complete')
+            })
+            .catch(() => {
+              const error = {
+                type: '결제후처리에러',
+                log: JSON.stringify(orderTransaction),
+                userId: view.props.user.id,
+                status: '미해결'
+              }
+              postError(error)
+              .then(() => {
+                return cancelPayment(orderTransaction.order)
+              })
+              .then((res) => {
+                // console.log('cancel res', res)
+                view.setState({ orderProcess: false })
+                alert('처리 중 오류가 발생했습니다. 다시 시도해주세요.')
+              })
             })
           } else {
             view.setState({ orderProcess: false })

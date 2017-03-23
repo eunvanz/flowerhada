@@ -1,4 +1,4 @@
-import { getUserByEmail } from '../common/UserService'
+import { getUserByEmail, getUserById } from '../common/UserService'
 
 // ------------------------------------
 // Constants
@@ -19,6 +19,15 @@ export function receiveUser (user = null) {
 export const fetchUser = email => {
   return dispatch => {
     return getUserByEmail(email)
+    .then(res => {
+      return dispatch(receiveUser(res.data))
+    })
+  }
+}
+
+export const fetchUserByUserId = id => {
+  return dispatch => {
+    return getUserById(id)
     .then(res => {
       return dispatch(receiveUser(res.data))
     })

@@ -5,7 +5,6 @@ import '../../styles/core.scss'
 import Helmet from 'react-helmet'
 import ScrollTop from 'components/ScrollTop'
 import Footer from 'components/Footer'
-import { ROOT } from 'common/constants'
 
 class CoreLayout extends React.Component {
   render () {
@@ -26,51 +25,51 @@ class CoreLayout extends React.Component {
             },
             {
               'rel': 'stylesheet',
-              'href': `${ROOT}/template/fonts/font-awesome/css/font-awesome.css`
+              'href': `/template/fonts/font-awesome/css/font-awesome.css`
             },
             {
               'rel': 'stylesheet',
-              'href': `${ROOT}/template/fonts/fontello/css/fontello.css`
+              'href': `/template/fonts/fontello/css/fontello.css`
             },
             {
               'rel': 'stylesheet',
-              'href': `${ROOT}/template/plugins/magnific-popup/magnific-popup.css`
+              'href': `/template/plugins/magnific-popup/magnific-popup.css`
             },
             {
               'rel': 'stylesheet',
-              'href': `${ROOT}/template/plugins/rs-plugin/css/settings.css`
+              'href': `/template/plugins/rs-plugin/css/settings.css`
             },
             {
               'rel': 'stylesheet',
-              'href': `${ROOT}/template/css/animations.css`
+              'href': `/template/css/animations.css`
             },
             {
               'rel': 'stylesheet',
-              'href': `${ROOT}/template/plugins/owl-carousel/owl.carousel.css`
+              'href': `/template/plugins/owl-carousel/owl.carousel.css`
             },
             {
               'rel': 'stylesheet',
-              'href': `${ROOT}/template/plugins/owl-carousel/owl.transitions.css`
+              'href': `/template/plugins/owl-carousel/owl.transitions.css`
             },
             {
               'rel': 'stylesheet',
-              'href': `${ROOT}/template/plugins/hover/hover-min.css`
+              'href': `/template/plugins/hover/hover-min.css`
             },
             {
               'rel': 'stylesheet',
-              'href': `${ROOT}/template/css/style.css`
+              'href': `/template/css/style.css`
             },
             {
               'rel': 'stylesheet',
-              'href': `${ROOT}/template/css/typography-default.css`
+              'href': `/template/css/typography-default.css`
             },
             {
               'rel': 'stylesheet',
-              'href': `${ROOT}/template/css/skins/cool_green.css`
+              'href': `/template/css/skins/cool_green.css`
             },
             {
               'rel': 'stylesheet',
-              'href': `${ROOT}/template/css/custom.css`
+              'href': `/template/css/custom.css`
             },
             {
               'rel': 'stylesheet',

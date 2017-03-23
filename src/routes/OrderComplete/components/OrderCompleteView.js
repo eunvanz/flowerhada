@@ -4,11 +4,11 @@ import numeral from 'numeral'
 import LessonDateInfo from 'components/LessonDateInfo'
 import keygen from 'keygenerator'
 import { Link } from 'react-router'
-import TextField from 'components/TextField'
 import Button from 'components/Button'
 import { assemblePhoneNumber } from 'common/util'
-import { postOrderTransaction } from 'common/OrderService'
+import { postOrderTransaction, cancelPayment } from 'common/OrderService'
 import Loading from 'components/Loading'
+import { postError } from 'common/ErrorService'
 
 class OrderCompleteView extends React.Component {
   constructor (props) {
@@ -21,25 +21,47 @@ class OrderCompleteView extends React.Component {
   }
   componentDidMount () {
     const { orderTransaction } = this.props
-    const uid = this.props.location.query.imp_uid
+    const { imp_uid, apply_num, vbank_num, vbank_name, vbank_holder, vbank_date } = this.props.location.query // eslint-disable-line
     if (!orderTransaction) {
       this.context.router.push('/not-found')
       return
-    } else if (uid) { // 모바일인경우 cartView의 콜백에 해당하는 부분 실행
+    // eslint-disable
+    } else if (imp_uid) { // 모바일인경우 cartView의 콜백에 해당하는 부분 실행
       this.setState({ orderProcess: true })
-      orderTransaction.order.uid = uid
+      orderTransaction.order.uid = imp_uid
+      orderTransaction.order.applyNum = apply_num
+      orderTransaction.order.vbankNum = vbank_num
+      orderTransaction.order.vbankName = vbank_name
+      orderTransaction.order.vbankHolder = vbank_holder
+      orderTransaction.order.vbankDate = vbank_date
+      // eslint-enable
       postOrderTransaction(orderTransaction)
       .then(() => {
         this.setState({ orderProcess: false })
         return this.props.fetchCartsByUserId(orderTransaction.userId)
       })
       .then(() => {
+        return this.props.fetchUserByUserId(orderTransaction.userId)
+      })
+      .then(() => {
         this.setState({ lockUpdate: true })
         this.props.clearOrderTransaction()
       })
       .catch(() => {
-        this.setState({ orderProcess: false })
-        alert('처리 중 오류가 발생했습니다.')
+        const error = {
+          type: '결제후처리에러',
+          log: JSON.stringify(orderTransaction),
+          userId: orderTransaction.userId,
+          status: '미해결'
+        }
+        postError(error)
+        .then(() => {
+          return cancelPayment(orderTransaction.order)
+        })
+        .then(() => {
+          this.setState({ orderProcess: false })
+          alert('처리 중 오류가 발생했습니다. 다시 시도해주세요.')
+        })
       })
     } else {
       this.setState({ lockUpdate: true })
@@ -123,7 +145,7 @@ class OrderCompleteView extends React.Component {
             포인트 사용
           </td>
           <td colSpan='2' className='form-inline text-right'>
-            {numeral(orderTransaction.spentPointHistory ? orderTransaction.spentPointHistory.amount : 0).format('0,0')}P
+            {numeral(orderTransaction.spentPointHistory ? (orderTransaction.spentPointHistory.amount * -1) : 0).format('0,0')}P
           </td>
         </tr>
       )
@@ -135,7 +157,7 @@ class OrderCompleteView extends React.Component {
             총 결제금액
           </td>
           <td className='total-amount'>
-            ￦<span className='text-default'>{numeral(this._getTotalPrice() - (orderTransaction.spentPointHistory ? orderTransaction.spentPointHistory.amount : 0)).format('0,0')}</span>
+            ￦<span className='text-default'>{numeral(this._getTotalPrice() + (orderTransaction.spentPointHistory ? orderTransaction.spentPointHistory.amount : 0)).format('0,0')}</span>
           </td>
         </tr>
       )
@@ -194,8 +216,7 @@ class OrderCompleteView extends React.Component {
                 <td>배송지 주소</td>
                 <td>{`[${order.postCode}] ${order.address} ${order.restAddress}`}</td>
               </tr>
-              {
-                order.transportMessage && order.transportMessage > 0 &&
+              {order.transportMessage && order.transportMessage > 0 &&
                 <tr>
                   <td>배송 메시지</td>
                   <td>{order.transportMessage}</td>
@@ -210,7 +231,6 @@ class OrderCompleteView extends React.Component {
     const renderStudentsRows = () => {
       let idx = 0
       const studentNames = JSON.parse(order.studentNames)
-      console.log(studentNames)
       const returnComponent = studentNames.map(name => {
         return (
           <tr key={keygen._()}>
@@ -302,7 +322,8 @@ OrderCompleteView.propTypes = {
   orderTransaction: PropTypes.object,
   clearOrderTransaction: PropTypes.func.isRequired,
   location: PropTypes.object,
-  fetchCartsByUserId: PropTypes.func
+  fetchCartsByUserId: PropTypes.func,
+  fetchUserByUserId: PropTypes.func
 }
 
 export default OrderCompleteView

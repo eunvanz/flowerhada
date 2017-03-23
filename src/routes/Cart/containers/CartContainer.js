@@ -1,12 +1,14 @@
 import { connect } from 'react-redux'
 import { fetchCartsByUserId } from 'store/cart'
 import { receiveOrderTransaction } from 'store/order'
+import { fetchUser } from 'store/user'
 
 import CartView from '../components/CartView'
 
 const mapDispatchToProps = {
   fetchCartsByUserId,
-  receiveOrderTransaction
+  receiveOrderTransaction,
+  fetchUser
 }
 
 const mapStateToProps = (state) => {

@@ -129,7 +129,7 @@ class Header extends React.Component {
                   {this.props.user &&
                     <div className='header-top-dropdown text-right'>
                       <div className='btn-group'>
-                        <Link to='/my-page' className='btn btn-default btn-sm' style={{ marginRight: '3px' }}>
+                        <Link to='/my-page/profile' className='btn btn-default btn-sm' style={{ marginRight: '3px' }}>
                           <i className='fa fa-user pr-10' /> 마이페이지
                         </Link>
                       </div>
@@ -281,7 +281,7 @@ class Header extends React.Component {
                                 </li>
                               </ul>
                             </li>
-                            {this.props.authUser.data &&
+                            {this.props.authUser.data && this.props.authUser.data.authorities[1] &&
                               this.props.authUser.data.authorities[1].authority === 'ADMIN' &&
                               <li className='dropdown'>
                                 <Link to='/admin' className='dropdown-toggle' data-toggle='dropdown'>

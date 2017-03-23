@@ -8,6 +8,7 @@ export const SELECT_ORDER = 'SELECT_ORDER'
 export const RECEIVE_ORDER_ITEM = 'RECEIVE_ORDER_ITEM'
 export const RECEIVE_ORDER_TRANSACTION = 'RECEIVE_ORDER_TRANSACTION'
 export const CLEAR_ORDER_TRANSACTION = 'CLEAR_ORDER_TRANSACTION'
+export const APPEND_ORDERS = 'APPEND_ORDERS'
 
 // ------------------------------------
 // Actions
@@ -15,6 +16,13 @@ export const CLEAR_ORDER_TRANSACTION = 'CLEAR_ORDER_TRANSACTION'
 export function receiveOrders (orders = null) {
   return {
     type    : RECEIVE_ORDERS,
+    payload : { orderList: orders }
+  }
+}
+
+export function appendOrders (orders = null) {
+  return {
+    type    : APPEND_ORDERS,
     payload : { orderList: orders }
   }
 }
@@ -59,11 +67,20 @@ export function clearOrderItem () {
   }
 }
 
-export const fetchOrdersByUserId = userId => {
+export const fetchOrdersByUserId = (userId, curPage, perPage) => {
   return dispatch => {
-    return getOrdersByUserId()
+    return getOrdersByUserId(userId, curPage, perPage)
     .then(res => {
       return dispatch(receiveOrders(res.data))
+    })
+  }
+}
+
+export const appendOrdersByUserId = (userId, curPage, perPage) => {
+  return dispatch => {
+    return getOrdersByUserId(userId, curPage, perPage)
+    .then(res => {
+      return dispatch(appendOrders(res.data))
     })
   }
 }
@@ -109,6 +126,13 @@ const ACTION_HANDLERS = {
     return Object.assign({}, state, action.payload)
   },
   [CLEAR_ORDER_TRANSACTION] : (state, action) => {
+    return Object.assign({}, state, action.payload)
+  },
+  [APPEND_ORDERS] : (state, action) => {
+    action.payload.orderList.content.forEach(element => {
+      state.orderList.content.push(element)
+    })
+    action.payload.orderList.content = state.orderList.content
     return Object.assign({}, state, action.payload)
   }
 }

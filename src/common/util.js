@@ -135,6 +135,10 @@ export const convertSqlDateToString = date => {
   return `${date.year}-${appendZeroTo1digitNumber(date.monthValue)}-${appendZeroTo1digitNumber(date.dayOfMonth)} ${appendZeroTo1digitNumber(date.hour)}:${appendZeroTo1digitNumber(date.minute)}:${appendZeroTo1digitNumber(date.second)}` // eslint-disable-line
 }
 
+export const convertSqlDateToStringDateOnly = date => {
+  return `${date.year}-${appendZeroTo1digitNumber(date.monthValue)}-${appendZeroTo1digitNumber(date.dayOfMonth)}` // eslint-disable-line
+}
+
 export const appendZeroTo1digitNumber = number => {
   if (number < 10) number = `0${number}`
   return number

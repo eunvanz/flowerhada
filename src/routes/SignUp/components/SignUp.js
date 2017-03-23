@@ -81,10 +81,10 @@ class SignUp extends React.Component {
       .then((res) => {
         return this.props.fetchAuthUser(userInfo)
       })
-      .then(() => {
+      .then((res) => {
         return this.props.fetchUser(this.props.authUser.data.email)
       })
-      .then(() => {
+      .then((res) => {
         this.context.router.push('/')
       })
     })
