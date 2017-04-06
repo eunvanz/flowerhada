@@ -303,7 +303,6 @@ class CartView extends React.Component {
               orderTransaction.order.vbankHolder = rsp.vbank_holder
               orderTransaction.order.vbankDate = rsp.vbank_date
             }
-            console.log('orderTransaction', orderTransaction)
             postOrderTransaction(orderTransaction)
             .then(() => {
               return view.props.fetchCartsByUserId(view.props.user.id)

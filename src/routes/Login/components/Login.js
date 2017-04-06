@@ -45,9 +45,7 @@ class Login extends React.Component {
       return
     }
 
-    const userInfo = new FormData()
-    userInfo.append('email', this.state.email)
-    userInfo.append('password', this.state.password)
+    const userInfo = { email: this.state.email, password: this.state.password }
     this.props.fetchAuthUser(userInfo)
     .then(() => {
       const sessionStorage = window.sessionStorage

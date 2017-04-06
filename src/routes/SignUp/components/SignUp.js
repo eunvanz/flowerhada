@@ -9,6 +9,7 @@ import $ from 'jquery'
 import Loading from '../../../components/Loading'
 import PhoneNumberInput from 'components/PhoneNumberInput'
 import keygen from 'keygenerator'
+import { assemblePhoneNumber } from 'common/util'
 
 class SignUp extends React.Component {
   constructor (props) {
@@ -65,7 +66,7 @@ class SignUp extends React.Component {
 
     this._checkEmailField()
     .then(() => {
-      if (!this._checkPasswordField() || !this._checkPasswordConfirmField() || !this._checkNameField()) {
+      if (!this._checkPasswordField() || !this._checkPasswordConfirmField() || !this._checkNameField() || !this._checkPhoneField()) {
         return
       }
       if (!this.state.isAgreed) {
@@ -73,10 +74,12 @@ class SignUp extends React.Component {
         return
       }
 
-      const userInfo = new FormData()
-      userInfo.append('email', this.state.email)
-      userInfo.append('password', this.state.password)
-      userInfo.append('name', this.state.name)
+      const userInfo = { email: this.state.email,
+        password: this.state.password,
+        name: this.state.name,
+        phone: assemblePhoneNumber(this.state.phone),
+        image: 'avatar.jpg'
+      }
       signUp(userInfo)
       .then((res) => {
         return this.props.fetchAuthUser(userInfo)

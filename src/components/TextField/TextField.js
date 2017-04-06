@@ -8,7 +8,7 @@ class TextField extends React.Component {
         <input type={this.props.type ? this.props.type : 'text'} className='form-control'
           id={this.props.id} onChange={this.props.onChange} disabled={this.props.disabled}
           value={this.props.value} data-limit={this.props.limit} style={this.props.style}
-          step={this.props.step} />
+          step={this.props.step} placeholder={this.props.placeholder} />
         {
           this.props.limit &&
           <div className='text-right small'>
@@ -30,7 +30,8 @@ TextField.propTypes = {
   length: React.PropTypes.number, // 현재 글자 수
   style: React.PropTypes.object,
   disabled: React.PropTypes.bool,
-  step: React.PropTypes.number
+  step: React.PropTypes.number,
+  placeholder: React.PropTypes.string
 }
 
 export default TextField

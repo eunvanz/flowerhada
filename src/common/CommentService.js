@@ -23,3 +23,7 @@ export const postCommentImage = file => {
   data.append('image', file)
   return axios.create({ headers: { 'Authorization': IMGUR_CLIENT_ID } }).post(`${IMG_BASE_URL}`, data)
 }
+
+export const getCommentsByUserIdAndType = (userId, type) => {
+  return axios.get(`${API_BASE_URL}/comments/user/${userId}/type/${type}`)
+}

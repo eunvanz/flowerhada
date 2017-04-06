@@ -2,6 +2,8 @@ import React from 'react'
 import CustomModal from 'components/CustomModal'
 import TextField from 'components/TextField'
 import { postCommentImage, postComment, putComment } from 'common/CommentService'
+import { postPointHistory } from 'common/PointHistoryService'
+import { updateUserPoint } from 'common/UserService'
 import Button from 'components/Button'
 import { Tooltip } from 'react-bootstrap'
 import numeral from 'numeral'
@@ -9,12 +11,19 @@ import numeral from 'numeral'
 class CommentModal extends React.Component {
   constructor (props) {
     super(props)
+    let validImagePoint = false
+    if (!this.props.comment) {
+      validImagePoint = true
+    } else if (this.props.comment && this.props.comment.image === '') {
+      validImagePoint = true
+    }
     this.state = {
       title: this.props.comment ? this.props.comment.title : '',
       content: this.props.comment ? this.props.comment.content.replace(/<br>/g, '\r\n') : '',
       image: this.props.comment ? this.props.comment.image : '',
       mode: this.props.comment ? 'put' : 'post',
-      process: false
+      process: false,
+      validImagePoint
     }
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
     this._handleOnClickSubmit = this._handleOnClickSubmit.bind(this)
@@ -45,19 +54,45 @@ class CommentModal extends React.Component {
       this.props.afterSubmit()
     }
     const doActionComment = () => {
-      const data = new URLSearchParams()
-      data.append('title', this.state.title)
-      data.append('content', this.state.content.replace(/\n/g, '<br>'))
-      data.append('type', this.props.type)
-      data.append('image', this.state.image)
-      data.append('groupName', this.props.groupName)
-      data.append('userId', this.props.userId)
-      if (this.props.parentId || (this.props.comment && this.props.comment.parentId)) {
-        data.append('parentId', this.props.parentId || this.props.comment.parentId)
+      const comment = {
+        title: this.state.title,
+        content: this.state.content.replace(/\n/g, '<br>'),
+        type: this.props.type,
+        image: this.state.image,
+        groupName: this.props.groupName,
+        userId: this.props.userId
       }
-      return this.state.mode === 'post' ? postComment(data) : putComment(data, this.props.comment.id)
+      if (this.props.parentId || (this.props.comment && this.props.comment.parentId)) {
+        comment.parentId = this.props.parentId || this.props.comment.parentId
+      }
+      return this.state.mode === 'post' ? postComment(comment) : putComment(comment, this.props.comment.id)
     }
-    if (file) {
+    const handlePoint = () => {
+      if (this.state.mode === 'post') {
+        const pointHistory = {
+          userId: this.props.userId,
+          amount: this.props.point,
+          action: '리뷰 작성'
+        }
+        return Promise.all([postPointHistory(pointHistory), updateUserPoint(this.props.userId, this.props.point)])
+      } else {
+        return Promise.resolve()
+      }
+    }
+    const handleImagePoint = () => {
+      if (this.state.validImagePoint) {
+        const pointHistory = {
+          userId: this.props.userId,
+          amount: this.props.imagePoint,
+          action: '리뷰에 이미지 업로드'
+        }
+        return Promise.all([postPointHistory(pointHistory),
+          updateUserPoint(this.props.userId, this.props.imagePoint)])
+      } else {
+        Promise.resolve()
+      }
+    }
+    if (file && this.props.imagePoint) {
       postCommentImage(file)
       .then(res => {
         const imgUrl = res.data.data.link
@@ -65,10 +100,19 @@ class CommentModal extends React.Component {
         doActionComment()
       })
       .then(() => {
+        handlePoint()
+      })
+      .then(() => {
+        handleImagePoint()
+      })
+      .then(() => {
         finalizeSubmit()
       })
     } else {
       doActionComment()
+      .then(() => {
+        handlePoint()
+      })
       .then(() => {
         finalizeSubmit()
       })
@@ -152,7 +196,8 @@ CommentModal.propTypes = {
   afterSubmit: React.PropTypes.func.isRequired,
   parentId: React.PropTypes.number,
   id: React.PropTypes.string.isRequired,
-  imagePoint: React.PropTypes.number
+  imagePoint: React.PropTypes.number,
+  point: React.PropTypes.number
 }
 
 export default CommentModal

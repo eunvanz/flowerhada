@@ -6,6 +6,8 @@ import keygen from 'keygenerator'
 import Button from 'components/Button'
 import MessageModal from 'components/MessageModal'
 import { deleteComment } from 'common/CommentService'
+import { postPointHistory } from 'common/PointHistoryService'
+import { updateUserPoint } from 'common/UserService'
 
 class Comment extends React.Component {
   constructor (props) {
@@ -72,8 +74,30 @@ class Comment extends React.Component {
     this.setState({ showMessageModal: true })
   }
   _handleOnClickConfirm () {
+    const { item, point, imagePoint } = this.props
     this.setState({ deleteProcess: true })
     deleteComment(this.props.item.id)
+    .then(() => {
+      const promArr = []
+      if (point) {
+        promArr.push(updateUserPoint(item.userId, point * -1))
+        promArr.push(postPointHistory({
+          userId: item.userId,
+          amount: point * -1,
+          action: '리뷰 삭제'
+        }))
+        if (item.image && item.image !== '') {
+          promArr.push(updateUserPoint(item.userId, imagePoint * -1))
+          promArr.push(postPointHistory({
+            userId: item.userId,
+            amount: imagePoint * -1,
+            action: '리뷰 이미지 삭제'
+          }))
+        }
+        return Promise.all(promArr)
+      }
+      return Promise.resolve()
+    })
     .then(() => {
       this.props.afterDelete()
     })
@@ -198,7 +222,7 @@ class Comment extends React.Component {
             />
             <MessageModal
               show={this.state.showMessageModal}
-              message='정말 삭제하시겠습니까?'
+              message='리뷰 등록으로 얻은 포인트 또한 차감됩니다. 정말 삭제하시겠습니까? '
               cancelBtnTxt='아니오'
               confirmBtnTxt='예'
               onConfirmClick={this._handleOnClickConfirm}
@@ -218,7 +242,9 @@ Comment.propTypes = {
   item: PropTypes.object.isRequired,
   userId: PropTypes.number,
   afterSubmit: PropTypes.func,
-  afterDelete: PropTypes.func
+  afterDelete: PropTypes.func,
+  point: PropTypes.number,
+  imagePoint: PropTypes.number
 }
 
 export default Comment

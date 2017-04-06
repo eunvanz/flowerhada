@@ -5,6 +5,8 @@ import { convertSqlDateToStringDateOnly } from 'common/util'
 import { Link } from 'react-router'
 import numeral from 'numeral'
 import Button from 'components/Button'
+import { cancelPayment, updateOrder } from 'common/OrderService'
+import { putCart } from 'common/CartService'
 
 class OrderListView extends React.Component {
   constructor (props) {
@@ -14,10 +16,12 @@ class OrderListView extends React.Component {
       curPage: 0,
       perPage: 10,
       isLoading: false,
-      initialized: false
+      initialized: false,
+      cancelProcess: false
     }
     this._initialize = this._initialize.bind(this)
     this._handleOnClickMoreList = this._handleOnClickMoreList.bind(this)
+    this._handleOnClickCancel = this._handleOnClickCancel.bind(this)
   }
   componentDidMount () {
     if (!this.props.user) {
@@ -26,14 +30,7 @@ class OrderListView extends React.Component {
     } else {
       this.props.fetchOrdersByUserId(this.props.user.id, 0, 10) // 현재페이지, 페이지당 개수
       .then(() => {
-        this.props.fetchCartsByUserId(this.props.user.id)
-      })
-      .then(() => {
-        const orders = this.props.orders.content.map(order => {
-          order.carts = this.props.carts.filter(cart => cart.orderId === order.id)
-          return order
-        })
-        this.setState({ orders })
+        this.setState({ orders: this.props.orders.content })
       })
       .then(() => {
         this._initialize()
@@ -57,6 +54,38 @@ class OrderListView extends React.Component {
       this.setState({ orders })
     })
   }
+  _handleOnClickCancel (order) {
+    this.setState({ cancelProcess: true })
+    const proms = []
+    const type = order.carts[0].lesson ? 'lesson' : 'product'
+    const status = type === 'lesson' ? '등록취소' : '주문취소'
+    const updatedOrder = Object.assign({}, order, { status })
+    cancelPayment(updatedOrder)
+    .then(res => {
+      if (res.data.code !== 0) return Promise.reject(res)
+      // cart 업데이트
+      for (const cart of order.carts) {
+        const updatedCart = Object.assign({}, cart, { status })
+        proms.push(putCart(updatedCart, updatedCart.id))
+      }
+      // order 업데이트
+      proms.push(updateOrder(updatedOrder, updatedOrder.id))
+      return Promise.all(proms)
+    })
+    .then(res => {
+      this.setState({ cancelProcess: false })
+      const updatedOrders = this.state.orders.map(o => {
+        if (order.id === o.id) {
+          o.status = status
+        }
+        return o
+      })
+      this.setState({ orders: updatedOrders })
+    })
+    .catch(res => {
+      window.alert('처리 중 에러 발생 - ' + res.data ? res.data.message : null)
+    })
+  }
   render () {
     const { user } = this.props
     const { orders } = this.state
@@ -72,7 +101,30 @@ class OrderListView extends React.Component {
         )
       })
     }
+    const renderCancelButton = order => {
+      const { status } = order
+      let returnComponent = null
+      if (status === '등록접수' || status === '등록완료' || status === '주문접수' || status === '배송준비중') {
+        returnComponent =
+          <span>
+            <br />
+            <Button
+              size='sm'
+              textComponent={<span>취소하기</span>}
+              process={this.state.cancelProcess}
+              onClick={() => this._handleOnClickCancel(order)} />
+          </span>
+      }
+      return returnComponent
+    }
     const renderOrderElements = () => {
+      if (orders.length === 0) {
+        return (
+          <tr>
+            <td colSpan={3} className='text-center' style={{ height: '200px' }}>구매 내역이 없습니다.</td>
+          </tr>
+        )
+      }
       return orders.map(order => {
         return (
           <tr key={keygen._()}>
@@ -80,8 +132,8 @@ class OrderListView extends React.Component {
             <td>{renderProductTitles(order.carts)}</td>
             <td className='text-center hidden-xs'>{numeral(order.pointSpent).format('0,0')}P</td>
             <td className='text-center hidden-xs'>{numeral(order.totalAmount - order.pointSpent).format('0,0')}원</td>
-            <td className='text-center'>{order.status}</td>
-            <td className='text-center hidden-xs'>121212</td>
+            <td className='text-center'>{order.status}{renderCancelButton(order)}</td>
+            <td className='text-center hidden-xs'>{order.transportCode}</td>
           </tr>
         )
       })

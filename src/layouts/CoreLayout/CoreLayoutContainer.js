@@ -1,12 +1,19 @@
 import { connect } from 'react-redux'
 import { fetchUser } from 'store/user'
 import { receiveAuthUser } from 'store/authUser'
+import { setInquiryModalShow } from 'store/inquiry'
 
 import CoreLayout from './CoreLayout'
 
 const mapDispatchToProps = {
   fetchUser,
-  receiveAuthUser
+  receiveAuthUser,
+  setInquiryModalShow
 }
 
-export default connect(mapDispatchToProps)(CoreLayout)
+const mapStateToProps = state => ({
+  inquiryModal: state.inquiry.inquiryModal,
+  user: state.user
+})
+
+export default connect(mapDispatchToProps, mapStateToProps)(CoreLayout)

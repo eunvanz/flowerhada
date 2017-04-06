@@ -2,6 +2,7 @@ import MyPageLayout from 'layouts/MyPageLayout/MyPageLayout'
 import Profile from './Profile'
 import OrderList from './OrderList'
 import PointHistory from './PointHistory'
+import InquiryList from './InquiryList'
 
 export const createRoutes = (store) => ({
   path        : 'my-page',
@@ -10,7 +11,8 @@ export const createRoutes = (store) => ({
   childRoutes : [
     Profile(store),
     OrderList(store),
-    PointHistory(store)
+    PointHistory(store),
+    InquiryList(store)
   ]
 })
 

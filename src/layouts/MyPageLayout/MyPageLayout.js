@@ -5,9 +5,9 @@ import MainContainer from 'components/MainContainer'
 const renderNav = () => {
   return (
     <Navigation
-      tabTitles={['내 정보', '구매목록', '포인트']}
-      tabIcons={['fa fa-user', 'fa fa-shopping-basket', 'fa fa-product-hunt']}
-      tabLinks={['/my-page/profile', '/my-page/order-list', '/my-page/point-history']}
+      tabTitles={['내 정보', '구매목록', '포인트', '1:1문의']}
+      tabIcons={['fa fa-user', 'fa fa-shopping-basket', 'fa fa-product-hunt', 'fa fa-question-circle']}
+      tabLinks={['/my-page/profile', '/my-page/order-list', '/my-page/point-history', '/my-page/inquiry-list']}
     />
   )
 }

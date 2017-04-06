@@ -6,6 +6,8 @@ import lessonReducer from './lesson'
 import productReducer from './product'
 import cartReducer from './cart'
 import orderReducer from './order'
+import inquiryReducer from './inquiry'
+import messageModalReducer from './messageModal'
 
 export const makeRootReducer = (asyncReducers) => {
   return combineReducers({
@@ -16,6 +18,8 @@ export const makeRootReducer = (asyncReducers) => {
     product: productReducer,
     cart: cartReducer,
     order: orderReducer,
+    inquiry: inquiryReducer,
+    messageModal: messageModalReducer,
     ...asyncReducers
   })
 }

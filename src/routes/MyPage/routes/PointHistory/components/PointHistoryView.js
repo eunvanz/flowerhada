@@ -30,7 +30,10 @@ class PointHistoryView extends React.Component {
       this.context.router.push('/login')
       return
     } else {
-      this._fetchAndSetPointHistories()
+      this.props.fetchUserByUserId(this.props.user.id)
+      .then(() => {
+        return this._fetchAndSetPointHistories()
+      })
     }
   }
   _fetchAndSetPointHistories () {
@@ -71,6 +74,13 @@ class PointHistoryView extends React.Component {
       return null
     }
     const renderOrderElements = () => {
+      if (pointHistories.length === 0) {
+        return (
+          <tr>
+            <td colSpan={3} className='text-center' style={{ height: '200px' }}>포인트 내역이 없습니다.</td>
+          </tr>
+        )
+      }
       return pointHistories.map(pointHistory => {
         const textColor = pointHistory.amount < 0 ? 'text-danger' : 'text-default'
         return (
@@ -154,7 +164,8 @@ PointHistoryView.contextTypes = {
 }
 
 PointHistoryView.propTypes = {
-  user: PropTypes.object.isRequired
+  user: PropTypes.object.isRequired,
+  fetchUserByUserId: PropTypes.func.isRequired
 }
 
 export default PointHistoryView

@@ -29,14 +29,15 @@ class ProductItem extends React.Component {
       this.context.router.push('/login')
       return
     }
-    const cart = new URLSearchParams()
-    cart.append('userId', this.props.user.id)
-    if (this.props.type === 'lesson') {
-      cart.append('lessonId', this.props.item.id)
-    } else {
-      cart.append('productId', this.props.item.id)
+    const cart = {
+      userId: this.props.user.id,
+      type: '위시리스트'
     }
-    cart.append('type', '위시리스트')
+    if (this.props.type === 'lesson') {
+      cart.lessonId = this.props.item.id
+    } else {
+      cart.productId = this.props.item.id
+    }
     postCart(cart)
     .then(() => {
       return this.props.fetchCartsByUserId(this.props.user.id)

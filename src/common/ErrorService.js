@@ -13,6 +13,6 @@ export const deleteError = id => {
   return axios.delete(`${API_BASE_URL}/errors/${id}`)
 }
 
-export const getAllError = () => {
-  return axios.get(`${API_BASE_URL}/errors`)
+export const getAllError = (curPage, perPage) => {
+  return axios.get(`${API_BASE_URL}/errors?curPage=${curPage}&perPage=${perPage}`)
 }

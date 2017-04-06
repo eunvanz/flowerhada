@@ -6,6 +6,7 @@ import { receiveOrderItem } from 'store/order'
 import { fetchReviewsByGroupName, clearReviews,
   fetchInquiriesByGroupName, clearInquiries,
   appendReviewsByGroupName, appendInquiriesByGroupName, fetchRelatedItems } from '../modules/item'
+import { fetchUserByUserId } from 'store/user'
 
 import ItemView from '../components/ItemView'
 
@@ -22,7 +23,8 @@ const mapDispatchToProps = {
   fetchProduct,
   unselectProduct,
   fetchCartsByUserId,
-  receiveOrderItem
+  receiveOrderItem,
+  fetchUserByUserId
 }
 
 const mapStateToProps = (state) => ({

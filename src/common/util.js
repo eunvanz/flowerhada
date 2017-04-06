@@ -136,6 +136,7 @@ export const convertSqlDateToString = date => {
 }
 
 export const convertSqlDateToStringDateOnly = date => {
+  if (!date) return ''
   return `${date.year}-${appendZeroTo1digitNumber(date.monthValue)}-${appendZeroTo1digitNumber(date.dayOfMonth)}` // eslint-disable-line
 }
 

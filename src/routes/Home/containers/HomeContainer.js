@@ -2,13 +2,27 @@ import { connect } from 'react-redux'
 import { fetchMainBanners } from '../modules/home'
 import { fetchLessons } from 'store/lesson'
 import { fetchProducts } from 'store/product'
+import { setInquiryModalShow, setInquiryModalInquiry,
+  setInquiryModalDefaultCategory, setInquiryModalMode, setInquiryModalAfterSubmit } from 'store/inquiry'
+import { setMessageModalShow, setMessageModalMessage, setMessageModalCancelBtnTxt, setMessageModalConfirmBtnTxt,
+  setMessageModalOnConfirmClick } from 'store/messageModal'
 
 import HomeView from '../components/HomeView'
 
 const mapDispatchToProps = {
   fetchMainBanners,
   fetchLessons,
-  fetchProducts
+  fetchProducts,
+  setInquiryModalShow,
+  setInquiryModalInquiry,
+  setInquiryModalDefaultCategory,
+  setInquiryModalMode,
+  setInquiryModalAfterSubmit,
+  setMessageModalShow,
+  setMessageModalMessage,
+  setMessageModalCancelBtnTxt,
+  setMessageModalConfirmBtnTxt,
+  setMessageModalOnConfirmClick
 }
 
 const mapStateToProps = (state) => ({

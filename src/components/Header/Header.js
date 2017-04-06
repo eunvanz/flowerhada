@@ -7,6 +7,10 @@ import { address, phone, email, facebook, instagram, ROOT } from 'common/constan
 import { fetchCartsByUserId, clearCarts } from 'store/cart'
 import WishList from 'components/WishList'
 import CartWindow from 'components/CartWindow'
+import { setInquiryModalMode, setInquiryModalShow,
+  setInquiryModalAfterSubmit, setInquiryModalDefaultCategory } from 'store/inquiry'
+import { setMessageModalShow, setMessageModalMessage, setMessageModalCancelBtnTxt, setMessageModalConfirmBtnTxt,
+  setMessageModalOnConfirmClick } from 'store/messageModal'
 
 const mapStateToProps = state => ({
   user: state.user,
@@ -20,7 +24,16 @@ const mapDispatchToProps = {
   fetchUser,
   receiveAuthUser,
   fetchCartsByUserId,
-  clearCarts
+  clearCarts,
+  setInquiryModalMode,
+  setInquiryModalShow,
+  setInquiryModalAfterSubmit,
+  setInquiryModalDefaultCategory,
+  setMessageModalShow,
+  setMessageModalMessage,
+  setMessageModalCancelBtnTxt,
+  setMessageModalConfirmBtnTxt,
+  setMessageModalOnConfirmClick
 }
 
 class Header extends React.Component {
@@ -28,6 +41,7 @@ class Header extends React.Component {
     super(props)
     this.displayName = 'Header'
     this._handleOnClickLogout = this._handleOnClickLogout.bind(this)
+    this._handleOnClickInquiry = this._handleOnClickInquiry.bind(this)
   }
   componentDidMount () {
     const sessionStorage = window.sessionStorage
@@ -47,6 +61,20 @@ class Header extends React.Component {
     this.props.removeAuthUser()
     this.props.clearCarts()
     browserHistory.push('/')
+  }
+  _handleOnClickInquiry () {
+    this.props.setInquiryModalDefaultCategory('분류선택')
+    this.props.setInquiryModalAfterSubmit(() => {
+      let message =
+        this.props.user ? '문의가 완료되었습니다. 문의 내역은 마이페이지 > 1:1문의 에서도 확인하실 수 있습니다.' : '문의가 완료되었습니다. 빠른 시일 내에 답변드리겠습니다.'
+      this.props.setMessageModalMessage(message)
+      this.props.setMessageModalCancelBtnTxt(null)
+      this.props.setMessageModalConfirmBtnTxt('확인')
+      this.props.setMessageModalOnConfirmClick(() => this.props.setMessageModalShow(false))
+      this.props.setMessageModalShow(true)
+    })
+    this.props.setInquiryModalMode('post')
+    this.props.setInquiryModalShow(true)
   }
   render () {
     const { cartList } = this.props
@@ -281,6 +309,11 @@ class Header extends React.Component {
                                 </li>
                               </ul>
                             </li>
+                            <li>
+                              <a id='inquiryBtn' onClick={this._handleOnClickInquiry} style={{ cursor: 'pointer' }}>
+                                1:1 문의
+                              </a>
+                            </li>
                             {this.props.authUser.data && this.props.authUser.data.authorities[1] &&
                               this.props.authUser.data.authorities[1].authority === 'ADMIN' &&
                               <li className='dropdown'>
@@ -296,6 +329,12 @@ class Header extends React.Component {
                                   </li>
                                   <li>
                                     <Link to='/admin/product'>상품</Link>
+                                  </li>
+                                  <li>
+                                    <Link to='/admin/order-list'>주문관리</Link>
+                                  </li>
+                                  <li>
+                                    <Link to='/admin/error-list'>오류관리</Link>
                                   </li>
                                 </ul>
                               </li>
@@ -365,7 +404,16 @@ Header.propTypes = {
   fetchUser: PropTypes.func.isRequired,
   fetchCartsByUserId: PropTypes.func.isRequired,
   clearCarts: PropTypes.func.isRequired,
-  cartList: PropTypes.array
+  cartList: PropTypes.array,
+  setInquiryModalMode: PropTypes.func.isRequired,
+  setInquiryModalShow: PropTypes.func.isRequired,
+  setInquiryModalAfterSubmit: PropTypes.func.isRequired,
+  setInquiryModalDefaultCategory: PropTypes.func.isRequired,
+  setMessageModalShow: PropTypes.func.isRequired,
+  setMessageModalMessage: PropTypes.func.isRequired,
+  setMessageModalCancelBtnTxt: PropTypes.func.isRequired,
+  setMessageModalConfirmBtnTxt: PropTypes.func.isRequired,
+  setMessageModalOnConfirmClick: PropTypes.func.isRequired
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header)

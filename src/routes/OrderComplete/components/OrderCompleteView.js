@@ -282,7 +282,7 @@ class OrderCompleteView extends React.Component {
           {renderSenderInfo()}
           {renderReceiverInfo()}
           {renderStudentInfo()}
-          <div className='text-right'>주문한 내역은 <Link to='/my-page/orders'>마이페이지 > 주문내역</Link> 에서 다시 확인하실 수 있습니다.</div>
+          <div className='text-right'>주문한 내역은 <Link to='/my-page/order-list'>마이페이지 > 구매목록</Link> 에서 다시 확인하실 수 있습니다.</div>
           <div className='text-right'>
             <Button
               onClick={() => this.context.router.push('my-page/orders')}

@@ -1,4 +1,4 @@
-import { getOrdersByUserId, getOrderById } from 'common/OrderService'
+import { getOrdersByUserId, getOrderById, getOrders } from 'common/OrderService'
 
 // ------------------------------------
 // Constants
@@ -79,6 +79,24 @@ export const fetchOrdersByUserId = (userId, curPage, perPage) => {
 export const appendOrdersByUserId = (userId, curPage, perPage) => {
   return dispatch => {
     return getOrdersByUserId(userId, curPage, perPage)
+    .then(res => {
+      return dispatch(appendOrders(res.data))
+    })
+  }
+}
+
+export const fetchOrders = (curPage, perPage) => {
+  return dispatch => {
+    return getOrders(curPage, perPage)
+    .then(res => {
+      return dispatch(receiveOrders(res.data))
+    })
+  }
+}
+
+export const fetchAndAppendMoreOrders = (curPage, perPage) => {
+  return dispatch => {
+    return getOrders(curPage, perPage)
     .then(res => {
       return dispatch(appendOrders(res.data))
     })

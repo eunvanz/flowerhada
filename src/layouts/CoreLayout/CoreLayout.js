@@ -5,6 +5,8 @@ import '../../styles/core.scss'
 import Helmet from 'react-helmet'
 import ScrollTop from 'components/ScrollTop'
 import Footer from 'components/Footer'
+import InquiryModal from 'components/InquiryModal'
+import GlobalMessageModal from 'components/GlobalMessageModal'
 
 class CoreLayout extends React.Component {
   render () {
@@ -79,6 +81,8 @@ class CoreLayout extends React.Component {
         />
         <Header />
         <ScrollTop />
+        <InquiryModal />
+        <GlobalMessageModal />
         <div>
           {this.props.children}
         </div>

@@ -27,8 +27,8 @@ export function loadAuthUser () {
 export const fetchAuthUser = userInfo => {
   return dispatch => {
     return login(userInfo)
-    .then(data => {
-      return dispatch(receiveAuthUser(data.body))
+    .then(res => {
+      return dispatch(receiveAuthUser(res.data))
     })
   }
 }

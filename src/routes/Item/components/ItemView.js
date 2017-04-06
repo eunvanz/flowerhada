@@ -19,6 +19,7 @@ import Parallax from 'components/Parallax'
 import DatePicker from 'components/DatePicker'
 import { deleteCartByUserIdAndItemTypeAndItemIdAndCartType, postCart } from 'common/CartService'
 import { Tooltip } from 'react-bootstrap'
+import { getCommentsByUserIdAndType } from 'common/CommentService'
 
 class ItemView extends React.Component {
   constructor (props) {
@@ -63,6 +64,7 @@ class ItemView extends React.Component {
     this._handleOnClickAddToCart = this._handleOnClickAddToCart.bind(this)
     this._renderPointInfo = this._renderPointInfo.bind(this)
     this._handleOnClickBuy = this._handleOnClickBuy.bind(this)
+    this._isAvailableWriter = this._isAvailableWriter.bind(this)
   }
   componentDidMount () {
     window.scrollTo(0, 0)
@@ -191,14 +193,12 @@ class ItemView extends React.Component {
       this.context.router.push('/login')
       return
     }
-    const wishList = new URLSearchParams()
-    wishList.append('userId', user.id)
+    const wishList = { userId: user.id, type: '위시리스트' }
     if (params.type === 'lesson') {
-      wishList.append('lessonId', item.id)
+      wishList.lessonId = item.id
     } else {
-      wishList.append('productId', item.id)
+      wishList.productId = item.id
     }
-    wishList.append('type', '위시리스트')
     postCart(wishList)
     .then(() => {
       return fetchCartsByUserId(user.id)
@@ -222,6 +222,9 @@ class ItemView extends React.Component {
     const action = this.state.tabActivated === 'review'
       ? this.props.fetchReviewsByGroupName : this.props.fetchInquiriesByGroupName
     action(this.props.item.groupName, 0, this.state.reviews.perPage)
+    .then(() => {
+      this.props.fetchUserByUserId(this.props.user.id)
+    })
   }
   _handleOnClickMoreList () {
     const commentType = this.state.tabActivated === 'review' ? 'reviews' : 'inquiries'
@@ -269,25 +272,26 @@ class ItemView extends React.Component {
       this.context.router.push('/login')
       return
     }
-    const cart = new URLSearchParams()
-    cart.append('userId', user.id)
-    if (params.type === 'lesson') {
-      cart.append('lessonId', item.id)
-    } else {
-      cart.append('productId', item.id)
-    }
-    cart.append('quantity', this.state.quantity)
-    cart.append('type', '장바구니')
     const options = []
     options.push(this.state.option1)
     options.push(this.state.option2)
     options.push(this.state.option3)
-    cart.append('options', JSON.stringify(options))
-    cart.append('totalAmount', this._getTotalPrice())
-    cart.append('itemPrice', this._getItemPrice())
-    cart.append('receiveDate', this.state.receiveDate)
-    cart.append('receiveTime', this.state.receiveTime)
-    cart.append('receiveArea', JSON.stringify(this.state.receiveArea))
+    const cart = {
+      userId: user.id,
+      quantity: this.state.quantity,
+      type: '장바구니',
+      options: JSON.stringify(options),
+      totalAmount: this._getTotalPrice(),
+      itemPrice: this._getItemPrice(),
+      receiveDate: this.state.receiveDate,
+      receiveTime: this.state.receiveTime,
+      receiveArea: JSON.stringify(this.state.receiveArea)
+    }
+    if (params.type === 'lesson') {
+      cart.lessonId = item.id
+    } else {
+      cart.productId = item.id
+    }
     postCart(cart)
     .then(() => {
       return fetchCartsByUserId(user.id)
@@ -312,6 +316,10 @@ class ItemView extends React.Component {
   _handleOnClickBuy () {
     const { item, receiveOrderItem, user, params } = this.props
     const { router } = this.context
+    if (!user) {
+      router.push('/login')
+      return
+    }
     const options = []
     options.push(this.state.option1)
     options.push(this.state.option2)
@@ -333,6 +341,24 @@ class ItemView extends React.Component {
     }
     receiveOrderItem(orderItem)
     router.push('/cart/direct')
+  }
+  _isAvailableWriter () {
+    const { carts, params, item, user } = this.props
+    if (!carts) return false
+    const filteredCarts = carts.filter(cart => {
+      if (params.type === 'lesson') {
+        return cart.lessonId === item.id && cart.status === '수강완료'
+      } else {
+        return cart.productId === item.id && cart.status === '배송완료'
+      }
+    })
+    return getCommentsByUserIdAndType(user.id, 'review')
+    .then(res => {
+      const userReviews = res.data
+      const filteredUserReviews = userReviews.filter(review => review.groupName === item.groupName)
+      if (filteredCarts.length > filteredUserReviews.length) return true
+      else return false
+    })
   }
   render () {
     const { type } = this.props.params
@@ -731,7 +757,8 @@ class ItemView extends React.Component {
       if (this.props.reviews && this.props.reviews.content && this.props.reviews.content.length > 0) {
         returnComponent = this.props.reviews.content.map(comment =>
           <Comment item={comment} key={keygen._()} userId={this.props.user ? this.props.user.id : null}
-            afterSubmit={this._handleOnSubmitComplete} afterDelete={this._handleOnSubmitComplete} />)
+            afterSubmit={this._handleOnSubmitComplete} afterDelete={this._handleOnSubmitComplete}
+            point={this._getItemPrice() * 0.01} imagePoint={this._getItemPrice() * 0.01} />)
       }
       return returnComponent || <div className='text-center'>등록된 후기가 없습니다.</div>
     }
@@ -774,6 +801,24 @@ class ItemView extends React.Component {
       }
       return returnComponent
     }
+    const renderWriteReviewButtton = () => {
+      if (this.props.user && this._isAvailableWriter()) {
+        return (
+          <div className='pull-right'>
+            <Button
+              color='dark'
+              onClick={this._handleOnClickWriteComment}
+              animated
+              textComponent={
+                <span>
+                  후기작성 <span className='text-default'>+{numeral(item.price * 0.01).format('0,0')}P</span> <i className='fa fa-pencil' />
+                </span>
+              }
+            />
+          </div>
+        )
+      }
+    }
     const renderTabSection = () => {
       /* eslint-disable */
       return (
@@ -798,21 +843,7 @@ class ItemView extends React.Component {
                     <div className='comments margin-clear space-top'>
                       {renderReviews()}
                       {renderShowMoreReviewsButton()}
-                      {
-                        this.props.user &&
-                        <div className='pull-right'>
-                          <Button
-                            color='dark'
-                            onClick={this._handleOnClickWriteComment}
-                            animated
-                            textComponent={
-                              <span>
-                                후기작성 <span className='text-default'>+{numeral(item.price * 0.01).format('0,0')}P</span> <i className='fa fa-pencil' />
-                              </span>
-                            }
-                          />
-                        </div>
-                      }
+                      {renderWriteReviewButtton()}
                     </div>
                   </div>
                   <div className='tab-pane fade' id='inquiryPane'>
@@ -848,6 +879,7 @@ class ItemView extends React.Component {
                   userId={this.props.user.id}
                   afterSubmit={this._handleOnSubmitComplete}
                   imagePoint={this._getItemPrice() * 0.01}
+                  point={this._getItemPrice() * 0.01}
                   id='registerComment'
                 />
               }
@@ -955,7 +987,8 @@ ItemView.propTypes = {
   unselectProduct: React.PropTypes.func,
   fetchCartsByUserId: React.PropTypes.func.isRequired,
   carts: React.PropTypes.array,
-  receiveOrderItem: React.PropTypes.func.isRequired
+  receiveOrderItem: React.PropTypes.func.isRequired,
+  fetchUserByUserId: React.PropTypes.func.isRequired
 }
 
 export default ItemView
