@@ -149,13 +149,13 @@ class ProfileView extends React.Component {
     user.phone = assemblePhoneNumber(this.state.phone)
     user.regDate = null
     if (this.state.changePassword && this._checkPasswordField() && this._checkPasswordConfirmField()) {
-      const userInfo = new FormData()
-      userInfo.append('email', user.email)
-      userInfo.append('password', this.state.oldPassword)
+      const userInfo = {
+        email: user.email,
+        password: this.state.oldPassword
+      }
       login(userInfo)
       .then(() => {
         user.password = this.state.newPassword
-        console.log(user)
         return updateUser(user)
       })
       .then(() => {

@@ -113,7 +113,7 @@ class InquiryListView extends React.Component {
       if (inquiries.length === 0) {
         return (
           <tr>
-            <td colSpan={3} className='text-center' style={{ height: '200px' }}>문의 내역이 없습니다.</td>
+            <td colSpan={3} className='text-center' style={{ height: '100px' }}>문의 내역이 없습니다.</td>
           </tr>
         )
       }

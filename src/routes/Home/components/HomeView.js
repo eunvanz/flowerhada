@@ -4,7 +4,6 @@ import { setInlineScripts, clearInlineScripts } from 'common/util'
 import HomeCard from './HomeCard'
 import ItemList from 'components/ItemList'
 import ActionBlock from 'components/ActionBlock'
-import { ROOT } from 'common/constants'
 import Loading from 'components/Loading'
 import Button from 'components/Button'
 // import 'template/plugins/jquery.themepunch.tools.min.js'
@@ -37,16 +36,16 @@ class HomeView extends React.Component {
     })
     .then(() => {
       const scripts = [
-        `${ROOT}/template/plugins/rs-plugin/js/jquery.themepunch.tools.min.js`,
-        `${ROOT}/template/plugins/rs-plugin/js/jquery.themepunch.revolution.min.js`,
-        `${ROOT}/template/plugins/owl-carousel/owl.carousel.js`,
-        `${ROOT}/template/plugins/jquery.browser.js`,
-        `${ROOT}/template/plugins/SmoothScroll.js`,
-        `${ROOT}/template/plugins/waypoints/jquery.waypoints.min.js`,
-        `${ROOT}/template/plugins/magnific-popup/jquery.magnific-popup.min.js`,
-        `${ROOT}/template/plugins/isotope/isotope.pkgd.min.js`,
-        `${ROOT}/template/js/template.js`,
-        `${ROOT}/template/js/inline-home-view.js`
+        `/template/plugins/rs-plugin/js/jquery.themepunch.tools.min.js`,
+        `/template/plugins/rs-plugin/js/jquery.themepunch.revolution.min.js`,
+        `/template/plugins/owl-carousel/owl.carousel.js`,
+        `/template/plugins/jquery.browser.js`,
+        `/template/plugins/SmoothScroll.js`,
+        `/template/plugins/waypoints/jquery.waypoints.min.js`,
+        `/template/plugins/magnific-popup/jquery.magnific-popup.min.js`,
+        `/template/plugins/isotope/isotope.pkgd.min.js`,
+        `/template/js/template.js`,
+        `/template/js/inline-home-view.js`
       ]
       setInlineScripts(scripts)
     })

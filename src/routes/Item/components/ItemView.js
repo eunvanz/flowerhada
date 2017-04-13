@@ -41,7 +41,8 @@ class ItemView extends React.Component {
       receiveDate: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`,
       receiveTime: '오전 10시 ~ 오전 12시',
       receiveArea: { name: '서울', price: 0 },
-      carouselFlag: true
+      carouselFlag: true,
+      writeReviewButton: false
     }
     this._handleOnClickShowMap = this._handleOnClickShowMap.bind(this)
     this._handleOnClickHideMap = this._handleOnClickHideMap.bind(this)
@@ -65,6 +66,8 @@ class ItemView extends React.Component {
     this._renderPointInfo = this._renderPointInfo.bind(this)
     this._handleOnClickBuy = this._handleOnClickBuy.bind(this)
     this._isAvailableWriter = this._isAvailableWriter.bind(this)
+    this._handleOnClickReOpen = this._handleOnClickReOpen.bind(this)
+    this._handleOnClickRequestLesson = this._handleOnClickRequestLesson.bind(this)
   }
   componentDidMount () {
     window.scrollTo(0, 0)
@@ -89,6 +92,7 @@ class ItemView extends React.Component {
       this._unselectItem()
       this._initializeState()
       this._loadItemInfo()
+      this._isAvailableWriter()
       window.scrollTo(0, 0)
     }
   }
@@ -164,6 +168,7 @@ class ItemView extends React.Component {
       }
       setRecentItemToLocalStorage(recentItem)
       this.setState({ loading: { isLoading: false } })
+      this._isAvailableWriter()
     })
   }
   _handleOnClickShowMap () {
@@ -352,13 +357,71 @@ class ItemView extends React.Component {
         return cart.productId === item.id && cart.status === '배송완료'
       }
     })
-    return getCommentsByUserIdAndType(user.id, 'review')
+    getCommentsByUserIdAndType(user.id, 'review')
     .then(res => {
       const userReviews = res.data
       const filteredUserReviews = userReviews.filter(review => review.groupName === item.groupName)
-      if (filteredCarts.length > filteredUserReviews.length) return true
-      else return false
+      // console.log(filteredCarts)
+      // console.log(filteredUserReviews)
+      // console.log(filteredCarts.length > filteredUserReviews.length)
+      if (filteredCarts.length > filteredUserReviews.length) {
+        this.setState({
+          writeReviewButton: true
+        })
+      }
     })
+  }
+  _handleOnClickReOpen () {
+    const inquiryModal = {
+      mode: 'post',
+      defaultCategory: '레슨재개설신청',
+      inquiry: {
+        content:
+`희망 레슨 : ${this.props.item.title}
+희망 지역 :
+희망일 :
+희망 인원 :
+신청자이름 : ${this.props.user ? this.props.user.name : ''}
+연락처 : ${this.props.user ? this.props.user.phone : ''}`
+      },
+      afterSubmit: () => {
+        const messageModal = {
+          show: true,
+          message: '문의가 완료되었습니다. 빠른 시일내에 답변드리겠습니다.',
+          cancelBtnTxt: null,
+          confirmBtnTxt: '확인',
+          onConfirmClick: () => this.props.setMessageModalShow(false),
+          process: false
+        }
+        this.props.setMessageModal(messageModal)
+      },
+      show: true
+    }
+    this.props.setInquiryModal(inquiryModal)
+  }
+  _handleOnClickRequestLesson () {
+    const inquiryModal = {
+      inquiry: {},
+      show: true,
+      process: false,
+      defaultCategory: '출장레슨신청',
+      afterSubmit: () => {
+        let message = this.props.user ? '문의가 완료되었습니다. 문의 내역은 "마이페이지"에서도 확인하실 수 있습니다.' : '문의가 완료되었습니다. 빠른 시일 내에 연락드리겠습니다.'
+        const messageModal = {
+          show: true,
+          message,
+          cancelBtnTxt: null,
+          confirmBtnTxt: '확인',
+          onConfirmClick: () => {
+            this.props.setMessageModalShow(false)
+          },
+          process: false
+        }
+        this.props.setMessageModal(messageModal)
+      },
+      mode: 'post'
+    }
+    this.props.setInquiryModal(inquiryModal)
   }
   render () {
     const { type } = this.props.params
@@ -445,35 +508,40 @@ class ItemView extends React.Component {
         return (
           <table className='table' style={{ marginBottom: '0px' }}>
             <tbody>
-              <tr>
-                <td className='text-right' style={{ width: '90px' }}><strong>모집인원</strong></td>
-                <td>최대 <span className='text-default'>{item.maxParty}</span>명, 현재 <span className='text-default'>{item.currParty}</span>명 등록 중</td>
-              </tr>
               {
-                !item.oneday &&
+                !item.expired &&
+                <tr>
+                  <td className='text-right' style={{ width: '90px' }}><strong>모집인원</strong></td>
+                  <td>최대 <span className='text-default'>{item.maxParty}</span>명, 현재 <span className='text-default'>{item.currParty}</span>명 등록 중</td>
+                </tr>
+              }
+              {
+                !item.oneday && !item.expired &&
                 <tr>
                   <td className='text-right'><strong>레슨일정</strong></td>
                   <td>오는 <span className='text-default'>{convertDateToString(item.lessonDate)}</span>부터 <span className='text-default'>{`${item.weekType} ${extractDaysFromLessonDays(item.lessonDays)}요일`}</span>에 <span className='text-default'>{item.weekLong}주간</span> 진행</td>
                 </tr>
               }
               {
-                !item.oneday &&
+                !item.oneday && !item.expired &&
                 <tr>
                   <td className='text-right'><strong>레슨시간</strong></td>
                   <td>{extractDetailScheduleFromLessonDays(item.lessonDays).map(elem => <div key={keygen._()}>{elem}<br /></div>)}</td>
                 </tr>
               }
               {
-                item.oneday &&
+                item.oneday && !item.expired &&
                 <tr>
                   <td className='text-right'><strong>레슨일정</strong></td>
                   <td>오는 <span className='text-default'>{convertDateToString(item.lessonDate)}</span>에 진행되는 <span className='text-default'>원데이레슨</span></td>
                 </tr>
               }
-              <tr>
-                <td className='text-right'><strong>장소</strong></td>
-                <td>{`${item.address} ${item.restAddress} `}<LinkButton onClick={this._handleOnClickShowMap} textComponent={<span>지도보기 <i className='fa fa-map-marker' /></span>} /></td>
-              </tr>
+              { !item.expired &&
+                <tr>
+                  <td className='text-right'><strong>장소</strong></td>
+                  <td>{`${item.address} ${item.restAddress} `}<LinkButton onClick={this._handleOnClickShowMap} textComponent={<span>지도보기 <i className='fa fa-map-marker' /></span>} /></td>
+                </tr>
+            }
             </tbody>
           </table>
         )
@@ -639,7 +707,14 @@ class ItemView extends React.Component {
     }
     const renderPrice = () => {
       if (item.expired) {
-        return <Alert type='warning' text='신청 기간이 지난 레슨입니다. 다음 번엔 좀 더 서두르세요!' />
+        return <Alert type='warning' text='신청 기간이 지난 레슨입니다. 다음 번엔 좀 더 서두르세요!' button={
+          <Button
+            textComponent={<span>재개설 신청하기</span>}
+            size='sm'
+            color='dark'
+            onClick={this._handleOnClickReOpen}
+          />
+        } />
       } else if (item.soldOut) {
         return <Alert type='warning' text='일시적으로 품절된 상품입니다. 다음 번엔 좀 더 서두르세요!' />
       } else if (type === 'lesson' && item.maxParty <= item.currParty) {
@@ -802,7 +877,7 @@ class ItemView extends React.Component {
       return returnComponent
     }
     const renderWriteReviewButtton = () => {
-      if (this.props.user && this._isAvailableWriter()) {
+      if (this.state.writeReviewButton) {
         return (
           <div className='pull-right'>
             <Button
@@ -953,7 +1028,7 @@ class ItemView extends React.Component {
           <ActionBlock
             title='우리동네로 call hada'
             desc='내게 맞는 레슨이 없다고 좌절하지 마세요. 여러분이 원하는 지역과 시간대로 레슨을 개설해드립니다.'
-            link='/apply-lesson'
+            onClick={this._handleOnClickRequestLesson}
             btnTxt='출장레슨 신청'
             btnIcon='fa fa-pencil-square-o pl-20'
           />
@@ -988,7 +1063,10 @@ ItemView.propTypes = {
   fetchCartsByUserId: React.PropTypes.func.isRequired,
   carts: React.PropTypes.array,
   receiveOrderItem: React.PropTypes.func.isRequired,
-  fetchUserByUserId: React.PropTypes.func.isRequired
+  fetchUserByUserId: React.PropTypes.func.isRequired,
+  setMessageModal: React.PropTypes.func.isRequired,
+  setMessageModalShow: React.PropTypes.func.isRequired,
+  setInquiryModal: React.PropTypes.func.isRequired
 }
 
 export default ItemView

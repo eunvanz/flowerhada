@@ -22,6 +22,7 @@ class OrderListView extends React.Component {
     this._initialize = this._initialize.bind(this)
     this._handleOnClickMoreList = this._handleOnClickMoreList.bind(this)
     this._handleOnClickCancel = this._handleOnClickCancel.bind(this)
+    this._doCancel = this._doCancel.bind(this)
   }
   componentDidMount () {
     if (!this.props.user) {
@@ -54,7 +55,8 @@ class OrderListView extends React.Component {
       this.setState({ orders })
     })
   }
-  _handleOnClickCancel (order) {
+  _doCancel (order) {
+    this.props.setMessageModalShow(false)
     this.setState({ cancelProcess: true })
     const proms = []
     const type = order.carts[0].lesson ? 'lesson' : 'product'
@@ -85,6 +87,17 @@ class OrderListView extends React.Component {
     .catch(res => {
       window.alert('처리 중 에러 발생 - ' + res.data ? res.data.message : null)
     })
+  }
+  _handleOnClickCancel (order) {
+    const messageModal = {
+      show: true,
+      message: '정말 취소하시겠습니까?',
+      cancelBtnTxt: '아니오',
+      confirmBtnTxt: '예',
+      onConfirmClick: order => this._doCancel(order),
+      process: false
+    }
+    this.props.setMessageModal(messageModal)
   }
   render () {
     const { user } = this.props
@@ -121,7 +134,7 @@ class OrderListView extends React.Component {
       if (orders.length === 0) {
         return (
           <tr>
-            <td colSpan={3} className='text-center' style={{ height: '200px' }}>구매 내역이 없습니다.</td>
+            <td colSpan={6} className='text-center' style={{ height: '200px' }}>구매 내역이 없습니다.</td>
           </tr>
         )
       }
@@ -215,7 +228,9 @@ OrderListView.propTypes = {
   user: PropTypes.object.isRequired,
   carts: PropTypes.array,
   orders: PropTypes.object,
-  appendOrdersByUserId: PropTypes.func.isRequired
+  appendOrdersByUserId: PropTypes.func.isRequired,
+  setMessageModal: PropTypes.func.isRequired,
+  setMessageModalShow: PropTypes.func.isRequired
 }
 
 export default OrderListView

@@ -1,13 +1,16 @@
 import { connect } from 'react-redux'
 import { fetchOrdersByUserId, appendOrdersByUserId } from 'store/order'
 import { fetchCartsByUserId } from 'store/cart'
+import { setMessageModal, setMessageModalShow } from 'store/messageModal'
 
 import OrderListView from '../components/OrderListView'
 
 const mapDispatchToProps = {
   fetchOrdersByUserId,
   fetchCartsByUserId,
-  appendOrdersByUserId
+  appendOrdersByUserId,
+  setMessageModal,
+  setMessageModalShow
 }
 
 const mapStateToProps = (state) => ({

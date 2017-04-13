@@ -4,6 +4,8 @@ import backgroundImage from '../assets/images/background.jpg'
 import { setInlineScripts } from 'common/util'
 import validator from 'validator'
 import $ from 'jquery'
+import FindPasswordModal from 'components/FindPasswordModal'
+import Button from 'components/Button'
 
 class Login extends React.Component {
   constructor (props) {
@@ -11,7 +13,9 @@ class Login extends React.Component {
     this.displayName = 'Login'
     this.state = {
       email: '',
-      password: ''
+      password: '',
+      showFindPasswordModal: false,
+      process: false
     }
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
     this._handleOnClickSubmit = this._handleOnClickSubmit.bind(this)
@@ -45,6 +49,7 @@ class Login extends React.Component {
       return
     }
 
+    this.setState({ process: true })
     const userInfo = { email: this.state.email, password: this.state.password }
     this.props.fetchAuthUser(userInfo)
     .then(() => {
@@ -58,9 +63,11 @@ class Login extends React.Component {
       return this.props.fetchCartsByUserId(this.props.user.id)
     })
     .then(() => {
+      this.setState({ process: false })
       this.context.router.goBack()
     })
-    .catch(() => {
+    .catch((res) => {
+      console.log(res)
       this._showErrorMessage('이메일 혹은 비밀번호가 잘못되었습니다.')
     })
   }
@@ -97,7 +104,7 @@ class Login extends React.Component {
               <div className='form-block center-block p-30 light-gray-bg border-clear'>
                 <h2 className='title'>로그인</h2>
                 <form className='form-horizontal' role='form'>
-                  <div className='form-group has-feedback'>
+                  {/* <div className='form-group has-feedback'>
                     <label htmlFor='inputEmail' className='col-sm-3 control-label'>
                       소셜계정 로그인
                     </label>
@@ -120,7 +127,7 @@ class Login extends React.Component {
                         네이버 <i style={{ fontFamily: 'Archivo Black', lineHeight: '28px', fontStyle: 'normal' }}>N</i>
                       </button>
                     </div>
-                  </div>
+                  </div> */}
                   <div className='separator' />
                   <div className='form-group has-feedback' id='formGroupEmail'>
                     <label htmlFor='inputEmail' className='col-sm-3 control-label'>
@@ -146,17 +153,22 @@ class Login extends React.Component {
                   <div className='col-sm-offset-3 col-sm-8 small message' />
                   <div className='form-group'>
                     <div className='col-sm-offset-3 col-sm-8'>
-                      <button onClick={this._handleOnClickSubmit}
-                        className='btn btn-group btn-block btn-default btn-animated'>
-                        로그인 <i className='fa fa-key' />
-                      </button>
+                      <Button
+                        onClick={this._handleOnClickSubmit}
+                        className='btn-block'
+                        style={{ color: 'white' }}
+                        textComponent={<span><i className='fa fa-key' />로그인</span>}
+                        animated
+                        process={this.state.process}
+                      />
                     </div>
                   </div>
                   <div className='form-group'>
                     <div className='col-sm-offset-3 col-sm-8'>
                       <ul>
                         <li>
-                          <a>비밀번호를 잊으셨나요?</a>
+                          <a style={{ cursor: 'pointer' }}
+                            onClick={() => this.setState({ showFindPasswordModal: true })}>비밀번호를 잊으셨나요?</a>
                         </li>
                         <li>
                           <Link to='/sign-up'>아직 회원이 아니신가요?</Link>
@@ -169,6 +181,8 @@ class Login extends React.Component {
             </div>
           </div>
         </div>
+        <FindPasswordModal show={this.state.showFindPasswordModal}
+          close={() => this.setState({ showFindPasswordModal: false })} />
       </div>
     )
   }

@@ -1,6 +1,6 @@
 export const imgRouteMainBanner = 'http://imgur.com'
 export const imgRoute = '/images'
-export const ROOT = 'http://localhost:3000'
+export const ROOT = 'http://d2j7zouas1cvep.cloudfront.net'
 
 export const address = '서울 송파구 석촌동 215-13'
 export const phone = '010 9023 8807'

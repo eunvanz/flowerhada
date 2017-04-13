@@ -3,7 +3,7 @@ import Loading from 'components/Loading'
 import keygen from 'keygenerator'
 import { convertSqlDateToStringDateOnly } from 'common/util'
 import Button from 'components/Button'
-import { getAllError } from 'common/ErrorService'
+import { getAllError, putError } from 'common/ErrorService'
 import $ from 'jquery'
 
 class ErrorListView extends React.Component {
@@ -61,6 +61,25 @@ class ErrorListView extends React.Component {
   _handleOnClickToggleLog (id) {
     $(`#${id}`).toggle()
   }
+  _handleOnClickStatus (error) {
+    const { status } = error
+    let updatedError
+    let updatedStatus
+    if (status === '미해결') updatedStatus = '해결'
+    else updatedStatus = '미해결'
+    updatedError = Object.assign({}, error, { status: updatedStatus })
+    putError(updatedError, updatedError.id)
+    .then(() => {
+      this.setState({ errors: this.state.errors.map(item => {
+        if (item.id === updatedError.id) {
+          item.status = updatedStatus
+          return item
+        } else {
+          return item
+        }
+      }) })
+    })
+  }
   render () {
     const { errors } = this.state
     const renderErrorElements = () => {
@@ -73,7 +92,10 @@ class ErrorListView extends React.Component {
             <td className='text-center'>{convertSqlDateToStringDateOnly(error.date)}</td>
             <td className='text-center'>{error.user.email}</td>
             <td className='text-center'><a onClick={() => this._handleOnClickToggleLog(id)} style={{ cursor: 'pointer' }}>로그보이기/접기</a></td>
-            <td className='text-center'><span className={textColor}>{error.status}</span></td>
+            <td className='text-center'><span
+              style={{ cursor: 'pointer' }}
+              className={textColor}
+              onClick={() => this._handleOnClickStatus(error)}>{error.status}</span></td>
           </tr>
         )
         returnComponent.push(

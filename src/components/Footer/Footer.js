@@ -1,5 +1,5 @@
 import React from 'react'
-import { address, phone, email, facebook, instagram, ROOT } from 'common/constants'
+import { address, phone, email, facebook, instagram } from 'common/constants'
 
 class Footer extends React.Component {
   render () {
@@ -13,7 +13,7 @@ class Footer extends React.Component {
                   <div className='footer-content text-center padding-ver-clear'>
                     <div className='logo-footer'>
                       <img id='logo-footer' className='center-block'
-                        src={`${ROOT}/template/images/logo_cool_green.png`} alt='flower hada' />
+                        src={`/template/images/logo_cool_green.png`} alt='flowerhada' />
                     </div>
                     <ul className='list-inline mb-20'>
                       <li>

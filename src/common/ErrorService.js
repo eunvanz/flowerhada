@@ -6,6 +6,8 @@ export const postError = error => {
 }
 
 export const putError = (error, id) => {
+  error.date = null
+  error.user.regDate = null
   return axios.put(`${API_BASE_URL}/errors/${id}`, error)
 }
 

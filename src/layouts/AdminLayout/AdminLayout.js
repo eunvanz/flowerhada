@@ -1,10 +1,10 @@
 import React from 'react'
 import Navigation from 'components/Navigation'
 
-const tabTitles = ['메인배너관리', '레슨관리', '상품관리', '주문관리', '오류관리', '문의관리']
-const tabIcons = ['icon-star', 'icon-star', 'icon-star', 'icon-star', 'icon-star', 'icon-star']
+const tabTitles = ['메인배너관리', '레슨관리', '상품관리', '주문관리', '오류관리', '문의관리', '회원관리']
+const tabIcons = ['icon-star', 'icon-star', 'icon-star', 'icon-star', 'icon-star', 'icon-star', 'icon-star']
 const tabLinks = ['/admin/main-banner', '/admin/lesson', '/admin/product', '/admin/order-list', '/admin/error-list',
-  '/admin/inquiry-list']
+  '/admin/inquiry-list', '/admin/user-list']
 
 export const AdminLayout = ({ children }) => (
   <div className='main-container'>

@@ -10,6 +10,7 @@ import ProductRegister from './ProductRegister'
 import OrderList from './OrderList'
 import ErrorList from './ErrorList'
 import InquiryList from './InquiryList'
+import UserList from './UserList'
 
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
@@ -27,7 +28,8 @@ export const createRoutes = (store) => ({
     ProductRegister(store),
     OrderList(store),
     ErrorList(store),
-    InquiryList(store)
+    InquiryList(store),
+    UserList(store)
   ]
 })
 

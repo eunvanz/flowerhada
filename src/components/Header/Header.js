@@ -3,7 +3,7 @@ import { IndexLink, Link, browserHistory } from 'react-router'
 import { connect } from 'react-redux'
 import { removeUser, fetchUser } from 'store/user'
 import { removeAuthUser, receiveAuthUser } from 'store/authUser'
-import { address, phone, email, facebook, instagram, ROOT } from 'common/constants'
+import { address, phone, email, facebook, instagram } from 'common/constants'
 import { fetchCartsByUserId, clearCarts } from 'store/cart'
 import WishList from 'components/WishList'
 import CartWindow from 'components/CartWindow'
@@ -219,7 +219,7 @@ class Header extends React.Component {
                   </div>
                   <div id='logo' className='logo'>
                     <IndexLink to='/'>
-                      <img id='logo_img' src={`${ROOT}/template/images/logo_cool_green.png`} alt='flowerhada' />
+                      <img id='logo_img' src={`/template/images/logo_cool_green.png`} alt='flowerhada' />
                     </IndexLink>
                   </div>
                   <div className='site-slogan' style={{ marginLeft: '45px' }}>live florally</div>
@@ -335,6 +335,9 @@ class Header extends React.Component {
                                   </li>
                                   <li>
                                     <Link to='/admin/error-list'>오류관리</Link>
+                                  </li>
+                                  <li>
+                                    <Link to='/admin/user-list'>회원</Link>
                                   </li>
                                 </ul>
                               </li>

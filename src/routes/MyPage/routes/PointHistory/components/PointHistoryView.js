@@ -77,7 +77,7 @@ class PointHistoryView extends React.Component {
       if (pointHistories.length === 0) {
         return (
           <tr>
-            <td colSpan={3} className='text-center' style={{ height: '200px' }}>포인트 내역이 없습니다.</td>
+            <td colSpan={3} className='text-center' style={{ height: '100px' }}>포인트 내역이 없습니다.</td>
           </tr>
         )
       }
@@ -118,7 +118,7 @@ class PointHistoryView extends React.Component {
         )
       }
     }
-    const renderOrderList = () => {
+    const renderPointHistoryList = () => {
       return (
         <table className='table cart table-hover table-colored'>
           <thead>
@@ -145,7 +145,7 @@ class PointHistoryView extends React.Component {
             <div className='text-left'>
               <h3>현재 보유 포인트: <span className='text-default'>{numeral(user.point).format('0,0')}</span>P</h3>
             </div>
-            {renderOrderList()}
+            {renderPointHistoryList()}
           </div>
         )
       }

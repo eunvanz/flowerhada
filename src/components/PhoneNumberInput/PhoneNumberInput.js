@@ -4,7 +4,7 @@ class PhoneNumberInput extends React.Component {
   render () {
     return (
       <div>
-        <select className='form-control' data-index={0} data-seq={this.props.seq} style={{ width: '80px', display: 'inline' }}
+        <select className='form-control' data-index={0} data-seq={this.props.seq} style={{ width: '80px', display: 'inline', paddingRight: '0px' }}
           value={this.props.valueStart} onChange={this.props.onChange}>
           <option value='010'>010</option>
           <option value='011'>011</option>

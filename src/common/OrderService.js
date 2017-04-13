@@ -1,6 +1,5 @@
-import { API_BASE_URL, IAMPORT_URL } from './serverConfig'
+import { API_BASE_URL } from './serverConfig'
 import axios from 'axios'
-import qs from 'qs'
 
 export const getOrdersByUserId = (userId, curPage, perPage) => {
   return axios.get(`${API_BASE_URL}/orders/user/${userId}?curPage=${curPage}&perPage=${perPage}`)

@@ -47,7 +47,6 @@ class InquiryListView extends React.Component {
     })
   }
   _handleOnClickTitle (id) {
-    console.log(this.state.showQuestion[id])
     if (!this.state.showQuestion[id]) {
       this.setState({
         showQuestion: Object.assign({}, this.state.showQuestion, { [id]: true })
@@ -136,6 +135,7 @@ class InquiryListView extends React.Component {
             <td><a onClick={() => this._handleOnClickTitle(inquiry.id)}
               style={{ cursor: 'pointer' }}>{inquiry.title}</a></td>
             <td className='text-center'>{inquiry.user ? inquiry.user.name : '비회원'}</td>
+            <td className='text-center'>{inquiry.user ? inquiry.user.email : '비회원'}</td>
             <td className='text-center'>{renderStatus(inquiry)}</td>
           </tr>
         )
@@ -143,7 +143,7 @@ class InquiryListView extends React.Component {
           <tr key={keygen._()} id={`question-${inquiry.id}`}
             style={{ display: this.state.showQuestion[inquiry.id] ? 'table-row' : 'none' }}>
             <td className='text-center'>문의내용</td>
-            <td colSpan={3}>
+            <td colSpan={4}>
               <div dangerouslySetInnerHTML={{ __html: inquiry.content }}></div>
             </td>
           </tr>
@@ -153,7 +153,7 @@ class InquiryListView extends React.Component {
             <tr key={keygen._()} id={`answer-${inquiry.id}`}
               style={{ display: this.state.showAnswer[inquiry.id] ? 'table-row' : 'none' }}>
               <td className='text-center'>답변</td>
-              <td colSpan={3}>
+              <td colSpan={4}>
                 <div dangerouslySetInnerHTML={{ __html: inquiry.answers[0].content }}></div>
                 <Button
                   textComponent={<span>수정</span>} onClick={() => this._handleOnClickEditAnswer(inquiry.answers[0])} />
@@ -168,7 +168,7 @@ class InquiryListView extends React.Component {
       if (!this.props.inquiries.last) {
         return (
           <tr>
-            <td colSpan={4}>
+            <td colSpan={5}>
               <Button
                 className='btn-block'
                 onClick={this._handleOnClickMoreList}
@@ -197,7 +197,8 @@ class InquiryListView extends React.Component {
             <tr>
               <th className='text-center' style={{ width: '150px' }}>문의일자</th>
               <th className='text-center'>제목</th>
-              <th className='text-center'>작성자</th>
+              <th className='text-center'>작성자이름</th>
+              <th className='text-center'>작성자이메일</th>
               <th className='text-center' style={{ width: '150px' }}>답변</th>
             </tr>
           </thead>

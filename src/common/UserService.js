@@ -28,3 +28,11 @@ export const updateUserPoint = (id, point) => {
 export const updateUser = user => {
   return axios.put(`${API_BASE_URL}/users/${user.id}`, user)
 }
+
+export const getUserByPhone = phone => {
+  return axios.get(`${API_BASE_URL}/users/phone/${phone}`)
+}
+
+export const resetUserPassword = (email) => {
+  return axios.put(`${API_BASE_URL}/users/reset-password?email=${email}`)
+}

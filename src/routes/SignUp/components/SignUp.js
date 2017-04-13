@@ -10,6 +10,7 @@ import Loading from '../../../components/Loading'
 import PhoneNumberInput from 'components/PhoneNumberInput'
 import keygen from 'keygenerator'
 import { assemblePhoneNumber } from 'common/util'
+import Button from 'components/Button'
 
 class SignUp extends React.Component {
   constructor (props) {
@@ -22,7 +23,8 @@ class SignUp extends React.Component {
       name: '',
       isAgreed: false,
       showMessagePopup: false,
-      phone: ['010', '', '']
+      phone: ['010', '', ''],
+      process: false
     }
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
     this._handleOnClickSubmit = this._handleOnClickSubmit.bind(this)
@@ -208,7 +210,7 @@ class SignUp extends React.Component {
               <div className='form-block center-block p-30 light-gray-bg border-clear'>
                 <h2 className='title'>회원가입</h2>
                 <form className='form-horizontal' role='form'>
-                  <div className='form-group has-feedback'>
+                  {/* <div className='form-group has-feedback'>
                     <label htmlFor='inputEmail' className='col-sm-3 control-label'>
                       소셜계정으로 가입
                     </label>
@@ -231,7 +233,7 @@ class SignUp extends React.Component {
                         네이버 <i style={{ fontFamily: 'Archivo Black', lineHeight: '28px', fontStyle: 'normal' }}>N</i>
                       </button>
                     </div>
-                  </div>
+                  </div> */}
                   <div className='separator' />
                   <div className='form-group has-feedback' id='formGroupEmail'>
                     <label htmlFor='inputEmail' className='col-sm-3 control-label'>
@@ -313,10 +315,14 @@ class SignUp extends React.Component {
                   </div>
                   <div className='form-group'>
                     <div className='col-sm-offset-3 col-sm-8'>
-                      <button onClick={this._handleOnClickSubmit}
-                        className='btn btn-block btn-group btn-default btn-animated'>
-                        가입하기 <i className='fa fa-check' />
-                      </button>
+                      <Button
+                        textComponent={<span>가입하기 <i className='fa fa-check' /></span>}
+                        animated
+                        className='btn-block'
+                        style={{ color: 'white' }}
+                        onClick={this._handleOnClickSubmit}
+                        process={this.state.process}
+                      />
                     </div>
                   </div>
                 </form>

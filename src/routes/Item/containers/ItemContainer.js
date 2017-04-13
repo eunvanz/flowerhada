@@ -7,6 +7,8 @@ import { fetchReviewsByGroupName, clearReviews,
   fetchInquiriesByGroupName, clearInquiries,
   appendReviewsByGroupName, appendInquiriesByGroupName, fetchRelatedItems } from '../modules/item'
 import { fetchUserByUserId } from 'store/user'
+import { setMessageModal, setMessageModalShow } from 'store/messageModal'
+import { setInquiryModal } from 'store/inquiry'
 
 import ItemView from '../components/ItemView'
 
@@ -24,7 +26,10 @@ const mapDispatchToProps = {
   unselectProduct,
   fetchCartsByUserId,
   receiveOrderItem,
-  fetchUserByUserId
+  fetchUserByUserId,
+  setMessageModal,
+  setMessageModalShow,
+  setInquiryModal
 }
 
 const mapStateToProps = (state) => ({
