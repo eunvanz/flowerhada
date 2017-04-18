@@ -1,9 +1,9 @@
 import React from 'react'
 import { convertDateToString, extractDaysFromLessonDays, extractDetailScheduleFromLessonDays,
-  setRecentItemToLocalStorage } from 'common/util'
+  setRecentItemToLocalStorage, isMobile } from 'common/util'
 import MapModal from 'components/MapModal'
 import numeral from 'numeral'
-import ActionBlock from 'components/ActionBlock'
+import LessonRequestActionBlock from 'components/LessonRequestActionBlock'
 import LinkButton from 'components/LinkButton'
 import Comment from 'components/Comment'
 import $ from 'jquery'
@@ -13,7 +13,6 @@ import Button from 'components/Button'
 import RecentItem from 'components/RecentItem'
 import Alert from 'components/Alert'
 import Loading from 'components/Loading'
-import TextField from 'components/TextField'
 import ImageCarousel from 'components/ImageCarousel'
 import Parallax from 'components/Parallax'
 import DatePicker from 'components/DatePicker'
@@ -42,7 +41,7 @@ class ItemView extends React.Component {
       receiveTime: '오전 10시 ~ 오전 12시',
       receiveArea: { name: '서울', price: 0 },
       carouselFlag: true,
-      writeReviewButton: false
+      isReviewWriteable: false
     }
     this._handleOnClickShowMap = this._handleOnClickShowMap.bind(this)
     this._handleOnClickHideMap = this._handleOnClickHideMap.bind(this)
@@ -65,9 +64,8 @@ class ItemView extends React.Component {
     this._handleOnClickAddToCart = this._handleOnClickAddToCart.bind(this)
     this._renderPointInfo = this._renderPointInfo.bind(this)
     this._handleOnClickBuy = this._handleOnClickBuy.bind(this)
-    this._isAvailableWriter = this._isAvailableWriter.bind(this)
+    this._renderWriteReviewButton = this._renderWriteReviewButton.bind(this)
     this._handleOnClickReOpen = this._handleOnClickReOpen.bind(this)
-    this._handleOnClickRequestLesson = this._handleOnClickRequestLesson.bind(this)
   }
   componentDidMount () {
     window.scrollTo(0, 0)
@@ -92,13 +90,12 @@ class ItemView extends React.Component {
       this._unselectItem()
       this._initializeState()
       this._loadItemInfo()
-      this._isAvailableWriter()
       window.scrollTo(0, 0)
     }
   }
   componentWillUnmount () {
     this._unselectItem(this.props.params.type)
-    this.props.clearInquiries()
+    this.props.clearItemInquiries()
     this.props.clearReviews()
   }
   _initializeState () {
@@ -119,7 +116,8 @@ class ItemView extends React.Component {
       receiveDate: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`,
       receiveTime: '오전 10시 ~ 오전 12시',
       receiveArea: { name: '서울', price: 0 },
-      carouselFlag: true
+      carouselFlag: true,
+      isReviewWriteable: false
     })
   }
   _isValidPage () {
@@ -138,24 +136,28 @@ class ItemView extends React.Component {
     let fetchItem = this.props.fetchProduct
     if (type === 'lesson') fetchItem = this.props.fetchLesson
     this.setState({ loading: { isLoading: true, text: `${type === 'lesson' ? '레슨' : '상품'} 정보를 불러오는 중..` } })
-    fetchItem(this.props.params.id)
+    return fetchItem(this.props.params.id)
     .then(() => {
+      // console.log('아이템 로드 완료')
       if (!this.props.item) {
         this.context.router.push('/not-found')
         return
       }
       this.setState({ itemPrice: this.props.item.price })
-      this.props.fetchReviewsByGroupName(this.props.item.groupName,
+      return this.props.fetchReviewsByGroupName(this.props.item.groupName,
         this.state.reviews.curPage, this.state.reviews.perPage)
     })
     .then(() => {
-      this.props.fetchInquiriesByGroupName(this.props.item.groupName,
+      // console.log('리뷰 로드 완료')
+      return this.props.fetchItemInquiriesByGroupName(this.props.item.groupName,
         this.state.reviews.curPage, this.state.reviews.perPage)
     })
     .then(() => {
-      this.props.fetchRelatedItems(this.props.item, type)
+      // console.log('문의 로드 완료')
+      return this.props.fetchRelatedItems(this.props.item, type)
     })
     .then(() => {
+      // console.log('관련상품 로드 완료')
       const recentItem = {
         id: this.props.item.id,
         type: type,
@@ -166,9 +168,16 @@ class ItemView extends React.Component {
         price: this.props.item.price,
         discountedPrice: this.props.item.discountedPrice
       }
-      setRecentItemToLocalStorage(recentItem)
-      this.setState({ loading: { isLoading: false } })
-      this._isAvailableWriter()
+      if (!isMobile.any()) {
+        setRecentItemToLocalStorage(recentItem)
+      }
+      // console.log('최근본 상품 로컬스토리지에 저장 완료')
+      return this._renderWriteReviewButton()
+      .then(() => {
+        // console.log('리뷰작성 버튼 렌더링 완료')
+        this.setState({ loading: { isLoading: false } })
+        return Promise.resolve()
+      })
     })
   }
   _handleOnClickShowMap () {
@@ -225,16 +234,19 @@ class ItemView extends React.Component {
   _handleOnSubmitComplete () {
     this.setState({ [this.state.tabActivated]: { curPage: 0, perPage: 5 } })
     const action = this.state.tabActivated === 'review'
-      ? this.props.fetchReviewsByGroupName : this.props.fetchInquiriesByGroupName
+      ? this.props.fetchReviewsByGroupName : this.props.fetchItemInquiriesByGroupName
     action(this.props.item.groupName, 0, this.state.reviews.perPage)
     .then(() => {
       this.props.fetchUserByUserId(this.props.user.id)
+    })
+    .then(() => {
+      this._renderWriteReviewButton()
     })
   }
   _handleOnClickMoreList () {
     const commentType = this.state.tabActivated === 'review' ? 'reviews' : 'inquiries'
     const appendList = this.state.tabActivated === 'review'
-      ? this.props.appendReviewsByGroupName : this.props.appendInquiriesByGroupName
+      ? this.props.appendReviewsByGroupName : this.props.appendItemInquiriesByGroupName
     this.setState({ [commentType]:
       { curPage: this.state[commentType].curPage + 1, perPage: 5, isLoading: true } })
     appendList(this.props.item.groupName,
@@ -245,10 +257,11 @@ class ItemView extends React.Component {
     })
   }
   _handleOnChangeDate (value, formattedValue) {
-    let receiveDate = value
+    let receiveDate = new Date(value)
     const today = new Date()
-    const theDayAfterTomorrow = new Date(today.valueOf() + (24 * 60 * 60 * 1000 * 2)).toISOString()
-    if (value < theDayAfterTomorrow) receiveDate = theDayAfterTomorrow
+    const theDayAfterTomorrow = new Date(today.valueOf() + (24 * 60 * 60 * 1000 * 2))
+    const theDayAfterTomorrowISO = theDayAfterTomorrow.toISOString()
+    if (value < theDayAfterTomorrowISO) receiveDate = theDayAfterTomorrow
     this.setState({
       receiveDateISO: receiveDate.toISOString(),
       receiveDate: `${receiveDate.getFullYear()}-${receiveDate.getMonth() + 1}-${receiveDate.getDate()}` })
@@ -302,6 +315,7 @@ class ItemView extends React.Component {
       return fetchCartsByUserId(user.id)
     })
     .then(() => {
+      window.scrollTo(0, 0)
       $('.cart-btn').click()
     })
   }
@@ -347,9 +361,10 @@ class ItemView extends React.Component {
     receiveOrderItem(orderItem)
     router.push('/cart/direct')
   }
-  _isAvailableWriter () {
+  _renderWriteReviewButton () {
+    // console.log('리뷰 버튼 렌더링 중')
     const { carts, params, item, user } = this.props
-    if (!carts) return false
+    if (!carts) return Promise.resolve()
     const filteredCarts = carts.filter(cart => {
       if (params.type === 'lesson') {
         return cart.lessonId === item.id && cart.status === '수강완료'
@@ -357,18 +372,16 @@ class ItemView extends React.Component {
         return cart.productId === item.id && cart.status === '배송완료'
       }
     })
-    getCommentsByUserIdAndType(user.id, 'review')
+    return getCommentsByUserIdAndType(user.id, 'review')
     .then(res => {
       const userReviews = res.data
       const filteredUserReviews = userReviews.filter(review => review.groupName === item.groupName)
-      // console.log(filteredCarts)
-      // console.log(filteredUserReviews)
-      // console.log(filteredCarts.length > filteredUserReviews.length)
       if (filteredCarts.length > filteredUserReviews.length) {
-        this.setState({
-          writeReviewButton: true
-        })
+        this.setState({ isReviewWriteable: true })
+      } else {
+        this.setState({ isReviewWriteable: false })
       }
+      return Promise.resolve()
     })
   }
   _handleOnClickReOpen () {
@@ -399,30 +412,6 @@ class ItemView extends React.Component {
     }
     this.props.setInquiryModal(inquiryModal)
   }
-  _handleOnClickRequestLesson () {
-    const inquiryModal = {
-      inquiry: {},
-      show: true,
-      process: false,
-      defaultCategory: '출장레슨신청',
-      afterSubmit: () => {
-        let message = this.props.user ? '문의가 완료되었습니다. 문의 내역은 "마이페이지"에서도 확인하실 수 있습니다.' : '문의가 완료되었습니다. 빠른 시일 내에 연락드리겠습니다.'
-        const messageModal = {
-          show: true,
-          message,
-          cancelBtnTxt: null,
-          confirmBtnTxt: '확인',
-          onConfirmClick: () => {
-            this.props.setMessageModalShow(false)
-          },
-          process: false
-        }
-        this.props.setMessageModal(messageModal)
-      },
-      mode: 'post'
-    }
-    this.props.setInquiryModal(inquiryModal)
-  }
   render () {
     const { type } = this.props.params
     const { item } = this.props
@@ -449,7 +438,7 @@ class ItemView extends React.Component {
         )
       }
     }
-    const renderShowMoreInquiriesButton = () => {
+    const renderShowMoreItemInquiriesButton = () => {
       if (this.props.inquiries && !this.props.inquiries.last) {
         return (
           <Button
@@ -551,8 +540,9 @@ class ItemView extends React.Component {
           <table className='table' style={{ marginBottom: '0px' }}>
             <tbody>
               <tr>
-                <td className='text-right' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령일</strong></td>
+                <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령일</strong></td>
                 <td>
+                  <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>희망 수령일</strong></div>
                   <DatePicker
                     id='receiveDate'
                     onChange={this._handleOnChangeDate}
@@ -561,8 +551,9 @@ class ItemView extends React.Component {
                 </td>
               </tr>
               <tr>
-                <td className='text-right' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령시간</strong></td>
+                <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령시간</strong></td>
                 <td>
+                  <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>희망 수령시간</strong></div>
                   <select className='form-control' id='receiveTime' style={{ width: '200px' }}
                     value={this.state.receiveTime} onChange={this._handleOnChangeInput}>
                     {renderTimeOptions()}
@@ -570,9 +561,10 @@ class ItemView extends React.Component {
                 </td>
               </tr>
               <tr>
-                <td className='text-right' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령지역</strong></td>
+                <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령지역</strong></td>
                 <td>
-                  <select className='form-control' id='receiveArea' style={{ width: '400px' }}
+                  <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>희망 수령지역</strong></div>
+                  <select className='form-control' id='receiveArea' style={{ width: '300px' }}
                     value={`${this.state.receiveArea.name}:${this.state.receiveArea.price}`}
                     onChange={this._handleOnChangeInput}>
                     {renderAreaOptions()}
@@ -581,8 +573,9 @@ class ItemView extends React.Component {
                 </td>
               </tr>
               <tr>
-                <td className='text-right' style={{ width: '120px', paddingTop: '18px' }}><strong>옵션</strong></td>
+                <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>옵션</strong></td>
                 <td>
+                  <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>옵션</strong></div>
                   <select className='form-control' id='option1' style={{ width: '200px' }}
                     value={this.state.option1.name + ':' + this.state.option1.price}
                     onChange={this._handleOnChangeInput}>
@@ -600,8 +593,9 @@ class ItemView extends React.Component {
           <table className='table' style={{ marginBottom: '0px' }}>
             <tbody>
               <tr>
-                <td className='text-right' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령일</strong></td>
+                <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령일</strong></td>
                 <td>
+                  <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>희망 수령일</strong></div>
                   <DatePicker
                     id='receiveDate'
                     onChange={this._handleOnChangeDate}
@@ -610,8 +604,9 @@ class ItemView extends React.Component {
                 </td>
               </tr>
               <tr>
-                <td className='text-right' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령시간</strong></td>
+                <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령시간</strong></td>
                 <td>
+                  <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>희망 수령시간</strong></div>
                   <select className='form-control' id='receiveTime' style={{ width: '200px' }}
                     value={this.state.receiveTime} onChange={this._handleOnChangeInput}>
                     {renderTimeOptions()}
@@ -621,9 +616,10 @@ class ItemView extends React.Component {
               {
                 item.deliveryType === '퀵' &&
                 <tr>
-                  <td className='text-right' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령지역</strong></td>
+                  <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령지역</strong></td>
                   <td>
-                    <select className='form-control' id='receiveArea' style={{ width: '400px' }}
+                    <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>희방 수령지역</strong></div>
+                    <select className='form-control' id='receiveArea' style={{ width: '300px' }}
                       value={`${this.state.receiveArea.name}:${this.state.receiveArea.price}`}
                       onChange={this._handleOnChangeInput}>
                       {renderAreaOptions()}
@@ -633,8 +629,9 @@ class ItemView extends React.Component {
                 </tr>
               }
               <tr>
-                <td className='text-right' style={{ width: '120px', paddingTop: '18px' }}><strong>코사지</strong></td>
+                <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>코사지</strong></td>
                 <td>
+                  <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>코사지</strong></div>
                   <select className='form-control' id='option1' style={{ width: '200px' }}
                     value={this.state.option1.name + ':' + this.state.option1.price}
                     onChange={this._handleOnChangeInput}>
@@ -644,8 +641,9 @@ class ItemView extends React.Component {
                 </td>
               </tr>
               <tr>
-                <td className='text-right' style={{ width: '120px', paddingTop: '18px' }}><strong>부토니에</strong></td>
+                <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>부토니에</strong></td>
                 <td>
+                  <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>부토니에</strong></div>
                   <select className='form-control' id='option2' style={{ width: '200px' }}
                     value={this.state.option2.name + ':' + this.state.option2.price}
                     onChange={this._handleOnChangeInput}>
@@ -655,8 +653,9 @@ class ItemView extends React.Component {
                 </td>
               </tr>
               <tr>
-                <td className='text-right' style={{ width: '120px', paddingTop: '18px' }}><strong>플라워샤워</strong></td>
+                <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>플라워샤워</strong></td>
                 <td>
+                  <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>플라워샤워</strong></div>
                   <select className='form-control option' id='option3' style={{ width: '200px' }}
                     value={this.state.option3.name + ':' + this.state.option3.price}
                     onChange={this._handleOnChangeInput}>
@@ -698,7 +697,7 @@ class ItemView extends React.Component {
           <div>
             <div className='form-group'>
               {`￦${numeral(this._getItemPrice()).format('0,0')} `}<i className='fa fa-times-circle' />{' '}
-              <TextField style={{ width: '50px', paddingRight: '5px', paddingLeft: '5px' }} type='number' id='quantity' value={this.state.quantity} onChange={this._handleOnChangeQuantity} /> 개
+              <input className='' type='number' style={{ width: '50px', paddingRight: '5px', paddingLeft: '5px' }}  id='quantity' value={this.state.quantity} onChange={this._handleOnChangeQuantity} /> 개
             </div>
           </div>
         )
@@ -785,14 +784,14 @@ class ItemView extends React.Component {
             <div className='container'>
               <div className='row'>
                 <div className='main col-md-12'>
-                  <h1 className='page-title'>{type === 'lesson' ? '레슨정보' : '상품정보'}</h1>
+                  <h2 className='page-title'>{type === 'lesson' ? '레슨정보' : '상품정보'}</h2>
                   <div className='separator-2' />
                   <div className='row'>
                     <div className='col-md-6' style={{ marginBottom: '40px' }}>
                       {renderImages()}
                     </div>
                     <div className='col-md-6'>
-                      <h2>{item.title}</h2>
+                      <h3>{item.title}</h3>
                       <p>{item.detail}{renderWishListButton()}</p>
                       {renderSpecs()}
                       {renderPrice()}
@@ -812,7 +811,7 @@ class ItemView extends React.Component {
               </div>
               <div className='row' style={{ marginTop: '50px' }}>
                 <div className='col-md-12'>
-                  <h1 className='page-title'>세부정보</h1>
+                  <h2 className='page-title'>세부정보</h2>
                   <div className='separator-2' />
                   <div className='row'>
                     <div className='col-md-12'>
@@ -837,14 +836,14 @@ class ItemView extends React.Component {
       }
       return returnComponent || <div className='text-center'>등록된 후기가 없습니다.</div>
     }
-    const renderInquiries = () => {
+    const renderItemInquiries = () => {
       let returnComponent = null
       if (this.props.inquiries && this.props.inquiries.content && this.props.inquiries.content.length > 0) {
         returnComponent = this.props.inquiries.content.map(inquiry =>
           <Comment item={inquiry} key={keygen._()} userId={this.props.user ? this.props.user.id : null}
             afterSubmit={this._handleOnSubmitComplete} afterDelete={this._handleOnSubmitComplete} />)
       }
-      return returnComponent || <div className='text-center'>둥록된 문의가 없습니다.</div>
+      return returnComponent || <div className='text-center'>등록된 문의가 없습니다.</div>
     }
     const renderRecentItems = () => {
       let returnComponent = <div className='text-center'>최근 본 상품이 없습니다.</div>
@@ -877,7 +876,7 @@ class ItemView extends React.Component {
       return returnComponent
     }
     const renderWriteReviewButtton = () => {
-      if (this.state.writeReviewButton) {
+      if (this.state.isReviewWriteable) {
         return (
           <div className='pull-right'>
             <Button
@@ -923,8 +922,8 @@ class ItemView extends React.Component {
                   </div>
                   <div className='tab-pane fade' id='inquiryPane'>
                     <div className='comments margin-clear space-top'>
-                      {renderInquiries()}
-                      {renderShowMoreInquiriesButton()}
+                      {renderItemInquiries()}
+                      {renderShowMoreItemInquiriesButton()}
                       {
                         this.props.user &&
                         <div className='pull-right'>
@@ -961,15 +960,17 @@ class ItemView extends React.Component {
               <div className='col-md-4 col-lg-3 col-lg-offset-1'>
                 <div className='sidebar'>
                   <div className='bolck clearfix' style={{ marginBottom: '40px' }}>
-                    <h3 className='title'>관련된 상품</h3>
+                    <h2 className='title'>관련된 상품</h2>
                     <div className='separator-2'></div>
                     {renderRelatedItems()}
                   </div>
-                  <div className='bolck clearfix'>
-                    <h3 className='title'>최근 본 상품</h3>
-                    <div className='separator-2'></div>
-                    {renderRecentItems()}
-                  </div>
+                  { !isMobile.any() &&
+                    <div className='bolck clearfix'>
+                      <h2 className='title'>최근 본 상품</h2>
+                      <div className='separator-2'></div>
+                      {renderRecentItems()}
+                    </div>
+                  }
                 </div>
               </div>
             </div>
@@ -1025,13 +1026,7 @@ class ItemView extends React.Component {
       <div>
         {renderPage()}
         { type === 'lesson' &&
-          <ActionBlock
-            title='우리동네로 call hada'
-            desc='내게 맞는 레슨이 없다고 좌절하지 마세요. 여러분이 원하는 지역과 시간대로 레슨을 개설해드립니다.'
-            onClick={this._handleOnClickRequestLesson}
-            btnTxt='출장레슨 신청'
-            btnIcon='fa fa-pencil-square-o pl-20'
-          />
+          <LessonRequestActionBlock />
         }
       </div>
     )
@@ -1048,14 +1043,14 @@ ItemView.propTypes = {
   fetchLesson: React.PropTypes.func,
   unselectLesson: React.PropTypes.func,
   fetchReviewsByGroupName: React.PropTypes.func,
-  fetchInquiriesByGroupName: React.PropTypes.func,
+  fetchItemInquiriesByGroupName: React.PropTypes.func,
   clearReviews: React.PropTypes.func,
-  clearInquiries: React.PropTypes.func,
+  clearItemInquiries: React.PropTypes.func,
   reviews: React.PropTypes.object,
   inquiries: React.PropTypes.object,
   user: React.PropTypes.object,
   appendReviewsByGroupName: React.PropTypes.func,
-  appendInquiriesByGroupName: React.PropTypes.func,
+  appendItemInquiriesByGroupName: React.PropTypes.func,
   relatedItems: React.PropTypes.array,
   fetchRelatedItems: React.PropTypes.func,
   fetchProduct: React.PropTypes.func,
@@ -1064,8 +1059,8 @@ ItemView.propTypes = {
   carts: React.PropTypes.array,
   receiveOrderItem: React.PropTypes.func.isRequired,
   fetchUserByUserId: React.PropTypes.func.isRequired,
-  setMessageModal: React.PropTypes.func.isRequired,
   setMessageModalShow: React.PropTypes.func.isRequired,
+  setMessageModal: React.PropTypes.func.isRequired,
   setInquiryModal: React.PropTypes.func.isRequired
 }
 

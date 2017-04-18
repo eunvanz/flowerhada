@@ -5,28 +5,39 @@ import LessonDateInfo from 'components/LessonDateInfo'
 import keygen from 'keygenerator'
 import { Link } from 'react-router'
 import Button from 'components/Button'
-import { assemblePhoneNumber } from 'common/util'
+import { assemblePhoneNumber, isMobile } from 'common/util'
 import { postOrderTransaction, cancelPayment } from 'common/OrderService'
 import Loading from 'components/Loading'
 import { postError } from 'common/ErrorService'
+import Alert from 'components/Alert'
 
 class OrderCompleteView extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       orderProcess: false,
-      lockUpdate: false
+      lockUpdate: false,
+      success: true,
+      errorMsg: ''
     }
     this._getTotalPrice = this._getTotalPrice.bind(this)
   }
   componentDidMount () {
     const { orderTransaction } = this.props
-    const { imp_uid, apply_num, vbank_num, vbank_name, vbank_holder, vbank_date } = this.props.location.query // eslint-disable-line
-    if (!orderTransaction) {
+    const { query } = this.props.location
+    const { imp_uid, apply_num, vbank_num, vbank_name, vbank_holder, vbank_date, order_transaction, imp_success, error_msg } = query // eslint-disable-line
+    // console.log(query)
+    if (!orderTransaction && !isMobile.any()) {
       this.context.router.push('/not-found')
       return
     // eslint-disable
-    } else if (imp_uid) { // 모바일인경우 cartView의 콜백에 해당하는 부분 실행
+    } else if (imp_success === 'false') {
+      this.setState({
+        success: false,
+        errorMsg: error_msg
+      })
+    } else if (isMobile.any()) { // 모바일인경우 cartView의 콜백에 해당하는 부분 실행
+      const orderTransaction = JSON.parse(order_transaction)
       this.setState({ orderProcess: true })
       orderTransaction.order.uid = imp_uid
       orderTransaction.order.applyNum = apply_num
@@ -37,6 +48,7 @@ class OrderCompleteView extends React.Component {
       // eslint-enable
       postOrderTransaction(orderTransaction)
       .then(() => {
+        this.props.receiveOrderTransaction(orderTransaction)
         this.setState({ orderProcess: false })
         return this.props.fetchCartsByUserId(orderTransaction.userId)
       })
@@ -80,6 +92,14 @@ class OrderCompleteView extends React.Component {
     }, 0)
   }
   render () {
+    if (!this.state.success) {
+      return (
+        <MainContainer
+          title='주문실패'
+          bodyComponent={<Alert type='warning' text={this.state.errorMsg} />}
+        />
+      )
+    }
     const { orderTransaction } = this.props
     if (!orderTransaction) return null
     const { order } = orderTransaction
@@ -285,7 +305,7 @@ class OrderCompleteView extends React.Component {
           <div className='text-right'>주문한 내역은 <Link to='/my-page/order-list'>마이페이지 > 구매목록</Link> 에서 다시 확인하실 수 있습니다.</div>
           <div className='text-right'>
             <Button
-              onClick={() => this.context.router.push('my-page/orders')}
+              onClick={() => this.context.router.push('/')}
               textComponent={<span><i className='fa fa-home' /> 메인화면으로</span>}
             />
           </div>
@@ -323,7 +343,8 @@ OrderCompleteView.propTypes = {
   clearOrderTransaction: PropTypes.func.isRequired,
   location: PropTypes.object,
   fetchCartsByUserId: PropTypes.func,
-  fetchUserByUserId: PropTypes.func
+  fetchUserByUserId: PropTypes.func,
+  receiveOrderTransaction: PropTypes.func
 }
 
 export default OrderCompleteView

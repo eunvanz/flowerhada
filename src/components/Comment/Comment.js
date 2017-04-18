@@ -94,7 +94,9 @@ class Comment extends React.Component {
             action: '리뷰 이미지 삭제'
           }))
         }
-        return Promise.all(promArr)
+        return promArr.reduce((cur, next) => {
+          return cur.then(next)
+        }, Promise.resolve())
       }
       return Promise.resolve()
     })
@@ -185,7 +187,7 @@ class Comment extends React.Component {
           />
         </div>
         <header>
-          <h3>{item.title}</h3>
+          <h4>{item.title}</h4>
           <div className='comment-meta'>작성자 {maskName(item.user.name)} | {convertSqlDateToString(item.regDate)}</div>
         </header>
         <div className='comment-content'>
@@ -222,7 +224,7 @@ class Comment extends React.Component {
             />
             <MessageModal
               show={this.state.showMessageModal}
-              message='리뷰 등록으로 얻은 포인트 또한 차감됩니다. 정말 삭제하시겠습니까? '
+              message={this.props.item.type === 'review' ? '리뷰 등록으로 얻은 포인트 또한 차감됩니다. 정말 삭제하시겠습니까?' : '정말 삭제하시겠습니까?'}
               cancelBtnTxt='아니오'
               confirmBtnTxt='예'
               onConfirmClick={this._handleOnClickConfirm}

@@ -94,7 +94,7 @@ class OrderListView extends React.Component {
       message: '정말 취소하시겠습니까?',
       cancelBtnTxt: '아니오',
       confirmBtnTxt: '예',
-      onConfirmClick: order => this._doCancel(order),
+      onConfirmClick: () => this._doCancel(order),
       process: false
     }
     this.props.setMessageModal(messageModal)
@@ -123,6 +123,7 @@ class OrderListView extends React.Component {
             <br />
             <Button
               size='sm'
+              color='dark'
               textComponent={<span>취소하기</span>}
               process={this.state.cancelProcess}
               onClick={() => this._handleOnClickCancel(order)} />
@@ -134,7 +135,7 @@ class OrderListView extends React.Component {
       if (orders.length === 0) {
         return (
           <tr>
-            <td colSpan={6} className='text-center' style={{ height: '200px' }}>구매 내역이 없습니다.</td>
+            <td colSpan={6} className='text-center' style={{ height: '100px' }}>구매 내역이 없습니다.</td>
           </tr>
         )
       }

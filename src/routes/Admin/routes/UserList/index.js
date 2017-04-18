@@ -8,6 +8,6 @@ export default (store) => ({
       const reducer = require('./modules/userList').default
       injectReducer(store, { key: 'userList', reducer })
       cb(null, UserList)
-    }, 'UserList')
+    }, 'user-list')
   }
 })

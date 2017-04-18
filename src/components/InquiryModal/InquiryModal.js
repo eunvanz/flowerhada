@@ -65,14 +65,17 @@ class InquiryModal extends React.Component {
   }
   _setContentAlongCategory (category) {
     let content = '분류를 먼저 선택해주세요.'
+    let title = ''
     if (category === '출장레슨신청') {
+      title = '출장레슨을 신청합니다.'
       content = `희망 레슨 : \n희망 지역 : \n희망일 : \n희망 인원 : \n신청자이름 : ${this.props.user ? this.props.user.name : ''}\n연락처 : ${this.props.user ? this.props.user.phone : ''}`
     } else if (category === '레슨재개설신청') {
+      title = '레슨을 다시 개설해주세요.'
       content = `희망 레슨 : \n희망 지역 : \n희망일 : \n희망 인원 : \n신청자이름 : ${this.props.user ? this.props.user.name : ''}\n연락처 : ${this.props.user ? this.props.user.phone : ''}`
     } else if (category === '기타') {
       content = `문의 내용 : \n이름 : ${this.props.user ? this.props.user.name : ''}\n연락처 : ${this.props.user ? this.props.user.phone : ''}`
     }
-    this.setState({ content })
+    this.setState({ title, content })
   }
   _handleOnClickSubmit () {
     this.props.setInquiryModalProcess(true)

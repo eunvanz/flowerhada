@@ -51,7 +51,6 @@ class SignUp extends React.Component {
     setInlineScripts(scripts)
   }
   _handleOnChangeInput (e) {
-    e.preventDefault()
     this.setState({ [e.target.name]: e.target.value })
   }
   _handleOnChangePhone (e) {

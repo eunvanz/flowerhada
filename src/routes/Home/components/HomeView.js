@@ -3,10 +3,10 @@ import MainBanner from './MainBanner'
 import { setInlineScripts, clearInlineScripts } from 'common/util'
 import HomeCard from './HomeCard'
 import ItemList from 'components/ItemList'
-import ActionBlock from 'components/ActionBlock'
+import LessonRequestActionBlock from 'components/LessonRequestActionBlock'
 import Loading from 'components/Loading'
 import Button from 'components/Button'
-// import 'template/plugins/jquery.themepunch.tools.min.js'
+// import 'template/plugins/rs-plugin/js/jquery.themepunch.tools.min.js'
 // import 'template/plugins/rs-plugin/js/jquery.themepunch.revolution.min.js'
 // import 'template/plugins/owl-carousel/owl.carousel.js'
 // import 'template/plugins/jquery.browser.js'
@@ -14,8 +14,9 @@ import Button from 'components/Button'
 // import 'template/plugins/waypoints/jquery.waypoints.min.js'
 // import 'template/plugins/magnific-popup/jquery.magnific-popup.min.js'
 // import 'template/plugins/isotope/isotope.pkgd.min.js'
-// import 'template/js/template.js'
-// import 'template/js/inline-home-view.js'
+// import '/template/js/template.js'
+// import '/template/js/inline-home-view.js'
+import $ from 'jquery'
 
 class HomeView extends React.Component {
   constructor (props) {
@@ -24,7 +25,6 @@ class HomeView extends React.Component {
     this._handleOnClickMoreLesson = this._handleOnClickMoreLesson.bind(this)
     this._handleOnClickMoreFlowers = this._handleOnClickMoreFlowers.bind(this)
     this._handleOnClickMoreWeddings = this._handleOnClickMoreWeddings.bind(this)
-    this._handleOnClickRequestLesson = this._handleOnClickRequestLesson.bind(this)
   }
   componentDidMount () {
     this.props.fetchMainBanners()
@@ -51,7 +51,14 @@ class HomeView extends React.Component {
     })
   }
   componentWillUnmount () {
-    window.dispatchEvent(new Event('popstate'))
+    const agent = navigator.userAgent.toLowerCase()
+    if (agent.indexOf('trident') !== -1 || agent.indexOf('msie') !== -1) {
+      const evt = document.createEvent('Event')
+      evt.initEvent('popstate', true, false)
+      document.dispatchEvent(evt)
+    } else {
+      window.dispatchEvent(new Event('popstate'))
+    }
     clearInlineScripts()
   }
   _handleOnClickMoreLesson () {
@@ -62,19 +69,6 @@ class HomeView extends React.Component {
   }
   _handleOnClickMoreWeddings () {
     this.context.router.push('/item-list/wedding/all')
-  }
-  _handleOnClickRequestLesson () {
-    this.props.setInquiryModalDefaultCategory('출장레슨신청')
-    this.props.setInquiryModalAfterSubmit(() => {
-      let message = this.props.user ? '문의가 완료되었습니다. 문의 내역은 "마이페이지"에서도 확인하실 수 있습니다.' : '문의가 완료되었습니다. 빠른 시일 내에 연락드리겠습니다.'
-      this.props.setMessageModalMessage(message)
-      this.props.setMessageModalCancelBtnTxt(null)
-      this.props.setMessageModalConfirmBtnTxt('확인')
-      this.props.setMessageModalOnConfirmClick(() => this.props.setMessageModalShow(false))
-      this.props.setMessageModalShow(true)
-    })
-    this.props.setInquiryModalMode('post')
-    this.props.setInquiryModalShow(true)
   }
   render () {
     const renderBanner = () => {
@@ -147,13 +141,7 @@ class HomeView extends React.Component {
             </div>
           </div>
         </section>
-        <ActionBlock
-          title='우리동네로 call hada'
-          desc='내게 맞는 레슨이 없다고 좌절하지 마세요. 여러분이 원하는 지역과 시간대로 레슨을 개설해드립니다.'
-          onClick={this._handleOnClickRequestLesson}
-          btnTxt='출장레슨 신청'
-          btnIcon='fa fa-pencil-square-o pl-20'
-        />
+        <LessonRequestActionBlock />
         <section className='section white-bg clearfix'>
           <div className='container'>
             <div className='row'>
@@ -253,17 +241,7 @@ HomeView.propTypes = {
   fetchLessons: React.PropTypes.func.isRequired,
   products: React.PropTypes.array,
   fetchProducts: React.PropTypes.func.isRequired,
-  user: React.PropTypes.object,
-  setInquiryModalShow: React.PropTypes.func.isRequired,
-  setInquiryModalInquiry: React.PropTypes.func.isRequired,
-  setInquiryModalDefaultCategory: React.PropTypes.func.isRequired,
-  setInquiryModalMode: React.PropTypes.func.isRequired,
-  setInquiryModalAfterSubmit: React.PropTypes.func.isRequired,
-  setMessageModalShow: React.PropTypes.func.isRequired,
-  setMessageModalMessage: React.PropTypes.func.isRequired,
-  setMessageModalCancelBtnTxt: React.PropTypes.func.isRequired,
-  setMessageModalConfirmBtnTxt: React.PropTypes.func.isRequired,
-  setMessageModalOnConfirmClick: React.PropTypes.func.isRequired
+  user: React.PropTypes.object
 }
 
 export default HomeView

@@ -2,7 +2,7 @@ import numeral from 'numeral'
 
 export const clearInlineScripts = () => {
   const scriptElements = document.body.getElementsByTagName('SCRIPT')
-  while (scriptElements.length > 11) {
+  while (scriptElements.length > 12) {
     const length = scriptElements.length
     document.body.removeChild(scriptElements[length - 1])
   }
@@ -171,6 +171,56 @@ export const setRecentItemToLocalStorage = item => {
       recentItems.push(item)
     }
     localStorage.setItem('recentItems', JSON.stringify(recentItems))
+  }
+}
+
+export const isMobile = {
+  Android: () => {
+    return navigator.userAgent.match(/Android/i)
+  },
+  BlackBerry: () => {
+    return navigator.userAgent.match(/BlackBerry/i)
+  },
+  iOS: () => {
+    return navigator.userAgent.match(/iPhone|iPad|iPod/i)
+  },
+  Opera: () => {
+    return navigator.userAgent.match(/Opera Mini/i)
+  },
+  Windows: () => {
+    return navigator.userAgent.match(/IEMobile/i)
+  },
+  any: () => {
+    return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows())
+  }
+}
+
+export const setRecentItemToSessionStorage = item => {
+  const sessionStorage = window.sessionStorage
+  const recentItems = JSON.parse(sessionStorage.getItem('recentItems'))
+  // recentItems가 없을 경우에는 새로 생성
+  if (!recentItems) {
+    const newArr = []
+    newArr.push(item)
+    sessionStorage.setItem('recentItems', JSON.stringify(newArr))
+  } else {
+    if (recentItems.length > 5) recentItems.shift()
+    // recentItems가 있을 경우에는 기존 array에 추가하는데,
+    // 기존 array에 id가 존재할 경우에는 기존걸 삭제하고 새로 받은걸 0번으로 세팅한다.
+    let existIndex = -1
+    for (let i = 0; i < recentItems.length; i++) {
+      if (recentItems[i].id === item.id && recentItems[i].type === item.type) {
+        existIndex = i
+        break
+      }
+    }
+    if (existIndex === -1) {
+      recentItems.push(item)
+    } else {
+      recentItems.splice(existIndex, 1)
+      recentItems.push(item)
+    }
+    sessionStorage.setItem('recentItems', JSON.stringify(recentItems))
   }
 }
 

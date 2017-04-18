@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react'
 import Parallax from 'components/Parallax'
 import Navigation from 'components/Navigation'
 import ItemList from 'components/ItemList'
-import ActionBlock from 'components/ActionBlock'
+import LessonRequestActionBlock from 'components/LessonRequestActionBlock'
 
 class ItemListView extends React.Component {
   constructor (props) {
@@ -139,13 +139,7 @@ class ItemListView extends React.Component {
           </div>
         </section>
         { type === 'lesson' &&
-          <ActionBlock
-            title='우리동네로 call hada'
-            desc='내게 맞는 레슨이 없다고 좌절하지 마세요. 여러분이 원하는 지역과 시간대로 레슨을 개설해드립니다.'
-            link='/apply-lesson'
-            btnTxt='출장레슨 신청'
-            btnIcon='fa fa-pencil-square-o pl-20'
-          />
+          <LessonRequestActionBlock />
         }
       </div>
     )

@@ -10,9 +10,9 @@ export const RECEIVE_REVIEW = 'RECEIVE_REVIEW'
 export const CLEAR_REVIEWS = 'CLEAR_REVIEWS'
 export const CLEAR_REVIEW = 'CLEAR_REVIEW'
 export const APPEND_REVIEWS = 'APPEND_REVIEWS'
-export const RECEIVE_INQUIRIES = 'RECEIVE_INQUIRIES'
-export const CLEAR_INQUIRIES = 'CLEAR_INQUIRIES'
-export const APPEND_INQUIRIES = 'APPEND_INQUIRIES'
+export const RECEIVE_ITEM_INQUIRIES = 'RECEIVE_ITEM_INQUIRIES'
+export const CLEAR_ITEM_INQUIRIES = 'CLEAR_ITEM_INQUIRIES'
+export const APPEND_ITEM_INQUIRIES = 'APPEND_ITEM_INQUIRIES'
 export const RECEIVE_RECENT_ITEMS = 'RECEIVE_RECENT_ITEMS'
 export const RECEIVE_RELATED_ITEMS = 'RECEIVE_RELATED_ITEMS'
 
@@ -40,9 +40,9 @@ export function receiveReviews (reviews = null) {
   }
 }
 
-export function receiveInquiries (inquiries = null) {
+export function receiveItemInquiries (inquiries = null) {
   return {
-    type: RECEIVE_INQUIRIES,
+    type: RECEIVE_ITEM_INQUIRIES,
     payload: { inquiries }
   }
 }
@@ -68,9 +68,9 @@ export function clearReviews () {
   }
 }
 
-export function clearInquiries () {
+export function clearItemInquiries () {
   return {
-    type: CLEAR_INQUIRIES,
+    type: CLEAR_ITEM_INQUIRIES,
     payload: { inquiries: null }
   }
 }
@@ -82,9 +82,9 @@ export function appendReviews (reviews = null) {
   }
 }
 
-export function appendInquiries (inquiries = null) {
+export function appendItemInquiries (inquiries = null) {
   return {
-    type: APPEND_INQUIRIES,
+    type: APPEND_ITEM_INQUIRIES,
     payload: { inquiries }
   }
 }
@@ -98,11 +98,11 @@ export const fetchReviewsByGroupName = (groupName, curPage, perPage) => {
   }
 }
 
-export const fetchInquiriesByGroupName = (groupName, curPage, perPage) => {
+export const fetchItemInquiriesByGroupName = (groupName, curPage, perPage) => {
   return (dispatch) => {
     return getCommentByGroupName(groupName, 'inquiry', curPage, perPage)
     .then(res => {
-      return dispatch(receiveInquiries(res.data))
+      return dispatch(receiveItemInquiries(res.data))
     })
   }
 }
@@ -116,11 +116,11 @@ export const appendReviewsByGroupName = (groupName, curPage, perPage) => {
   }
 }
 
-export const appendInquiriesByGroupName = (groupName, curPage, perPage) => {
+export const appendItemInquiriesByGroupName = (groupName, curPage, perPage) => {
   return (dispatch) => {
     return getCommentByGroupName(groupName, 'inquiry', curPage, perPage)
     .then(res => {
-      return dispatch(appendInquiries(res.data))
+      return dispatch(appendItemInquiries(res.data))
     })
   }
 }
@@ -143,8 +143,8 @@ export const fetchRelatedItems = (item, type) => {
 export const actions = {
   fetchReviewsByGroupName,
   clearReviews,
-  fetchInquiriesByGroupName,
-  clearInquiries,
+  fetchItemInquiriesByGroupName,
+  clearItemInquiries,
   fetchRelatedItems
 }
 
@@ -155,13 +155,13 @@ const ACTION_HANDLERS = {
   [RECEIVE_REVIEWS] : (state, action) => {
     return Object.assign({}, state, action.payload)
   },
-  [RECEIVE_INQUIRIES] : (state, action) => {
+  [RECEIVE_ITEM_INQUIRIES] : (state, action) => {
     return Object.assign({}, state, action.payload)
   },
   [CLEAR_REVIEWS] : (state, action) => {
     return Object.assign({}, state, action.payload)
   },
-  [CLEAR_INQUIRIES] : (state, action) => {
+  [CLEAR_ITEM_INQUIRIES] : (state, action) => {
     return Object.assign({}, state, action.payload)
   },
   [RECEIVE_REVIEW] : (state, action) => {
@@ -177,7 +177,7 @@ const ACTION_HANDLERS = {
     action.payload.reviews.content = state.reviews.content
     return Object.assign({}, state, action.payload)
   },
-  [APPEND_INQUIRIES] : (state, action) => {
+  [APPEND_ITEM_INQUIRIES] : (state, action) => {
     action.payload.inquiries.content.forEach(element => {
       state.inquiries.content.push(element)
     })
@@ -193,7 +193,7 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = { reviews: null, inquiries: null, relatedItems: null }
-export default function counterReducer (state = initialState, action) {
+export default function itemReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
 
   return handler ? handler(state, action) : state

@@ -4,10 +4,10 @@ import { fetchProduct, unselectProduct } from 'store/product'
 import { fetchCartsByUserId } from 'store/cart'
 import { receiveOrderItem } from 'store/order'
 import { fetchReviewsByGroupName, clearReviews,
-  fetchInquiriesByGroupName, clearInquiries,
-  appendReviewsByGroupName, appendInquiriesByGroupName, fetchRelatedItems } from '../modules/item'
+  fetchItemInquiriesByGroupName, clearItemInquiries,
+  appendReviewsByGroupName, appendItemInquiriesByGroupName, fetchRelatedItems } from '../modules/item'
 import { fetchUserByUserId } from 'store/user'
-import { setMessageModal, setMessageModalShow } from 'store/messageModal'
+import { setMessageModalShow, setMessageModal } from 'store/messageModal'
 import { setInquiryModal } from 'store/inquiry'
 
 import ItemView from '../components/ItemView'
@@ -18,17 +18,17 @@ const mapDispatchToProps = {
   fetchReviewsByGroupName,
   clearReviews,
   appendReviewsByGroupName,
-  fetchInquiriesByGroupName,
-  clearInquiries,
-  appendInquiriesByGroupName,
+  fetchItemInquiriesByGroupName,
+  clearItemInquiries,
+  appendItemInquiriesByGroupName,
   fetchRelatedItems,
   fetchProduct,
   unselectProduct,
   fetchCartsByUserId,
   receiveOrderItem,
   fetchUserByUserId,
-  setMessageModal,
   setMessageModalShow,
+  setMessageModal,
   setInquiryModal
 }
 

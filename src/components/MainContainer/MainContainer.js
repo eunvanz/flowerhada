@@ -6,7 +6,7 @@ class MainContainer extends React.Component {
       if (!this.props.title) return
       return (
         <div>
-          <h1 className='page-title'>{this.props.title}</h1>
+          <h2 className='page-title'>{this.props.title}</h2>
           <div className='separator-2'></div>
         </div>
       )

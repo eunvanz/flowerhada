@@ -14,7 +14,6 @@ import MessageModal from 'components/MessageModal'
 import PhoneNumberInput from 'components/PhoneNumberInput'
 import CustomModal from 'components/CustomModal'
 import { getAddressHistoryByUserId } from 'common/AddressHistoryService'
-import { ROOT } from 'common/constants'
 import { postError } from 'common/ErrorService'
 
 class CartView extends React.Component {
@@ -289,7 +288,7 @@ class CartView extends React.Component {
           buyer_name: this.props.user.name,
           buyer_email: this.props.user.email,
           buyer_tel: assemblePhoneNumber(this.props.user.phone),
-          m_redirect_url: `http://${ROOT}/order-complete`
+          m_redirect_url: `http://flowerhada.com/order-complete?order_transaction=${JSON.stringify(orderTransaction)}`
         }
         const view = this
         window.IMP.request_pay(settings, function (rsp) {
@@ -436,6 +435,7 @@ class CartView extends React.Component {
     const { type } = this.props.params
     const { carts, orderItem } = this.props
     const items = type === 'direct' ? [orderItem] : carts
+    this.setState({ orderProcess: false })
     if (items[0].product) {
       if (this.state.receiver.length === 0) {
         this.setState({ validateText: '수신인 이름을 입력해주세요.' })
@@ -816,7 +816,7 @@ class CartView extends React.Component {
               </div>
               <div className='form-group'>
                 <label htmlFor='sender' className='col-md-2 control-label'>
-                  발신인 번호<small className='text-default'>*</small>
+                  발신인 연락처<small className='text-default'>*</small>
                 </label>
                 <div className='col-md-9 form-inline'>
                   <select className='form-control' data-index={0} style={{ width: '80px', display: 'inline' }}

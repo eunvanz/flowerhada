@@ -22,7 +22,7 @@ class GlobalMessageModal extends React.Component {
         onConfirmClick={this.props.onConfirmClick}
         id='globalMessageModal'
         process={this.props.process}
-        close={() => setMessageModalShow(false)}
+        close={() => this.props.setMessageModalShow(false)}
       />
     )
   }
@@ -34,7 +34,8 @@ GlobalMessageModal.propTypes = {
   cancelBtnTxt: React.PropTypes.string,
   confirmBtnTxt: React.PropTypes.string.isRequired,
   onConfirmClick: React.PropTypes.func.isRequired,
-  process: React.PropTypes.bool.isRequired
+  process: React.PropTypes.bool.isRequired,
+  setMessageModalShow: React.PropTypes.func.isRequired
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(GlobalMessageModal)

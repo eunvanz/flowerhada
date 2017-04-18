@@ -11,6 +11,7 @@ import { setInquiryModalMode, setInquiryModalShow,
   setInquiryModalAfterSubmit, setInquiryModalDefaultCategory } from 'store/inquiry'
 import { setMessageModalShow, setMessageModalMessage, setMessageModalCancelBtnTxt, setMessageModalConfirmBtnTxt,
   setMessageModalOnConfirmClick } from 'store/messageModal'
+import cookie from 'cookie'
 
 const mapStateToProps = state => ({
   user: state.user,
@@ -44,8 +45,11 @@ class Header extends React.Component {
     this._handleOnClickInquiry = this._handleOnClickInquiry.bind(this)
   }
   componentDidMount () {
-    const sessionStorage = window.sessionStorage
-    const authUser = JSON.parse(sessionStorage.getItem('authUser'))
+    // const sessionStorage = window.sessionStorage
+    // const authUser = JSON.parse(sessionStorage.getItem('authUser'))
+    const cookies = cookie.parse(document.cookie)
+    let authUser = null
+    if (cookies.authUser) authUser = JSON.parse(cookies.authUser)
     if (authUser) { // 세션에 authUser가 있을 경우 store에 세팅하고 db에서 user 가져옴
       this.props.receiveAuthUser(authUser)
       this.props.fetchUser(authUser.email)
@@ -55,8 +59,9 @@ class Header extends React.Component {
     }
   }
   _handleOnClickLogout () {
-    const sessionStorage = window.sessionStorage
-    sessionStorage.removeItem('authUser')
+    // const sessionStorage = window.sessionStorage
+    // sessionStorage.removeItem('authUser')
+    document.cookie = `authUser=; expires=${new Date().toUTCString()}; path=/;`
     this.props.removeUser()
     this.props.removeAuthUser()
     this.props.clearCarts()

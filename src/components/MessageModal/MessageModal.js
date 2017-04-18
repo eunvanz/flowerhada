@@ -60,7 +60,7 @@ class MessageModal extends React.Component {
           footerComponent={footerComponent()}
           close={this.props.close}
           backdrop
-          width='300px'
+          width={window.innerWidth <= 768 ? null : '300px'}
           id={this.props.id}
         />
       </div>

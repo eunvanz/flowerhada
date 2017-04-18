@@ -106,10 +106,8 @@ class PointHistoryView extends React.Component {
                 textComponent={
                   <span>
                     <i className='fa fa-angle-down' /> <span className='text-default'>
-                      {this.state.totalPages - 1 -
-                      this.state.number === 1 ? this.state.totalElements -
-                      (this.state.number + 1) * this.state.numberOfElements
-                      : this.state.numberOfElements}</span>건 더 보기
+                      {this.state.last ? this.state.numberOfElements
+                      : this.state.perPage}</span>건 더 보기
                   </span>
                 }
               />

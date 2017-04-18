@@ -78,7 +78,7 @@ class Button extends React.Component {
         style={{ ...this.props.style, cursor: 'pointer' }}
         disabled={this.props.disabled}
       >
-        {this.props.process ? <span>처리중... <i className='fa fa-spinner fa-pulse' /></span> : this.props.textComponent}
+        {this.props.process ? <span>처리중... <i className='fa fa-circle-o-notch fa-spin' /></span> : this.props.textComponent}
       </a>
     )
   }

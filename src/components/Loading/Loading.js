@@ -5,7 +5,7 @@ class Loading extends React.Component {
     return (
       <div className='text-center' style={{ height: '200px' }}>
         <div style={{ position: 'relative', top: '90px' }}>
-          <i className='fa fa-spinner fa-pulse fa-fw' /> {this.props.text}
+          <i className='fa fa-circle-o-notch fa-spin fa-fw' /> {this.props.text}
         </div>
       </div>
     )

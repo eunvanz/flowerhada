@@ -38,7 +38,6 @@ class Login extends React.Component {
     })
   }
   _handleOnChangeInput (e) {
-    e.preventDefault()
     this.setState({ [e.target.name]: e.target.value })
   }
   _handleOnClickSubmit (e) {
@@ -53,8 +52,12 @@ class Login extends React.Component {
     const userInfo = { email: this.state.email, password: this.state.password }
     this.props.fetchAuthUser(userInfo)
     .then(() => {
-      const sessionStorage = window.sessionStorage
-      sessionStorage.setItem('authUser', JSON.stringify(this.props.authUser.data))
+      // if (!isMobile.any()) {
+      //   const sessionStorage = window.sessionStorage
+      //   sessionStorage.setItem('authUser', JSON.stringify(this.props.authUser.data))
+      // }
+      document.cookie = `authUser=${JSON.stringify(this.props.authUser.data)}; max-age=${60 * 60 * 24}; path=/;`
+      return Promise.resolve()
     })
     .then(() => {
       return this.props.fetchUser(this.props.authUser.data.email)
@@ -67,7 +70,7 @@ class Login extends React.Component {
       this.context.router.goBack()
     })
     .catch((res) => {
-      console.log(res)
+      this.setState({ process: false })
       this._showErrorMessage('이메일 혹은 비밀번호가 잘못되었습니다.')
     })
   }

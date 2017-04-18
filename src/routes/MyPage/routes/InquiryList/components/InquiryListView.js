@@ -87,6 +87,10 @@ class InquiryListView extends React.Component {
           process: false
         }
         this.props.setMessageModal(messageModal)
+        this.props.fetchInquiriesByUserId(this.props.user.id, 0, (this.state.curPage + 1) * this.state.perPage)
+        .then(() => {
+          this.setState({ inquiries: this.props.inquiries.content })
+        })
       },
       show: true
     }
@@ -180,9 +184,9 @@ class InquiryListView extends React.Component {
         <table className='table cart table-hover table-colored'>
           <thead>
             <tr>
-              <th className='text-center' style={{ width: '150px' }}>문의일자</th>
+              <th className='text-center' style={{ width: '120px' }}>문의일자</th>
               <th className='text-center'>제목</th>
-              <th className='text-center' style={{ width: '150px' }}>답변</th>
+              <th className='text-center' style={{ width: '100px' }}>답변</th>
             </tr>
           </thead>
           <tbody>

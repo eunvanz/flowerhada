@@ -3,7 +3,6 @@ import CustomModal from 'components/CustomModal'
 import TextField from 'components/TextField'
 import { postCommentImage, postComment, putComment } from 'common/CommentService'
 import { postPointHistory } from 'common/PointHistoryService'
-import { updateUserPoint } from 'common/UserService'
 import Button from 'components/Button'
 import { Tooltip } from 'react-bootstrap'
 import numeral from 'numeral'
@@ -74,7 +73,7 @@ class CommentModal extends React.Component {
           amount: this.props.point,
           action: '리뷰 작성'
         }
-        return Promise.all([postPointHistory(pointHistory), updateUserPoint(this.props.userId, this.props.point)])
+        return postPointHistory(pointHistory)
       } else {
         return Promise.resolve()
       }
@@ -86,35 +85,37 @@ class CommentModal extends React.Component {
           amount: this.props.imagePoint,
           action: '리뷰에 이미지 업로드'
         }
-        return Promise.all([postPointHistory(pointHistory),
-          updateUserPoint(this.props.userId, this.props.imagePoint)])
+        return postPointHistory(pointHistory)
       } else {
         Promise.resolve()
       }
     }
-    if (file && this.props.imagePoint) {
+    if (file) {
       postCommentImage(file)
       .then(res => {
         const imgUrl = res.data.data.link
         this.setState({ image: imgUrl })
-        doActionComment()
+        return doActionComment()
       })
       .then(() => {
-        handlePoint()
+        if (this.props.type === 'review') return handlePoint()
+        else return Promise.resolve()
       })
       .then(() => {
-        handleImagePoint()
+        if (this.props.type === 'review' && this.props.imagePoint) return handleImagePoint()
+        else return Promise.resolve()
       })
       .then(() => {
-        finalizeSubmit()
+        return finalizeSubmit()
       })
     } else {
       doActionComment()
       .then(() => {
-        handlePoint()
+        if (this.props.type === 'review') return handlePoint()
+        else return Promise.resolve()
       })
       .then(() => {
-        finalizeSubmit()
+        return finalizeSubmit()
       })
     }
   }
@@ -141,9 +142,10 @@ class CommentModal extends React.Component {
                 limit={30}
                 length={this.state.title.length}
                 data-limit={30}
+                placeholder='제목을 입력해주세요.'
               />
               <label>내용</label>
-              <textarea id='content' className='form-control' rows='8'
+              <textarea id='content' className='form-control' rows='8' placeholder='내용을 입력해주세요.'
                 value={this.state.content} onChange={this._handleOnChangeInput}
                 data-limit={1000} />
               <div className='text-right small'>
@@ -163,11 +165,12 @@ class CommentModal extends React.Component {
       return (
         <div style={{ textAlign: 'right' }}>
           <Button className='margin-clear' color='dark' onClick={this.props.close} textComponent={<span>취소</span>} />
+          {this.state.title !== '' && this.state.content !== '' &&
           <Button className='margin-clear'
             onClick={this.state.process ? null : this._handleOnClickSubmit}
             animated
             process={this.state.process}
-            textComponent={<span>작성완료 <i className='fa fa-check' /></span>} />
+            textComponent={<span>작성완료 <i className='fa fa-check' /></span>} />}
         </div>
       )
     }
@@ -188,7 +191,7 @@ class CommentModal extends React.Component {
 
 CommentModal.propTypes = {
   comment: React.PropTypes.object,
-  type: React.PropTypes.string,
+  type: React.PropTypes.string, // 'review' 혹은 'inquiry'
   show: React.PropTypes.bool.isRequired,
   close: React.PropTypes.func.isRequired,
   groupName: React.PropTypes.string,
