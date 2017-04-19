@@ -9,7 +9,7 @@ import LessonDateInfo from 'components/LessonDateInfo'
 import { postOrderTransaction, cancelPayment } from 'common/OrderService'
 import { Tooltip } from 'react-bootstrap'
 import Alert from 'components/Alert'
-import { dividePhoneNumber, assemblePhoneNumber } from 'common/util'
+import { dividePhoneNumber, assemblePhoneNumber, isIE } from 'common/util'
 import MessageModal from 'components/MessageModal'
 import PhoneNumberInput from 'components/PhoneNumberInput'
 import CustomModal from 'components/CustomModal'
@@ -280,7 +280,7 @@ class CartView extends React.Component {
 
       if (this._isValid()) {
         const settings = {
-          pg: 'html5_inicis',
+          pg: isIE() ? 'inicis' : 'html5_inicis',
           pay_method: this.state.paymentMethod,
           merchant_uid: 'merchant_' + new Date().getTime(),
           name: title,

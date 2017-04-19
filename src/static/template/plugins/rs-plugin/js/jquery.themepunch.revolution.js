@@ -194,7 +194,7 @@
 							container.trigger('revolution.slide.onpause');
 							var bt = container.parent().find('.tp-bannertimer');
 							var opt = bt.data('opt');
-							opt.bannertimeronpause = true;
+							if (opt!=undefined) opt.bannertimeronpause = true;
 							container.trigger('stoptimer');
 
 							punchgs.TweenLite.killTweensOf(container.find('*'),false);
@@ -680,7 +680,7 @@
 									if (opt.shadow!=0) {
 										container.parent().append('<div class="tp-bannershadow tp-shadow'+opt.shadow+'"></div>');
 										var loff=0;
-										if (opt.forceFullWidth=="on")
+										if (opt&&opt.forceFullWidth=="on")
 													loff = 0-opt.container.parent().offset().left;
 										container.parent().find('.tp-bannershadow').css({'width':opt.width,'left':loff});
 									}
@@ -791,7 +791,7 @@
 									// FIRST TIME STOP/START HIDE / SHOW SLIDER
 									//REMOVE AND SHOW SLIDER ON DEMAND
 									var contpar= container.parent();
-									if (jQuery(window).width()<opt.hideSliderAtLimit) {
+									if (opt&&jQuery(window).width()<opt.hideSliderAtLimit) {
 										container.trigger('stoptimer');
 										if (contpar.css('display')!="none")
 											contpar.data('olddisplay',contpar.css('display'));
@@ -921,7 +921,7 @@
 		/////////////////////////
 		var containerResized = function (container,opt) {
 
-			if (container==undefined) return false;
+			if (container==undefined || opt==undefined) return false;
 			// HIDE THUMBS UNDER SIZE...
 			try{
 				if (opt.hideThumbsUnderResoluition!=0 && opt.navigationType=="thumb") {
@@ -941,7 +941,7 @@
 
 			//REMOVE AND SHOW SLIDER ON DEMAND
 			var contpar= container.parent();
-			if (jQuery(window).width()<opt.hideSliderAtLimit) {
+			if (opt&&jQuery(window).width()<opt.hideSliderAtLimit) {
 				container.trigger('stoptimer');
 				if (contpar.css('display')!="none")
 					contpar.data('olddisplay',contpar.css('display'));
@@ -963,7 +963,7 @@
 
 
 			var loff=0;
-			if (opt.forceFullWidth=="on")
+			if (opt&&opt.forceFullWidth=="on")
 						loff = 0-opt.container.parent().offset().left;
 			try{
 				container.parent().find('.tp-bannershadow').css({'width':opt.width,'left':loff});
@@ -1363,7 +1363,7 @@
 				tr.insertBefore(bullets.find('.tpclear')).css({'float':'left'});
 			}
 			var loff=0;
-			if (opt.forceFullWidth=="on")
+			if (opt&&opt.forceFullWidth=="on")
 						loff = 0-opt.container.parent().offset().left;
 
 			var gridposX = 0,
@@ -2179,7 +2179,7 @@
 		//	-	SWAP THE SLIDES -  //
 		////////////////////////////
 		var swapSlide = function(container,opt) {
-
+				if (!opt) return
 				try{
 					var actli =container.find('>ul:first-child >li:eq('+opt.act+')');
 				} catch(e) {
@@ -3931,7 +3931,7 @@
 												apptxt = apptxt + '<source src="'+videoogv+'" type="video/ogg" />';
 												apptxt = apptxt + '</video>';
 											nextcaption.append(apptxt);*/
-											
+
 											if (nextcaption.data('videoposter')!=undefined)
 												if (nextcaption.data('videoposter') != undefined) apptxt = apptxt + 'poster="'+nextcaption.data('videoposter')+'">';
 												if (videowebm!=undefined && get_browser().toLowerCase()=="firefox") apptxt = apptxt + '<source src="'+videowebm+'" type="video/webm" />';
@@ -6263,5 +6263,3 @@ function revslider_showDoubleJqueryError(sliderID) {
 	errorMessage = "<span style='font-size:16px;color:#BC0C06;'>" + errorMessage + "</span>"
 		jQuery(sliderID).show().html(errorMessage);
 }
-
-

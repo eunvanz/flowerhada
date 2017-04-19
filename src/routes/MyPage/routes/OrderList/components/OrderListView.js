@@ -86,6 +86,7 @@ class OrderListView extends React.Component {
     })
     .catch(res => {
       window.alert('처리 중 에러 발생 - ' + res.data ? res.data.message : null)
+      this.setState({ cancelProcess: false })
     })
   }
   _handleOnClickCancel (order) {

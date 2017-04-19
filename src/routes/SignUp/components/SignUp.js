@@ -86,6 +86,7 @@ class SignUp extends React.Component {
         return this.props.fetchAuthUser(userInfo)
       })
       .then((res) => {
+        document.cookie = `authUser=${JSON.stringify(this.props.authUser.data)}; max-age=${60 * 60 * 24}; path=/;`
         return this.props.fetchUser(this.props.authUser.data.email)
       })
       .then((res) => {

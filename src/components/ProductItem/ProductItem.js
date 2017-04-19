@@ -7,7 +7,6 @@ import { fetchCartsByUserId } from 'store/cart'
 import { connect } from 'react-redux'
 import Button from 'components/Button'
 import LessonDateInfo from 'components/LessonDateInfo'
-import $ from 'jquery'
 
 const mapStateToProps = state => ({
   user: state.user,

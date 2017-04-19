@@ -7,8 +7,24 @@ import ScrollTop from 'components/ScrollTop'
 import Footer from 'components/Footer'
 import InquiryModal from 'components/InquiryModal'
 import GlobalMessageModal from 'components/GlobalMessageModal'
+import $ from 'jquery'
 
 class CoreLayout extends React.Component {
+  componentDidMount () {
+    /* eslint-disable */
+    $(window).scroll(function() {
+			if($(this).scrollTop() != 0) {
+				$(".scrollToTop").fadeIn();
+			} else {
+				$(".scrollToTop").fadeOut();
+			}
+		});
+
+		$(".scrollToTop").click(function() {
+			$("body,html").animate({scrollTop:0},800);
+		});
+    /* eslint-enable */
+  }
   render () {
     return (
       <div className='page-wrapper'>

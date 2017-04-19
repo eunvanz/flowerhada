@@ -1,6 +1,6 @@
 import React from 'react'
 import MainBanner from './MainBanner'
-import { setInlineScripts, clearInlineScripts } from 'common/util'
+import { setInlineScripts, clearInlineScripts, isIE } from 'common/util'
 import HomeCard from './HomeCard'
 import ItemList from 'components/ItemList'
 import LessonRequestActionBlock from 'components/LessonRequestActionBlock'
@@ -16,7 +16,6 @@ import Button from 'components/Button'
 // import 'template/plugins/isotope/isotope.pkgd.min.js'
 // import '/template/js/template.js'
 // import '/template/js/inline-home-view.js'
-import $ from 'jquery'
 
 class HomeView extends React.Component {
   constructor (props) {
@@ -37,7 +36,7 @@ class HomeView extends React.Component {
     .then(() => {
       const scripts = [
         `/template/plugins/rs-plugin/js/jquery.themepunch.tools.min.js`,
-        `/template/plugins/rs-plugin/js/jquery.themepunch.revolution.min.js`,
+        `/template/plugins/rs-plugin/js/jquery.themepunch.revolution.js`,
         `/template/plugins/owl-carousel/owl.carousel.js`,
         `/template/plugins/jquery.browser.js`,
         `/template/plugins/SmoothScroll.js`,
@@ -51,8 +50,7 @@ class HomeView extends React.Component {
     })
   }
   componentWillUnmount () {
-    const agent = navigator.userAgent.toLowerCase()
-    if (agent.indexOf('trident') !== -1 || agent.indexOf('msie') !== -1) {
+    if (isIE()) {
       const evt = document.createEvent('Event')
       evt.initEvent('popstate', true, false)
       document.dispatchEvent(evt)

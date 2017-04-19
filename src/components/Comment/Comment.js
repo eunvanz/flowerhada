@@ -7,7 +7,6 @@ import Button from 'components/Button'
 import MessageModal from 'components/MessageModal'
 import { deleteComment } from 'common/CommentService'
 import { postPointHistory } from 'common/PointHistoryService'
-import { updateUserPoint } from 'common/UserService'
 
 class Comment extends React.Component {
   constructor (props) {
@@ -80,15 +79,13 @@ class Comment extends React.Component {
     .then(() => {
       const promArr = []
       if (point) {
-        promArr.push(updateUserPoint(item.userId, point * -1))
-        promArr.push(postPointHistory({
+        promArr.push(() => postPointHistory({
           userId: item.userId,
           amount: point * -1,
           action: '리뷰 삭제'
         }))
         if (item.image && item.image !== '') {
-          promArr.push(updateUserPoint(item.userId, imagePoint * -1))
-          promArr.push(postPointHistory({
+          promArr.push(() => postPointHistory({
             userId: item.userId,
             amount: imagePoint * -1,
             action: '리뷰 이미지 삭제'
@@ -187,7 +184,7 @@ class Comment extends React.Component {
           />
         </div>
         <header>
-          <h4>{item.title}</h4>
+          <h4 style={{ marginTop: '2px' }}>{item.title}</h4>
           <div className='comment-meta'>작성자 {maskName(item.user.name)} | {convertSqlDateToString(item.regDate)}</div>
         </header>
         <div className='comment-content'>

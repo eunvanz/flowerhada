@@ -2,7 +2,7 @@ import numeral from 'numeral'
 
 export const clearInlineScripts = () => {
   const scriptElements = document.body.getElementsByTagName('SCRIPT')
-  while (scriptElements.length > 12) {
+  while (scriptElements.length > 11) {
     const length = scriptElements.length
     document.body.removeChild(scriptElements[length - 1])
   }
@@ -250,4 +250,9 @@ export const dividePhoneNumber = phoneNumber => {
 
 export const assemblePhoneNumber = phoneNumberArr => {
   return `${phoneNumberArr[0]}-${phoneNumberArr[1]}-${phoneNumberArr[2]}`
+}
+
+export const isIE = () => {
+  const agent = navigator.userAgent.toLowerCase()
+  return agent.indexOf('trident') !== -1 || agent.indexOf('msie') !== -1
 }

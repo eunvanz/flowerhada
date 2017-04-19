@@ -16,7 +16,7 @@ import Loading from 'components/Loading'
 import ImageCarousel from 'components/ImageCarousel'
 import Parallax from 'components/Parallax'
 import DatePicker from 'components/DatePicker'
-import { deleteCartByUserIdAndItemTypeAndItemIdAndCartType, postCart } from 'common/CartService'
+import { deleteCartByUserIdAndItemTypeAndItemIdAndCartType, postCart, getCartsByUserId } from 'common/CartService'
 import { Tooltip } from 'react-bootstrap'
 import { getCommentsByUserIdAndType } from 'common/CommentService'
 
@@ -66,6 +66,7 @@ class ItemView extends React.Component {
     this._handleOnClickBuy = this._handleOnClickBuy.bind(this)
     this._renderWriteReviewButton = this._renderWriteReviewButton.bind(this)
     this._handleOnClickReOpen = this._handleOnClickReOpen.bind(this)
+    this._reviewSubmitAuthorityValidator = this._reviewSubmitAuthorityValidator.bind(this)
   }
   componentDidMount () {
     window.scrollTo(0, 0)
@@ -382,6 +383,31 @@ class ItemView extends React.Component {
         this.setState({ isReviewWriteable: false })
       }
       return Promise.resolve()
+    })
+  }
+  _reviewSubmitAuthorityValidator () {
+    const { user, params, item } = this.props
+    return getCartsByUserId(user.id)
+    .then(res => {
+      const carts = res.data
+      if (!carts) return Promise.reject()
+      const filteredCarts = carts.filter(cart => {
+        if (params.type === 'lesson') {
+          return cart.lessonId === item.id && cart.status === '수강완료'
+        } else {
+          return cart.productId === item.id && cart.status === '배송완료'
+        }
+      })
+      return getCommentsByUserIdAndType(user.id, 'review')
+      .then(res => {
+        const userReviews = res.data
+        const filteredUserReviews = userReviews.filter(review => review.groupName === item.groupName)
+        if (filteredCarts.length > filteredUserReviews.length) {
+          return Promise.resolve()
+        } else {
+          return Promise.reject()
+        }
+      })
     })
   }
   _handleOnClickReOpen () {
@@ -955,6 +981,7 @@ class ItemView extends React.Component {
                   imagePoint={this._getItemPrice() * 0.01}
                   point={this._getItemPrice() * 0.01}
                   id='registerComment'
+                  validator={this._reviewSubmitAuthorityValidator}
                 />
               }
               <div className='col-md-4 col-lg-3 col-lg-offset-1'>

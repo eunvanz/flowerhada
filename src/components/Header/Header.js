@@ -12,6 +12,7 @@ import { setInquiryModalMode, setInquiryModalShow,
 import { setMessageModalShow, setMessageModalMessage, setMessageModalCancelBtnTxt, setMessageModalConfirmBtnTxt,
   setMessageModalOnConfirmClick } from 'store/messageModal'
 import cookie from 'cookie'
+import $ from 'jquery'
 
 const mapStateToProps = state => ({
   user: state.user,
@@ -49,7 +50,7 @@ class Header extends React.Component {
     // const authUser = JSON.parse(sessionStorage.getItem('authUser'))
     const cookies = cookie.parse(document.cookie)
     let authUser = null
-    if (cookies.authUser) authUser = JSON.parse(cookies.authUser)
+    if (cookies.authUser && cookies.authUser.indexOf('{') !== -1) authUser = JSON.parse(cookies.authUser)
     if (authUser) { // 세션에 authUser가 있을 경우 store에 세팅하고 db에서 user 가져옴
       this.props.receiveAuthUser(authUser)
       this.props.fetchUser(authUser.email)
@@ -57,11 +58,108 @@ class Header extends React.Component {
         this.props.fetchCartsByUserId(this.props.user.id)
       })
     }
+
+    /* eslint-disable */
+    //Show dropdown on hover only for desktop devices
+    //-----------------------------------------------
+		const delay = 0
+    let setTimeoutConst
+    const Modernizr = window.Modernizr
+		if ((Modernizr.mq('only all and (min-width: 768px)') && !Modernizr.touch) || $('html.ie8').length > 0) {
+			$('.main-navigation:not(.onclick) .navbar-nav>li.dropdown, .main-navigation:not(.onclick) li.dropdown>ul>li.dropdown').hover(
+			() => {
+				const $this = $(this)
+				setTimeoutConst = setTimeout(function(){
+					$this.addClass('open').slideDown()
+					$this.find('.dropdown-toggle').addClass('disabled')
+				}, delay)
+
+			}, () => {
+				window.clearTimeout(setTimeoutConst)
+				$(this).removeClass('open')
+				$(this).find('.dropdown-toggle').removeClass('disabled')
+			})
+		}
+
+		//Show dropdown on click only for mobile devices
+		//-----------------------------------------------
+		// if (Modernizr.mq('only all and (max-width: 767px)') || Modernizr.touch || $('.main-navigation.onclick').length > 0 ) {
+		// 	$('.main-navigation [data-toggle=dropdown], .header-top [data-toggle=dropdown]').on('click', event => {
+		// 	// Avoid following the href location when clicking
+		// 	event.preventDefault()
+		// 	// Avoid having the menu to close when clicking
+		// 	event.stopPropagation()
+		// 	// close all the siblings
+		// 	$(this).parent().siblings().removeClass('open')
+		// 	// close all the submenus of siblings
+		// 	$(this).parent().siblings().find('[data-toggle=dropdown]').parent().removeClass('open')
+		// 	// opening the one you clicked on
+		// 	$(this).parent().toggleClass('open')
+		// 	})
+		// }
+
+    // Fixed header
+		//-----------------------------------------------
+		let headerTopHeight = $(".header-top").outerHeight()
+		let headerHeight = $("header.header.fixed").outerHeight()
+		$(window).resize(function() {
+			if(($(this).scrollTop() < headerTopHeight + headerHeight -5 ) && ($(window).width() > 767)) {
+				headerTopHeight = $(".header-top").outerHeight(),
+				headerHeight = $("header.header.fixed").outerHeight()
+			}
+		})
+
+		$(window).scroll(function() {
+			if (($(".header.fixed:not(.fixed-before)").length > 0)  && !($(".transparent-header .slideshow").length>0)) {
+				if (($(this).scrollTop() > headerTopHeight + headerHeight) && ($(window).width() > 767)) {
+					$("body").addClass("fixed-header-on")
+					$(".header.fixed:not(.fixed-before)").addClass('animated object-visible fadeInDown')
+					$(".header-container").css("paddingBottom", (headerHeight)+"px")
+				} else {
+					$("body").removeClass("fixed-header-on")
+					$(".header-container").css("paddingBottom", (0)+"px")
+					$(".header.fixed:not(.fixed-before)").removeClass('animated object-visible fadeInDown')
+				}
+			} else if ($(".header.fixed:not(.fixed-before)").length > 0) {
+				if (($(this).scrollTop() > headerTopHeight + headerHeight) && ($(window).width() > 767)) {
+					$("body").addClass("fixed-header-on")
+					$(".header.fixed:not(.fixed-before)").addClass('animated object-visible fadeInDown')
+				} else {
+					$("body").removeClass("fixed-header-on")
+					$(".header.fixed:not(.fixed-before)").removeClass('animated object-visible fadeInDown')
+				}
+			}
+		})
+
+		$(window).scroll(function() {
+			if (($(".header.fixed.fixed-before").length > 0)  && !($(".transparent-header .slideshow").length>0)) {
+				if (($(this).scrollTop() > headerTopHeight) && ($(window).width() > 767)) {
+					$("body").addClass("fixed-header-on")
+					$(".header.fixed.fixed-before").addClass('object-visible')
+					$(".header-container").css("paddingBottom", (headerHeight)+"px")
+				} else {
+					$("body").removeClass("fixed-header-on")
+					$(".header-container").css("paddingBottom", (0)+"px")
+					$(".header.fixed.fixed-before").removeClass('object-visible')
+				}
+			} else if ($(".header.fixed.fixed-before").length > 0) {
+				if (($(this).scrollTop() > headerTopHeight) && ($(window).width() > 767)) {
+					$("body").addClass("fixed-header-on")
+					$(".header.fixed.fixed-before").addClass('object-visible')
+				} else {
+					$("body").removeClass("fixed-header-on")
+					$(".header.fixed.fixed-before").removeClass('object-visible')
+				}
+			}
+		})
+    /* eslint-enable */
   }
   _handleOnClickLogout () {
     // const sessionStorage = window.sessionStorage
     // sessionStorage.removeItem('authUser')
-    document.cookie = `authUser=; expires=${new Date().toUTCString()}; path=/;`
+    const expireDate = new Date()
+    expireDate.setDate(expireDate.getDate() - 1)
+    document.cookie = `authUser=; expires=${expireDate.toGMTString()}; path=/;`
     this.props.removeUser()
     this.props.removeAuthUser()
     this.props.clearCarts()

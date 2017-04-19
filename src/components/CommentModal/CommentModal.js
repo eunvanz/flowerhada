@@ -90,34 +90,44 @@ class CommentModal extends React.Component {
         Promise.resolve()
       }
     }
-    if (file) {
-      postCommentImage(file)
-      .then(res => {
-        const imgUrl = res.data.data.link
-        this.setState({ image: imgUrl })
-        return doActionComment()
-      })
-      .then(() => {
-        if (this.props.type === 'review') return handlePoint()
-        else return Promise.resolve()
-      })
-      .then(() => {
-        if (this.props.type === 'review' && this.props.imagePoint) return handleImagePoint()
-        else return Promise.resolve()
-      })
-      .then(() => {
-        return finalizeSubmit()
-      })
-    } else {
-      doActionComment()
-      .then(() => {
-        if (this.props.type === 'review') return handlePoint()
-        else return Promise.resolve()
-      })
-      .then(() => {
-        return finalizeSubmit()
-      })
+    const validate = () => {
+      return this.props.type === 'review' ? this.props.validator() : Promise.resolve()
     }
+    validate()
+    .then(() => {
+      if (file) {
+        return postCommentImage(file)
+        .then(res => {
+          const imgUrl = res.data.data.link
+          this.setState({ image: imgUrl })
+          return doActionComment()
+        })
+        .then(() => {
+          if (this.props.type === 'review') return handlePoint()
+          else return Promise.resolve()
+        })
+        .then(() => {
+          if (this.props.type === 'review' && this.props.imagePoint) return handleImagePoint()
+          else return Promise.resolve()
+        })
+        .then(() => {
+          return finalizeSubmit()
+        })
+      } else {
+        return doActionComment()
+        .then(() => {
+          if (this.props.type === 'review') return handlePoint()
+          else return Promise.resolve()
+        })
+        .then(() => {
+          return finalizeSubmit()
+        })
+      }
+    })
+    .catch(() => {
+      this.setState({ process: false })
+      alert('레슨 수강완료 혹은 상품 배송완료 후에 작성 가능합니다.')
+    })
   }
   render () {
     const renderImageTooltip = () => {
@@ -200,7 +210,8 @@ CommentModal.propTypes = {
   parentId: React.PropTypes.number,
   id: React.PropTypes.string.isRequired,
   imagePoint: React.PropTypes.number,
-  point: React.PropTypes.number
+  point: React.PropTypes.number,
+  validator: React.PropTypes.func
 }
 
 export default CommentModal
