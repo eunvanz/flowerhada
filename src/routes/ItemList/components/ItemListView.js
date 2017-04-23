@@ -55,24 +55,24 @@ class ItemListView extends React.Component {
     const renderDescription = () => {
       let returnComponent = null
       if (type === 'lesson') {
-        returnComponent = <span>hada만의 고품격 레슨으로 유러피언 스타일의 작품들을 직접 만들어보세요.</span>
+        returnComponent = <span></span>
       } else if (type === 'flower') {
-        returnComponent = <span>hada의 꽃다발들은 주문과 동시에 만들어지기 때문에 언제나 싱싱합니다.</span>
+        returnComponent = <span></span>
       } else if (type === 'wedding') {
-        returnComponent = <span>hada가 준비한 웨딩 아이템들로 당신의 결혼식을 빛내보세요.</span>
+        returnComponent = <span></span>
       }
       return returnComponent
     }
     const setTabTitles = () => {
       if (type === 'lesson') {
-        return ['전체', '원데이레슨', '취미반', '창업반']
+        return ['전체', '원데이레슨', '취미반', '창업반', '웨딩반']
       } else if (type === 'flower') {
         return ['전체', '단체꽃다발', '이벤트꽃다발']
       }
     }
     const setTabIcons = () => {
       if (type === 'lesson') {
-        return ['fa fa-list', 'fa fa-check', 'fa fa-heart', 'fa fa-graduation-cap']
+        return ['fa fa-list', 'fa fa-scissors', 'fa fa-heart', 'fa fa-graduation-cap', 'fa fa-diamond']
       } else if (type === 'flower') {
         return ['fa fa-list', 'fa fa-users', 'fa fa-gift']
       }
@@ -80,7 +80,7 @@ class ItemListView extends React.Component {
     const setTabLinks = () => {
       if (type === 'lesson') {
         return ['/item-list/lesson/all', '/item-list/lesson/원데이레슨',
-          '/item-list/lesson/취미반', '/item-list/lesson/창업반']
+          '/item-list/lesson/취미반', '/item-list/lesson/창업반', '/item-list/lesson/웨딩반']
       } else if (type === 'flower') {
         return ['/item-list/flower/all', '/item-list/flower/단체꽃다발', '/item-list/flower/이벤트꽃다발']
       }

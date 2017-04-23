@@ -174,6 +174,56 @@ export const setRecentItemToLocalStorage = item => {
   }
 }
 
+export const setCookie = (cName, cValue, cDay) => {
+  const expire = new Date()
+  expire.setDate(expire.getDate() + cDay)
+  let cookies = cName + '=' + escape(cValue) + '; path=/ '
+  if (typeof cDay !== 'undefined') cookies += ';expires=' + expire.toGMTString() + ';'
+  document.cookie = cookies
+}
+
+export const getCookie = cName => {
+  cName = cName + '='
+  const cookieData = document.cookie
+  let start = cookieData.indexOf(cName)
+  let cValue = ''
+  if (start !== -1) {
+    start += cName.length
+    let end = cookieData.indexOf(';', start)
+    if (end === -1) end = cookieData.length
+    cValue = cookieData.substring(start, end)
+  }
+  return unescape(cValue)
+}
+
+export const setRecentItemToCookie = item => {
+  const recentItems = JSON.parse(getCookie('recentItems') === '' ? null : getCookie('recentItems'))
+  // recentItems가 없을 경우에는 새로 생성
+  if (!recentItems) {
+    const newArr = []
+    newArr.push(item)
+    setCookie('recentItems', JSON.stringify(newArr), 7)
+  } else {
+    if (recentItems.length > 5) recentItems.shift()
+    // recentItems가 있을 경우에는 기존 array에 추가하는데,
+    // 기존 array에 id가 존재할 경우에는 기존걸 삭제하고 새로 받은걸 0번으로 세팅한다.
+    let existIndex = -1
+    for (let i = 0; i < recentItems.length; i++) {
+      if (recentItems[i].id === item.id && recentItems[i].type === item.type) {
+        existIndex = i
+        break
+      }
+    }
+    if (existIndex === -1) {
+      recentItems.push(item)
+    } else {
+      recentItems.splice(existIndex, 1)
+      recentItems.push(item)
+    }
+    setCookie('recentItems', JSON.stringify(recentItems), 7)
+  }
+}
+
 export const isMobile = {
   Android: () => {
     return navigator.userAgent.match(/Android/i)

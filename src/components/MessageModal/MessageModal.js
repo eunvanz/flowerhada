@@ -12,6 +12,18 @@ class MessageModal extends React.Component {
   }
   componentWillReceiveProps (nextProps) {
     this.setState({ showModal: nextProps.show })
+    if (nextProps.show) {
+      document.addEventListener('keyup', event => {
+        const { keyCode } = event
+        if (keyCode === 13) {
+          this.props.onConfirmClick()
+        } else if (keyCode === 27) {
+          this.props.close()
+        }
+      })
+    } else if (nextProps.show === false) {
+      document.removeEventListener('keyup', () => {})
+    }
   }
   render () {
     const bodyComponent = () => {

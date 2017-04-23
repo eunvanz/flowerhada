@@ -91,7 +91,7 @@ class CommentModal extends React.Component {
       }
     }
     const validate = () => {
-      return this.props.type === 'review' ? this.props.validator() : Promise.resolve()
+      return this.props.type === 'review' && this.state.mode === 'post' ? this.props.validator() : Promise.resolve()
     }
     validate()
     .then(() => {
@@ -103,11 +103,11 @@ class CommentModal extends React.Component {
           return doActionComment()
         })
         .then(() => {
-          if (this.props.type === 'review') return handlePoint()
+          if (this.state.mode === 'post' && this.props.type === 'review') return handlePoint()
           else return Promise.resolve()
         })
         .then(() => {
-          if (this.props.type === 'review' && this.props.imagePoint) return handleImagePoint()
+          if (this.state.mode === 'post' && this.props.type === 'review' && this.props.imagePoint) return handleImagePoint()
           else return Promise.resolve()
         })
         .then(() => {

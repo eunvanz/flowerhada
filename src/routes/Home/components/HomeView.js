@@ -107,15 +107,42 @@ class HomeView extends React.Component {
             <div className='row'>
               <div className='col-md-8 col-md-offset-2'>
                 <h2 className='text-center'>
-                  <span className='text-default'>꽃</span>처럼 살아라
+                  찾아가는 플라워레슨
                 </h2>
                 <div className='separator' />
                 <p className='large text-center'>
-                  언제나 예쁘고 싱싱한 꽃처럼 살 수 없을까요? <span className='text-default'>hada</span>와 함께라면 가능합니다.
-                  <br /><span className='text-default'>hada</span>는 꽃으로 할 수 있는 풍성한 경험을 일상속으로 전달해드립니다.
+                  당신의 취미를 <span className='text-default'>배달</span>해드립니다.
                 </p>
               </div>
               <HomeCard
+                title='원데이레슨'
+                icon='fa fa-scissors'
+                actionName='원데이레슨'
+                content='내가 원하는 시간과 장소, 주제로 진행되는 맞춤형 레슨'
+                link='/item-list/lesson/원데이레슨'
+              />
+              <HomeCard
+                title='취미반'
+                icon='fa fa-heart'
+                actionName='취미반'
+                content='정기적으로 다양한 작품을 만드는 지속적 힐링 레슨'
+                link='/item-list/lesson/취미반'
+              />
+              <HomeCard
+                title='창업반'
+                icon='fa fa-graduation-cap'
+                actionName='창업반'
+                content='창업 필수 작품들을 집중적으로 다루는 전문가 과정'
+                link='/item-list/lesson/창업반'
+              />
+              <HomeCard
+                title='웨딩반'
+                icon='fa fa-diamond'
+                actionName='웨딩반'
+                content='특별한 날, 특별한 이벤트에 꼭 필요한 공간장식 레슨'
+                link='/item-list/lesson/웨딩반'
+              />
+              {/* <HomeCard
                 title='플라워레슨'
                 img='flower-scissors.jpg'
                 actionName='플라워레슨'
@@ -135,7 +162,7 @@ class HomeView extends React.Component {
                 actionName='웨딩'
                 content='꽃이 없는 웨딩은 앙꼬 없는 찐빵. hada가 제안하는 웨딩솔루션으로 결혼식을 화사하게 밝혀보세요.'
                 link='/item-list/wedding/all'
-              />
+              /> */}
             </div>
           </div>
         </section>

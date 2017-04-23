@@ -70,16 +70,39 @@ class ProductItem extends React.Component {
       /* eslint-enable */
       return returnComponent
     }
-    const renderDiscountBadge = () => {
-      if (item.discountedPrice &&
+    const renderBadges = () => {
+      if (this.props.type === 'lesson' && item.expired) {
+        return (
+          <span className='badge' style={{ borderColor: '#d9534f', color: '#d9534f' }}>기간만료</span>
+        )
+      } else if (this.props.type === 'lesson' && item.currParty === item.maxParty) {
+        return (
+          <span className='badge' style={{ borderColor: '#d9534f', color: '#d9534f' }}>등록마감</span>
+        )
+      } else if (this.props.type === 'lesson' && item.currParty >= item.maxParty - 2) {
+        return (
+          <span className='badge' style={{ borderColor: '#f0ad4e', color: '#f0ad4e' }}>마감임박</span>
+        )
+      } else if (this.props.type === 'product' && item.soldout) {
+        return (
+          <span className='badge' style={{ borderColor: '#d9534f', color: '#d9534f' }}>SOLD OUT</span>
+        )
+      } else if (item.discountedPrice &&
       item.discountedPrice !== 0 &&
       item.discountedPrice !== item.price) {
         return (
-          <span className='badge'>
+          <span className='badge' style={{ borderColor: '#09afdf', color: '#09afdf' }}>
             {
               `${getDiscountPercentage(item.price, item.discountedPrice)}% OFF`
             }
           </span>
+        )
+      }
+    }
+    const renderLocationBadge = () => {
+      if (this.props.type === 'lesson') {
+        return (
+          <span className='default-bg badge' style={{ left: '10px', right: 'auto' }}>{item.location}</span>
         )
       }
     }
@@ -174,7 +197,8 @@ class ProductItem extends React.Component {
             <Link to={`/item/${this.props.type}/${item.id}`} className='overlay-link'>
               <i className='fa fa-search-plus' />
             </Link>
-            {renderDiscountBadge()}
+            {renderBadges()}
+            {renderLocationBadge()}
             {/* <div className='overlay-to-top links'>
               <span className='small'>
                 {renderWishListButton()}
@@ -184,7 +208,7 @@ class ProductItem extends React.Component {
           <div className='body'>
             {renderCategory()}
             <h3>
-              {item.title} <span className='default-bg badge'>{item.location}</span>
+              {item.title}
             </h3>
             <p>
               {item.detail}

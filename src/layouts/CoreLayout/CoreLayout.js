@@ -7,20 +7,22 @@ import ScrollTop from 'components/ScrollTop'
 import Footer from 'components/Footer'
 import InquiryModal from 'components/InquiryModal'
 import GlobalMessageModal from 'components/GlobalMessageModal'
+import GoBack from 'components/GoBack'
 import $ from 'jquery'
+import { isMobile } from 'common/util'
 
 class CoreLayout extends React.Component {
   componentDidMount () {
     /* eslint-disable */
     $(window).scroll(function() {
 			if($(this).scrollTop() != 0) {
-				$(".scrollToTop").fadeIn();
+				$("#scrollTop").fadeIn();
 			} else {
-				$(".scrollToTop").fadeOut();
+				$("#scrollTop").fadeOut();
 			}
 		});
 
-		$(".scrollToTop").click(function() {
+		$("#scrollTop").click(function() {
 			$("body,html").animate({scrollTop:0},800);
 		});
     /* eslint-enable */
@@ -97,6 +99,7 @@ class CoreLayout extends React.Component {
         />
         <Header />
         <ScrollTop />
+        { location.pathname !== '/' && isMobile.any() && <GoBack /> }
         <InquiryModal />
         <GlobalMessageModal />
         <div>

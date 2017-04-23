@@ -1,4 +1,4 @@
 /* eslint-disable */
 window.addEventListener('popstate', function() {
-	$('#main-banner').revkill()
+	if (location.pathname !== '/') $('#main-banner').revkill()
 })

@@ -587,7 +587,7 @@ class CartView extends React.Component {
             </Tooltip>
           </td>
           <td colSpan='2' className='form-inline text-right'>
-            <TextField
+            <input
               id='pointSpent'
               type='number'
               step={100}

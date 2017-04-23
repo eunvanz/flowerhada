@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react'
 // import 'template/plugins/jquery.parallax-1.1.3'
-import { Parallax as ReactParallax, Background } from 'react-parallax'
+import { Parallax as ReactParallax } from 'react-parallax'
+import { isMobile } from 'common/util'
 // import $ from 'jquery'
 
 class Parallax extends React.Component {
@@ -28,10 +29,10 @@ class Parallax extends React.Component {
       // </div>
       <ReactParallax
         className='dark-translucent-bg'
-        strength={400}
+        strength={isMobile.any() ? 100 : 300}
         bgImage={this.props.backgroundImage}
       >
-        <div className='container' style={{ marginTop: '30px', marginBottom: '30px' }}>
+        <div className='container' style={{ paddingTop: '40px', paddingBottom: '40px' }}>
           <div className='row'>
             <div className='col-md-12'>
               <h2 className='text-center'>{this.props.title}</h2>

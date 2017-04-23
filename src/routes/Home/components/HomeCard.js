@@ -37,12 +37,13 @@ class HomeCard extends React.Component {
   // }
   render () {
     return (
-      <div className='col-md-4'>
+      <div className='col-md-3'>
         <div className='pv-30 ph-20 feature-box bordered
           shadow text-center object-non-visible animated object-visible fadeInDownSmall'
           data-animation-effect='fadeInDownSmall' data-effect-delay='100'>
           <span className='icon white-bg circle'>
-            <img src={`${imgRoute}/${this.props.img}`} width='60px' height='60px' />
+            {this.props.img && <img src={`${imgRoute}/${this.props.img}`} width='60px' height='60px' />}
+            {this.props.icon && <i className={`text-default ${this.props.icon}`} />}
           </span>
           <h3>{this.props.title}</h3>
           <div className='separator clearfix' />
@@ -59,7 +60,8 @@ class HomeCard extends React.Component {
 }
 
 HomeCard.propTypes = {
-  img: React.PropTypes.string.isRequired,
+  img: React.PropTypes.string,
+  icon: React.PropTypes.string,
   actionName: React.PropTypes.string.isRequired,
   title: React.PropTypes.string.isRequired,
   content: React.PropTypes.string.isRequired,

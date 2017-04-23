@@ -38,7 +38,9 @@ const mapStateToProps = (state) => ({
   inquiries: state.item.inquiries,
   user: state.user,
   relatedItems: state.item.relatedItems,
-  carts: state.cart.cartList
+  carts: state.cart.cartList,
+  isAdmin: state.authUser.data &&
+    state.authUser.data.authorities.filter((data) => data.authority === 'ADMIN').length > 0
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ItemView)

@@ -42,20 +42,14 @@ class Login extends React.Component {
   }
   _handleOnClickSubmit (e) {
     e.preventDefault()
-
     if (!this._checkEmailField() || !this._checkPasswordField()) {
       this._showErrorMessage('가입하신 이메일과 비밀번호를 입력해주세요.')
       return
     }
-
     this.setState({ process: true })
     const userInfo = { email: this.state.email, password: this.state.password }
     this.props.fetchAuthUser(userInfo)
     .then(() => {
-      // if (!isMobile.any()) {
-      //   const sessionStorage = window.sessionStorage
-      //   sessionStorage.setItem('authUser', JSON.stringify(this.props.authUser.data))
-      // }
       document.cookie = `authUser=${JSON.stringify(this.props.authUser.data)}; max-age=${60 * 60 * 24}; path=/;`
       return Promise.resolve()
     })
@@ -67,7 +61,7 @@ class Login extends React.Component {
     })
     .then(() => {
       this.setState({ process: false })
-      this.context.router.goBack()
+      // this.context.router.goBack()
     })
     .catch((res) => {
       this.setState({ process: false })
@@ -95,7 +89,7 @@ class Login extends React.Component {
   }
   render () {
     if (this.props.user) {
-      this.context.router.push('/')
+      this.context.router.goBack()
     }
     return (
       <div className='main-container dark-translucent-bg'
@@ -130,8 +124,8 @@ class Login extends React.Component {
                         네이버 <i style={{ fontFamily: 'Archivo Black', lineHeight: '28px', fontStyle: 'normal' }}>N</i>
                       </button>
                     </div>
-                  </div> */}
-                  <div className='separator' />
+                  </div>
+                  <div className='separator' /> */}
                   <div className='form-group has-feedback' id='formGroupEmail'>
                     <label htmlFor='inputEmail' className='col-sm-3 control-label'>
                       이메일주소

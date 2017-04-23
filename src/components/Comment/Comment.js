@@ -119,7 +119,7 @@ class Comment extends React.Component {
     }
     const renderReplyButton = () => {
       const isEditButtonRendered = this.props.userId === this.props.item.userId
-      if (this.props.userId && !this.props.item.parentId) {
+      if (this.props.isAdmin) {
         return (
           <a className='btn-md-link link-dark pull-right' onClick={this._handleOnClickReply}
             style={{ cursor: 'pointer' }}>
@@ -135,7 +135,7 @@ class Comment extends React.Component {
       let returnComponent = null
       if (this.state.showReplies && this.props.item.replies) {
         returnComponent = this.props.item.replies.map(reply => {
-          return <Comment item={reply} key={keygen._()} userId={this.props.userId}
+          return <Comment item={reply} key={keygen._()} userId={this.props.userId} isAdmin={this.props.isAdmin}
             afterDelete={this.props.afterDelete} afterSubmit={this.props.afterSubmit} />
         })
       }
@@ -184,7 +184,7 @@ class Comment extends React.Component {
           />
         </div>
         <header>
-          <h4 style={{ marginTop: '2px' }}>{item.title}</h4>
+          <h4 style={{ marginTop: '3px' }}>{item.title}</h4>
           <div className='comment-meta'>작성자 {maskName(item.user.name)} | {convertSqlDateToString(item.regDate)}</div>
         </header>
         <div className='comment-content'>
@@ -209,6 +209,7 @@ class Comment extends React.Component {
               afterSubmit={this.props.afterSubmit}
               userId={this.props.userId}
               id={`editModal${keygen._()}`}
+              validator={() => Promise.resolve()}
             />
             <CommentModal
               type={this.props.item.type}
@@ -218,6 +219,7 @@ class Comment extends React.Component {
               afterSubmit={this.props.afterSubmit}
               userId={this.props.userId}
               id={`replyModal${keygen._()}`}
+              validator={() => Promise.resolve()}
             />
             <MessageModal
               show={this.state.showMessageModal}
@@ -243,7 +245,8 @@ Comment.propTypes = {
   afterSubmit: PropTypes.func,
   afterDelete: PropTypes.func,
   point: PropTypes.number,
-  imagePoint: PropTypes.number
+  imagePoint: PropTypes.number,
+  isAdmin: PropTypes.bool
 }
 
 export default Comment

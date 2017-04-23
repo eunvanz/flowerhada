@@ -6,7 +6,7 @@ import TextField from 'components/TextField'
 import Checkbox from 'components/Checkbox'
 import DatePicker from 'components/DatePicker'
 import TimePicker from 'components/TimePicker'
-import { putLesson, postLesson, deleteLesson } from 'common/LessonService'
+import { putLesson, postLesson, deleteLesson, postLessonImage } from 'common/LessonService'
 import { postLessonDay, putLessonDay, deleteLessonDay } from 'common/LessonDayService'
 import $ from 'jquery'
 
@@ -71,12 +71,12 @@ class LessonListView extends React.Component {
           lessonTimes: this.state.lessonDays.length
         })
         $('#content').val(this.state.content)
-        const scripts = ['//cdn.tinymce.com/4/tinymce.min.js',
+        const scripts = ['//cdn.tinymce.com/4/tinymce.js',
           '/template/js/inline-lesson-register-view.js']
         setInlineScripts(scripts)
       })
     } else {
-      const scripts = ['//cdn.tinymce.com/4/tinymce.min.js',
+      const scripts = ['//cdn.tinymce.com/4/tinymce.js',
         '/template/js/inline-lesson-register-view.js']
       setInlineScripts(scripts)
     }
@@ -180,7 +180,6 @@ class LessonListView extends React.Component {
     lesson.append('latitude', $('#latitude').val())
     lesson.append('maxParty', $('#maxParty').val())
     lesson.append('currParty', $('#currParty').val())
-    lesson.append('titleImg', $('#titleImg').val())
     lesson.append('price', $('#price').val())
     lesson.append('discountedPrice', $('#discountedPrice').val())
     lesson.append('lessonDate', this.state.lessonDate)
@@ -196,7 +195,23 @@ class LessonListView extends React.Component {
     lesson.append('content', window.tinymce.get('content').getContent())
     let action = putLesson
     if (this.state.mode === 'register') action = postLesson
-    action(lesson, this.props.params.id)
+    const file = document.getElementById('titleImg').files[0]
+    let postImage
+    if (this.state.mode === 'register') {
+      postImage = () => postLessonImage(file)
+    } else {
+      postImage = file ? () => postLessonImage(file) : Promise.resolve()
+    }
+    postImage
+    .then(res => {
+      if (res) {
+        const imgUrl = res.data.data.link
+        lesson.append('titleImg', imgUrl)
+        return action(lesson, this.props.params.id)
+      } else {
+        Promise.resolve()
+      }
+    })
     .then((res) => {
       if (!this.state.oneday && this.state.lessonDays.length > 0) {
         const lessonDays = []
@@ -464,9 +479,9 @@ class LessonListView extends React.Component {
           />
           <TextField
             id='titleImg'
-            label='이미지'
-            onChange={this._handleOnChangeInput}
-            value={this.state.titleImg}
+            label='대표이미지'
+            type='file'
+            accept='image/*'
           />
           <TextField
             id='price'

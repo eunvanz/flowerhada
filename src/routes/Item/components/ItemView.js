@@ -1,6 +1,6 @@
 import React from 'react'
 import { convertDateToString, extractDaysFromLessonDays, extractDetailScheduleFromLessonDays,
-  setRecentItemToLocalStorage, isMobile } from 'common/util'
+  setRecentItemToCookie, isMobile, getCookie } from 'common/util'
 import MapModal from 'components/MapModal'
 import numeral from 'numeral'
 import LessonRequestActionBlock from 'components/LessonRequestActionBlock'
@@ -41,7 +41,8 @@ class ItemView extends React.Component {
       receiveTime: '오전 10시 ~ 오전 12시',
       receiveArea: { name: '서울', price: 0 },
       carouselFlag: true,
-      isReviewWriteable: false
+      isReviewWriteable: false,
+      pointInfoFlag: false // 포인트 적립정보 툴팁을 다시 렌더링 하기위한 플래그
     }
     this._handleOnClickShowMap = this._handleOnClickShowMap.bind(this)
     this._handleOnClickHideMap = this._handleOnClickHideMap.bind(this)
@@ -78,13 +79,15 @@ class ItemView extends React.Component {
     $(window).resize(() => {
       this._renderPointInfo()
     })
+    setTimeout(() => this.setState({ pointInfoFlag: !this.state.pointInfoFlag }), 300)
   }
   shouldComponentUpdate (nextProps, nextState) {
+    if (this.state.pointInfoFlag !== nextState.pointInfoFlag) return true
     if (nextState.carouselFlag !== this.state.carouselFlag) return false
     return true
   }
   componentWillUpdate (nextProps, nextState) {
-    this.setState({ carouselFlag: !this.state.carouselFlag })
+    if (!this.state.carouselFlag) this.setState({ carouselFlag: !this.state.carouselFlag })
   }
   componentDidUpdate (prevProps, prevState) {
     if (this.props.params !== prevProps.params) {
@@ -92,6 +95,7 @@ class ItemView extends React.Component {
       this._initializeState()
       this._loadItemInfo()
       window.scrollTo(0, 0)
+      setTimeout(() => this.setState({ pointInfoFlag: !this.state.pointInfoFlag }), 300)
     }
   }
   componentWillUnmount () {
@@ -169,9 +173,7 @@ class ItemView extends React.Component {
         price: this.props.item.price,
         discountedPrice: this.props.item.discountedPrice
       }
-      if (!isMobile.any()) {
-        setRecentItemToLocalStorage(recentItem)
-      }
+      setRecentItemToCookie(recentItem)
       // console.log('최근본 상품 로컬스토리지에 저장 완료')
       return this._renderWriteReviewButton()
       .then(() => {
@@ -386,6 +388,7 @@ class ItemView extends React.Component {
     })
   }
   _reviewSubmitAuthorityValidator () {
+    if (this.props.isAdmin) return Promise.resolve()
     const { user, params, item } = this.props
     return getCartsByUserId(user.id)
     .then(res => {
@@ -415,6 +418,7 @@ class ItemView extends React.Component {
       mode: 'post',
       defaultCategory: '레슨재개설신청',
       inquiry: {
+        title: '레슨을 다시 개설해주세요.',
         content:
 `희망 레슨 : ${this.props.item.title}
 희망 지역 :
@@ -434,7 +438,8 @@ class ItemView extends React.Component {
         }
         this.props.setMessageModal(messageModal)
       },
-      show: true
+      show: true,
+      process: false
     }
     this.props.setInquiryModal(inquiryModal)
   }
@@ -858,7 +863,9 @@ class ItemView extends React.Component {
         returnComponent = this.props.reviews.content.map(comment =>
           <Comment item={comment} key={keygen._()} userId={this.props.user ? this.props.user.id : null}
             afterSubmit={this._handleOnSubmitComplete} afterDelete={this._handleOnSubmitComplete}
-            point={this._getItemPrice() * 0.01} imagePoint={this._getItemPrice() * 0.01} />)
+            point={this._getItemPrice() * 0.01} imagePoint={this._getItemPrice() * 0.01}
+            isAdmin={this.props.isAdmin}
+          />)
       }
       return returnComponent || <div className='text-center'>등록된 후기가 없습니다.</div>
     }
@@ -867,14 +874,15 @@ class ItemView extends React.Component {
       if (this.props.inquiries && this.props.inquiries.content && this.props.inquiries.content.length > 0) {
         returnComponent = this.props.inquiries.content.map(inquiry =>
           <Comment item={inquiry} key={keygen._()} userId={this.props.user ? this.props.user.id : null}
-            afterSubmit={this._handleOnSubmitComplete} afterDelete={this._handleOnSubmitComplete} />)
+            afterSubmit={this._handleOnSubmitComplete} afterDelete={this._handleOnSubmitComplete}
+            isAdmin={this.props.isAdmin}
+          />)
       }
       return returnComponent || <div className='text-center'>등록된 문의가 없습니다.</div>
     }
     const renderRecentItems = () => {
       let returnComponent = <div className='text-center'>최근 본 상품이 없습니다.</div>
-      const localStorage = window.localStorage
-      const recentItems = JSON.parse(localStorage.getItem('recentItems'))
+      const recentItems = JSON.parse(getCookie('recentItems'))
       if (recentItems.length > 1) {
         recentItems.reverse()
         returnComponent = recentItems.map(elem => {
@@ -991,13 +999,11 @@ class ItemView extends React.Component {
                     <div className='separator-2'></div>
                     {renderRelatedItems()}
                   </div>
-                  { !isMobile.any() &&
-                    <div className='bolck clearfix'>
-                      <h2 className='title'>최근 본 상품</h2>
-                      <div className='separator-2'></div>
-                      {renderRecentItems()}
-                    </div>
-                  }
+                  <div className='bolck clearfix'>
+                    <h2 className='title'>최근 본 상품</h2>
+                    <div className='separator-2'></div>
+                    {renderRecentItems()}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1088,7 +1094,8 @@ ItemView.propTypes = {
   fetchUserByUserId: React.PropTypes.func.isRequired,
   setMessageModalShow: React.PropTypes.func.isRequired,
   setMessageModal: React.PropTypes.func.isRequired,
-  setInquiryModal: React.PropTypes.func.isRequired
+  setInquiryModal: React.PropTypes.func.isRequired,
+  isAdmin: React.PropTypes.bool.isRequired
 }
 
 export default ItemView
