@@ -45,6 +45,16 @@ class CoreLayout extends React.Component {
             },
             {
               'rel': 'stylesheet',
+              'type': 'text/css',
+              'href': 'https://fonts.googleapis.com/css?family=Niconne'
+            },
+            {
+              'rel': 'stylesheet',
+              'type': 'text/css',
+              'href': 'https://fonts.googleapis.com/css?family=Raleway:100,400'
+            },
+            {
+              'rel': 'stylesheet',
               'href': `/template/fonts/font-awesome/css/font-awesome.css`
             },
             {
@@ -90,10 +100,6 @@ class CoreLayout extends React.Component {
             {
               'rel': 'stylesheet',
               'href': `/template/css/custom.css`
-            },
-            {
-              'rel': 'stylesheet',
-              'href': `https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css`
             }
           ]}
         />

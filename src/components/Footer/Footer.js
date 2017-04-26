@@ -12,15 +12,11 @@ class Footer extends React.Component {
                 <div className='col-md-6 col-md-offset-3'>
                   <div className='footer-content text-center padding-ver-clear'>
                     <div className='logo-footer'>
-                      <img id='logo-footer' className='center-block'
-                        src={`/template/images/logo_cool_green.png`} alt='flowerhada' />
+                      <i className='text-muted' style={{ fontFamily: 'Niconne, cursive', lineHeight: '28px', fontSize: '38px', fontStyle: 'normal' }}>Flower<span className='text-default'>hada</span></i>
                     </div>
                     <ul className='list-inline mb-20'>
                       <li>
-                        <span className='text-default'>상호명</span> hada(하다)
-                      </li>
-                      <li>
-                        <span className='text-default'>사업자등록번호</span> 210-26-67507
+                        <span className='text-default'>상호명</span> flowerhada(꽃하다)
                       </li>
                       <li>
                         <span className='text-default'>사업자등록번호</span> 210-26-67507

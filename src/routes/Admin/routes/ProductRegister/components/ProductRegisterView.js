@@ -4,6 +4,7 @@ import { setInlineScripts, removeEmptyIndex } from 'common/util'
 import TextField from 'components/TextField'
 import Checkbox from 'components/Checkbox'
 import { putProduct, postProduct, deleteProduct } from 'common/ProductService'
+import { postLessonImage } from 'common/LessonService'
 import $ from 'jquery'
 
 class ProductListView extends React.Component {
@@ -147,26 +148,26 @@ class ProductListView extends React.Component {
           <TextField
             id='titleImg'
             label='대표이미지'
-            onChange={this._handleOnChangeInput}
-            value={this.state.titleImg}
+            type='file'
+            accept='image/*'
           />
           <TextField
             id='images1'
             label='이미지1'
-            onChange={this._handleOnChangeImage}
-            value={this.state.images[1] || ''}
+            type='file'
+            accept='image/*'
           />
           <TextField
             id='images2'
             label='이미지2'
-            onChange={this._handleOnChangeImage}
-            value={this.state.images[2] || ''}
+            type='file'
+            accept='image/*'
           />
           <TextField
             id='images3'
             label='이미지3'
-            onChange={this._handleOnChangeImage}
-            value={this.state.images[3] || ''}
+            type='file'
+            accept='image/*'
           />
           <TextField
             id='price'

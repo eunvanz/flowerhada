@@ -7,43 +7,15 @@ class HomeCard extends React.Component {
     super(props)
     this.displayName = 'HomeCard'
   }
-  // render () {
-  //   return (
-  //     <div className='col-md-4'>
-  //       <div className='image-box style-2 mb-20 shadow bordered light-gray-bg text-center'>
-  //         <div className='overlay-container'>
-  //           <img src={`${imgRoute}/${this.props.img}`} />
-  //           <div className='overlay-to-top'>
-  //             <p className='margin-clear'>
-  //               <em>{this.props.actionName}</em>
-  //             </p>
-  //           </div>
-  //         </div>
-  //         <div className='body'>
-  //           <h3>{this.props.title}</h3>
-  //           <div className='separator' />
-  //           <p>
-  //             {this.props.content}
-  //           </p>
-  //           <Link to={`/${this.props.link}`}>
-  //             <button className='btn btn-default btn-sm btn-hvr hvr-shutter-out-horizontal margin-clear'>
-  //               더 보기 <i className='fa fa-arrow-right pl-10' />
-  //             </button>
-  //           </Link>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   )
-  // }
   render () {
     return (
-      <div className='col-md-3'>
+      <div className='col-sm-3'>
         <div className='pv-30 ph-20 feature-box bordered
           shadow text-center object-non-visible animated object-visible fadeInDownSmall'
           data-animation-effect='fadeInDownSmall' data-effect-delay='100'>
-          <span className='icon white-bg circle'>
+          <span className={`icon ${this.props.img ? 'white-bg' : 'default-bg'} circle`} style={{ paddingTop: '2px' }}>
             {this.props.img && <img src={`${imgRoute}/${this.props.img}`} width='60px' height='60px' />}
-            {this.props.icon && <i className={`text-default ${this.props.icon}`} />}
+            {this.props.icon && <i className={`text-white ${this.props.icon}`} />}
           </span>
           <h3>{this.props.title}</h3>
           <div className='separator clearfix' />

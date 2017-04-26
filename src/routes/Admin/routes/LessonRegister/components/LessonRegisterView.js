@@ -71,12 +71,12 @@ class LessonListView extends React.Component {
           lessonTimes: this.state.lessonDays.length
         })
         $('#content').val(this.state.content)
-        const scripts = ['//cdn.tinymce.com/4/tinymce.js',
+        const scripts = ['//cdn.tinymce.com/4/tinymce.min.js',
           '/template/js/inline-lesson-register-view.js']
         setInlineScripts(scripts)
       })
     } else {
-      const scripts = ['//cdn.tinymce.com/4/tinymce.js',
+      const scripts = ['//cdn.tinymce.com/4/tinymce.min.js',
         '/template/js/inline-lesson-register-view.js']
       setInlineScripts(scripts)
     }
@@ -192,7 +192,8 @@ class LessonListView extends React.Component {
     }
     lesson.append('expired', $('#expired').prop('checked'))
     lesson.append('activated', $('#activated').prop('checked'))
-    lesson.append('content', window.tinymce.get('content').getContent())
+    const content = window.tinymce.get('content').getContent()
+    lesson.append('content', content)
     let action = putLesson
     if (this.state.mode === 'register') action = postLesson
     const file = document.getElementById('titleImg').files[0]
@@ -207,10 +208,10 @@ class LessonListView extends React.Component {
       if (res) {
         const imgUrl = res.data.data.link
         lesson.append('titleImg', imgUrl)
-        return action(lesson, this.props.params.id)
       } else {
-        Promise.resolve()
+        lesson.append('titleImg', this.props.lesson.titleImg)
       }
+      return action(lesson, this.props.params.id)
     })
     .then((res) => {
       if (!this.state.oneday && this.state.lessonDays.length > 0) {
@@ -445,7 +446,7 @@ class LessonListView extends React.Component {
               <button type='button' className='btn btn-default' id='searchPostCodeBtn'
                 onClick={this._handleOnClickPostCode}>우편번호찾기</button><br />
               <div id='postWrapper'
-                style={{ display: 'none', border: '1px solid', width: '500px', height: '300px', margin: '5px 0', position: 'relative' }}
+                style={{ display: 'none', border: '1px solid', maxWidth: window.innerWidth, height: '300px', margin: '5px 0', position: 'relative' }}
               >
                 <img src='//i1.daumcdn.net/localimg/localimages/07/postcode/320/close.png' id='btnFoldWrap'
                   style={{ cursor: 'pointer', position: 'absolute', right: '0px', top: '-1px', zIndex: '1' }}
@@ -456,9 +457,9 @@ class LessonListView extends React.Component {
                 id='address' placeholder='상세주소' style={{ width: '100%' }} readOnly value={this.state.address} />
               <input type='text' className='form-control' onChange={this._handleOnChangeInput}
                 id='restAddress' placeholder='나머지주소' value={this.state.restAddress} style={{ width: '100%' }} />
-              <input type='hidden' className='form-control'
+              <input type='text' className='form-control' readOnly
                 id='latitude' value={this.state.latitude} placeholder='경도' />
-              <input type='hidden' className='form-control'
+              <input type='text' className='form-control' readOnly
                 id='longitude' value={this.state.longitude} placeholder='위도' />
             </div>
           </div>

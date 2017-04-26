@@ -18,7 +18,7 @@ class RecentItem extends React.Component {
           </div>
           <div className='media-body'>
             <h5 className='media-heading' style={{ cursor: 'pointer' }}>
-              <Link to={`/item/${item.type}/${item.id}`}>{item.title}</Link>
+              <Link to={`/item/${item.type}/${item.id}`} className='text-default'>{item.title}</Link>
             </h5>
             <p className='margin-clear'>
               <small>

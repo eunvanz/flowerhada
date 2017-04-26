@@ -306,3 +306,10 @@ export const isIE = () => {
   const agent = navigator.userAgent.toLowerCase()
   return agent.indexOf('trident') !== -1 || agent.indexOf('msie') !== -1
 }
+
+export const isScreenSize = {
+  xs: () => window.innerWidth < 768,
+  sm: () => window.innerWidth < 992 && window.innerWidth >= 768,
+  md: () => window.innerWidth < 1200 && window.innerWidth >= 992,
+  lg: () => window.innerWidth >= 1200
+}

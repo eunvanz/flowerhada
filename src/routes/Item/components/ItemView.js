@@ -1,6 +1,6 @@
 import React from 'react'
 import { convertDateToString, extractDaysFromLessonDays, extractDetailScheduleFromLessonDays,
-  setRecentItemToCookie, isMobile, getCookie } from 'common/util'
+  setRecentItemToCookie, getCookie } from 'common/util'
 import MapModal from 'components/MapModal'
 import numeral from 'numeral'
 import LessonRequestActionBlock from 'components/LessonRequestActionBlock'
@@ -68,6 +68,8 @@ class ItemView extends React.Component {
     this._renderWriteReviewButton = this._renderWriteReviewButton.bind(this)
     this._handleOnClickReOpen = this._handleOnClickReOpen.bind(this)
     this._reviewSubmitAuthorityValidator = this._reviewSubmitAuthorityValidator.bind(this)
+    this._changeFlagRecursively = this._changeFlagRecursively.bind(this)
+    this._handleOnBlurQuantity = this._handleOnBlurQuantity.bind(this)
   }
   componentDidMount () {
     window.scrollTo(0, 0)
@@ -79,7 +81,7 @@ class ItemView extends React.Component {
     $(window).resize(() => {
       this._renderPointInfo()
     })
-    setTimeout(() => this.setState({ pointInfoFlag: !this.state.pointInfoFlag }), 300)
+    this._changeFlagRecursively()
   }
   shouldComponentUpdate (nextProps, nextState) {
     if (this.state.pointInfoFlag !== nextState.pointInfoFlag) return true
@@ -95,13 +97,19 @@ class ItemView extends React.Component {
       this._initializeState()
       this._loadItemInfo()
       window.scrollTo(0, 0)
-      setTimeout(() => this.setState({ pointInfoFlag: !this.state.pointInfoFlag }), 300)
+      this._changeFlagRecursively()
     }
   }
   componentWillUnmount () {
     this._unselectItem(this.props.params.type)
     this.props.clearItemInquiries()
     this.props.clearReviews()
+  }
+  _changeFlagRecursively () {
+    this.setState({ pointInfoFlag: !this.state.pointInfoFlag })
+    if ($('#point-info').length < 1) {
+      setTimeout(() => this._changeFlagRecursively(), 100)
+    }
   }
   _initializeState () {
     let date = new Date()
@@ -191,7 +199,7 @@ class ItemView extends React.Component {
   }
   _handleOnChangeQuantity (e) {
     let quantity = e.target.value
-    if (quantity < 1) quantity = 1
+    // if (quantity < 1) quantity = 1
     this.setState({ quantity })
   }
   _handleOnClickTab (e) {
@@ -443,6 +451,11 @@ class ItemView extends React.Component {
     }
     this.props.setInquiryModal(inquiryModal)
   }
+  _handleOnBlurQuantity (e) {
+    let quantity = e.target.value
+    if (quantity < 1) quantity = 1
+    this.setState({ quantity })
+  }
   render () {
     const { type } = this.props.params
     const { item } = this.props
@@ -458,11 +471,11 @@ class ItemView extends React.Component {
             color='gray'
             textComponent={
               <span>
-                <i className='fa fa-angle-down' /> <span className='text-default'>
+                <i className='fa fa-angle-down' /> <strong>
                   {this.props.reviews.totalPages - 1 -
                   this.props.reviews.number === 1 ? this.props.reviews.totalElements -
                   (this.props.reviews.number + 1) * this.props.reviews.numberOfElements
-                  : this.props.reviews.numberOfElements}</span>건 더 보기
+                  : this.props.reviews.numberOfElements}</strong>건 더 보기
               </span>
             }
           />
@@ -532,14 +545,14 @@ class ItemView extends React.Component {
                 !item.expired &&
                 <tr>
                   <td className='text-right' style={{ width: '90px' }}><strong>모집인원</strong></td>
-                  <td>최대 <span className='text-default'>{item.maxParty}</span>명, 현재 <span className='text-default'>{item.currParty}</span>명 등록 중</td>
+                  <td>최대 <strong>{item.maxParty}</strong>명, 현재 <strong>{item.currParty}</strong>명 등록 중</td>
                 </tr>
               }
               {
                 !item.oneday && !item.expired &&
                 <tr>
                   <td className='text-right'><strong>레슨일정</strong></td>
-                  <td>오는 <span className='text-default'>{convertDateToString(item.lessonDate)}</span>부터 <span className='text-default'>{`${item.weekType} ${extractDaysFromLessonDays(item.lessonDays)}요일`}</span>에 <span className='text-default'>{item.weekLong}주간</span> 진행</td>
+                  <td>오는 <strong>{convertDateToString(item.lessonDate)}</strong>부터 <strong>{`${item.weekType} ${extractDaysFromLessonDays(item.lessonDays)}요일`}</strong>에 <strong>{item.weekLong}주간</strong> 진행</td>
                 </tr>
               }
               {
@@ -553,7 +566,7 @@ class ItemView extends React.Component {
                 item.oneday && !item.expired &&
                 <tr>
                   <td className='text-right'><strong>레슨일정</strong></td>
-                  <td>오는 <span className='text-default'>{convertDateToString(item.lessonDate)}</span>에 진행되는 <span className='text-default'>원데이레슨</span></td>
+                  <td>오는 <strong>{convertDateToString(item.lessonDate)}</strong>에 진행되는 <strong>원데이레슨</strong></td>
                 </tr>
               }
               { !item.expired &&
@@ -579,6 +592,7 @@ class ItemView extends React.Component {
                     onChange={this._handleOnChangeDate}
                     value={this.state.receiveDateISO}
                   />
+                  <small><i className='fa fa-exclamation-circle' /> 주문과 함께 만들어지기 때문에 최소 이틀이 소요됩니다.</small>
                 </td>
               </tr>
               <tr>
@@ -632,6 +646,7 @@ class ItemView extends React.Component {
                     onChange={this._handleOnChangeDate}
                     value={this.state.receiveDateISO}
                   />
+                  <small><i className='fa fa-exclamation-circle' /> 주문과 함께 만들어지기 때문에 최소 이틀이 소요됩니다.</small>
                 </td>
               </tr>
               <tr>
@@ -728,7 +743,7 @@ class ItemView extends React.Component {
           <div>
             <div className='form-group'>
               {`￦${numeral(this._getItemPrice()).format('0,0')} `}<i className='fa fa-times-circle' />{' '}
-              <input className='' type='number' style={{ width: '50px', paddingRight: '5px', paddingLeft: '5px' }}  id='quantity' value={this.state.quantity} onChange={this._handleOnChangeQuantity} /> 개
+              <input className='' type='number' style={{ width: '50px', paddingRight: '5px', paddingLeft: '5px' }}  id='quantity' value={this.state.quantity} onFocus={e => e.target.value = ''} onBlur={this._handleOnBlurQuantity} onChange={this._handleOnChangeQuantity} /> 개
             </div>
           </div>
         )
@@ -763,7 +778,7 @@ class ItemView extends React.Component {
             <div className='light-gray-bg p-20 bordered clearfix'>
               <span className='product price' id='priceArea'>
                 {this._renderPointInfo()}
-                <i className='icon-tag pr-10' />￦<span className='text-default'>{numeral(this._getTotalPrice()).format('0,0')}</span>
+                <i className='icon-tag pr-10' />￦{numeral(this._getTotalPrice()).format('0,0')}
               </span>
               <div className='product elements-list pull-right clearfix'>
                 {type !== 'lesson' &&

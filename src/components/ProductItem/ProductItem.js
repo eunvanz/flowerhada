@@ -5,7 +5,6 @@ import numeral from 'numeral'
 import { postCart, deleteCartByUserIdAndItemTypeAndItemIdAndCartType } from 'common/CartService'
 import { fetchCartsByUserId } from 'store/cart'
 import { connect } from 'react-redux'
-import Button from 'components/Button'
 import LessonDateInfo from 'components/LessonDateInfo'
 
 const mapStateToProps = state => ({
@@ -20,6 +19,9 @@ const mapDispatchToProps = {
 class ProductItem extends React.Component {
   constructor (props) {
     super(props)
+    this.state = {
+      wishProcess: false
+    }
     this._handleOnClickAddToWishList = this._handleOnClickAddToWishList.bind(this)
     this._handleOnClickRemoveFromWishList = this._handleOnClickRemoveFromWishList.bind(this)
   }
@@ -28,6 +30,7 @@ class ProductItem extends React.Component {
       this.context.router.push('/login')
       return
     }
+    // this.setState({ wishProcess: true })
     const cart = {
       userId: this.props.user.id,
       type: '위시리스트'
@@ -39,13 +42,16 @@ class ProductItem extends React.Component {
     }
     postCart(cart)
     .then(() => {
+      // this.setState({ wishProcess: false })
       return this.props.fetchCartsByUserId(this.props.user.id)
     })
   }
   _handleOnClickRemoveFromWishList () {
+    // this.setState({ wishProcess: true })
     const { item, user, type } = this.props
     deleteCartByUserIdAndItemTypeAndItemIdAndCartType(user.id, type, item.id, '위시리스트')
     .then(() => {
+      // this.setState({ wishProcess: false })
       return this.props.fetchCartsByUserId(this.props.user.id)
     })
   }
@@ -59,12 +65,12 @@ class ProductItem extends React.Component {
         /* eslint-disable */
         returnComponent = (
           <span className='price'>
-            <del>￦{`${numeral(item.price).format('0,0')}`}</del> ￦<span className='text-default'>{`${numeral(item.discountedPrice).format('0,0')}`}</span>
+            <del>￦{`${numeral(item.price).format('0,0')}`}</del> ￦<span>{`${numeral(item.discountedPrice).format('0,0')}`}</span>
           </span>
         )
       } else {
         returnComponent = (
-          <span className='price'>￦<span className='text-default'>{`${numeral(item.price).format('0,0')}`}</span></span>
+          <span className='price'>￦<span>{`${numeral(item.price).format('0,0')}`}</span></span>
         )
       }
       /* eslint-enable */
@@ -73,7 +79,7 @@ class ProductItem extends React.Component {
     const renderBadges = () => {
       if (this.props.type === 'lesson' && item.expired) {
         return (
-          <span className='badge' style={{ borderColor: '#d9534f', color: '#d9534f' }}>기간만료</span>
+          <span className='badge' style={{ borderColor: '#d9534f', color: '#d9534f' }}>지난레슨</span>
         )
       } else if (this.props.type === 'lesson' && item.currParty === item.maxParty) {
         return (
@@ -125,23 +131,6 @@ class ProductItem extends React.Component {
         )
       }
     }
-    // const renderDateInfo = () => {
-    //   let returnComponent = null
-    //   if (item.oneday) {
-    //     /* eslint-disable */
-    //     returnComponent = (
-    //       <span>오는 <span className='text-default'>{convertDateToString(item.lessonDate)}</span>에 진행되는 <span className='text-default'>원데이레슨</span></span>
-    //     )
-    //   } else {
-    //     returnComponent = (
-    //       <span>
-    //         오는 <span className='text-default'>{convertDateToString(item.lessonDate)}</span>부터 <span className='text-default'>{`${item.weekType} ${extractDaysFromLessonDays(item.lessonDays)}요일`}</span>에 <span className='text-default'>{item.weekLong}주간</span> 진행
-    //       </span>
-    //     )
-    //     /* eslint-enable */
-    //   }
-    //   return returnComponent
-    // }
     const renderTag = () => {
       if (this.props.type === 'lesson') {
         return (
@@ -151,41 +140,23 @@ class ProductItem extends React.Component {
         )
       }
     }
-    // const renderWishListButton = () => {
-    //   if (cartList && cartList.filter(cart => {
-    //     if (type === 'lesson') return cart.lessonId === item.id && cart.type === '위시리스트'
-    //     else return cart.productId === item.id && cart.type === '위시리스트'
-    //   }).length > 0) {
-    //     return (
-    //       <a style={{ cursor: 'pointer' }} onClick={this._handleOnClickRemoveFromWishList}>
-    //         <i className='fa fa-times pr-10' /> 위시리스트에서 제거
-    //       </a>
-    //     )
-    //   } else {
-    //     return (
-    //       <a style={{ cursor: 'pointer' }} onClick={this._handleOnClickAddToWishList}>
-    //         <i className='fa fa-heart-o pr-10' /> 위시리스트에 담기
-    //       </a>
-    //     )
-    //   }
-    // }
     const renderWishListButton = () => {
-      if (cartList && cartList.filter(cart => {
+      if (this.state.wishProcess) {
+        return (
+          <i className='fa fa-circle-o-notch fa-spin fa-2x text-default pull-right' />
+        )
+      } else if (cartList && cartList.filter(cart => {
         if (type === 'lesson') return cart.lessonId === item.id && cart.type === '위시리스트'
         else return cart.productId === item.id && cart.type === '위시리스트'
       }).length > 0) {
         return (
-          <Button className='pull-right' animated color='white' style={{ margin: '0px' }}
-            onClick={this._handleOnClickRemoveFromWishList} size='sm'
-            textComponent={<span>위시리스트에서 제거 <i className='fa fa-times' /></span>}
-          />
+          <i className='fa fa-heart fa-2x text-danger pull-right'
+            onClick={this._handleOnClickRemoveFromWishList} style={{ cursor: 'pointer' }} />
         )
       } else {
         return (
-          <Button className='pull-right' animated color='white' style={{ margin: '0px' }}
-            onClick={this._handleOnClickAddToWishList} size='sm'
-            textComponent={<span>위시리스트에 담기 <i className='fa fa-heart-o' /></span>}
-          />
+          <i className='fa fa-heart-o fa-2x text-default pull-right'
+            onClick={this._handleOnClickAddToWishList} style={{ cursor: 'pointer' }} />
         )
       }
     }
@@ -207,8 +178,8 @@ class ProductItem extends React.Component {
           </div>
           <div className='body'>
             {renderCategory()}
-            <h3>
-              {item.title}
+            <h3 className='text-default'>
+              <Link to={`/item/${this.props.type}/${item.id}`} className='text-default'>{item.title}</Link>
             </h3>
             <p>
               {item.detail}

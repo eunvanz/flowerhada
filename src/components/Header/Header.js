@@ -44,6 +44,7 @@ class Header extends React.Component {
     this.displayName = 'Header'
     this._handleOnClickLogout = this._handleOnClickLogout.bind(this)
     this._handleOnClickInquiry = this._handleOnClickInquiry.bind(this)
+    this._collapseNav = this._collapseNav.bind(this)
   }
   componentDidMount () {
     // const sessionStorage = window.sessionStorage
@@ -179,6 +180,12 @@ class Header extends React.Component {
     this.props.setInquiryModalMode('post')
     this.props.setInquiryModalShow(true)
   }
+  _collapseNav () {
+    const navToggleBtn = $('.navbar-toggle')
+    if (!navToggleBtn.hasClass('collapsed')) {
+      navToggleBtn.click()
+    }
+  }
   render () {
     const { cartList } = this.props
     return (
@@ -288,7 +295,7 @@ class Header extends React.Component {
                   <div className='header-dropdown-buttons visible-xs'>
                     <div className='btn-group dropdown'>
                       <button type='button' id='wishListBtnSm' className='btn dropdown-toggle' data-toggle='dropdown'>
-                        <i className='fa fa-star' />
+                        <i className='fa fa-heart' />
                         <span className='cart-count default-bg'>
                           {!cartList ? '0' : cartList.filter(cart => cart.type === '위시리스트').length}
                         </span>
@@ -320,12 +327,28 @@ class Header extends React.Component {
                       <CartWindow items={cartList && cartList.filter(cart => cart.type === '장바구니')} />
                     </div>
                   </div>
-                  <div id='logo' className='logo'>
-                    <IndexLink to='/'>
-                      <img id='logo_img' src={`/template/images/logo_cool_green.png`} alt='flowerhada' />
+                  {/* <div id='logo' className='logo hidden-sm' style={{ marginTop: '4px' }}>
+                    <IndexLink to='/' style={{ textDecoration: 'none' }} onClick={this._collapseNav}>
+                      <i className='text-muted' style={{ fontFamily: 'Niconne, cursive', lineHeight: '28px', fontSize: '38px', fontStyle: 'normal' }}>Flower<span className='text-default'>hada</span></i>
                     </IndexLink>
                   </div>
-                  <div className='site-slogan' style={{ marginLeft: '45px' }}>live florally</div>
+                  <div id='logo' className='logo visible-sm' style={{ marginTop: '4px', textAlign: 'center' }}>
+                    <IndexLink to='/' style={{ textDecoration: 'none' }} onClick={this._collapseNav}>
+                      <i className='text-muted' style={{ fontFamily: 'Niconne, cursive', lineHeight: '28px', fontSize: '38px', fontStyle: 'normal' }}>Flower<span className='text-default'>hada</span></i>
+                    </IndexLink>
+                  </div> */}
+                  <div id='logo' className='logo hidden-sm' style={{ marginTop: '4px' }}>
+                    <IndexLink to='/' style={{ textDecoration: 'none' }} onClick={this._collapseNav}>
+                      <i className='text-muted' style={{ fontFamily: 'Raleway, sans-serif', lineHeight: '28px', fontSize: '32px', fontStyle: 'normal', fontWeight: '100' }}>flower<span className='text-default' style={{ fontWeight: '400' }}>hada</span></i>
+                    </IndexLink>
+                  </div>
+                  <div id='logo' className='logo visible-sm' style={{ marginTop: '4px', textAlign: 'center' }}>
+                    <IndexLink to='/' style={{ textDecoration: 'none' }} onClick={this._collapseNav}>
+                      <i className='text-muted' style={{ fontFamily: 'Raleway, sans-serif', lineHeight: '28px', fontSize: '32px', fontStyle: 'normal', fontWeight: '100'  }}>flower<span className='text-default' style={{ fontWeight: '400' }}>hada</span></i>
+                    </IndexLink>
+                  </div>
+                  <div className='site-slogan hidden-sm text-muted' style={{ marginLeft: '54px', textAlign: 'left' }}>live florally</div>
+                  <div className='site-slogan visible-sm text-muted' style={{ textAlign: 'center' }}>live florally</div>
                 </div>
               </div>
               <div className='col-md-8'>
@@ -355,16 +378,16 @@ class Header extends React.Component {
                               </Link>
                               <ul className='dropdown-menu'>
                                 <li>
-                                  <Link to='/item-list/lesson/all'>전체</Link>
+                                  <Link to='/item-list/lesson/all' onClick={this._collapseNav}>전체</Link>
                                 </li>
                                 <li>
-                                  <Link to='/item-list/lesson/취미반'>취미반</Link>
+                                  <Link to='/item-list/lesson/취미반' onClick={this._collapseNav}>취미반</Link>
                                 </li>
                                 <li>
-                                  <Link to='/item-list/lesson/창업반'>창업반</Link>
+                                  <Link to='/item-list/lesson/창업반' onClick={this._collapseNav}>창업반</Link>
                                 </li>
                                 <li>
-                                  <Link to='/item-list/lesson/원데이레슨'>원데이레슨</Link>
+                                  <Link to='/item-list/lesson/원데이레슨' onClick={this._collapseNav}>원데이레슨</Link>
                                 </li>
                               </ul>
                             </li>
@@ -374,18 +397,18 @@ class Header extends React.Component {
                               </Link>
                               <ul className='dropdown-menu'>
                                 <li>
-                                  <Link to='/item-list/flower/all'>전체</Link>
+                                  <Link to='/item-list/flower/all' onClick={this._collapseNav}>전체</Link>
                                 </li>
                                 <li>
-                                  <Link to='/item-list/flower/단체꽃다발'>단체꽃다발</Link>
+                                  <Link to='/item-list/flower/단체꽃다발' onClick={this._collapseNav}>단체꽃다발</Link>
                                 </li>
                                 <li>
-                                  <Link to='/item-list/flower/이벤트꽃다발'>이벤트꽃다발</Link>
+                                  <Link to='/item-list/flower/이벤트꽃다발' onClick={this._collapseNav}>이벤트꽃다발</Link>
                                 </li>
                               </ul>
                             </li>
                             <li>
-                              <Link to='/item-list/wedding/all'>
+                              <Link to='/item-list/wedding/all' onClick={this._collapseNav}>
                                 웨딩
                               </Link>
                             </li>
@@ -405,10 +428,10 @@ class Header extends React.Component {
                               </Link>
                               <ul className='dropdown-menu'>
                                 <li>
-                                  <Link to='/lessons/hobby'>브랜드스토리</Link>
+                                  <Link to='/lessons/hobby' onClick={this._collapseNav}>브랜드스토리</Link>
                                 </li>
                                 <li>
-                                  <Link to='/lessons/business'>발자취</Link>
+                                  <Link to='/lessons/business' onClick={this._collapseNav}>발자취</Link>
                                 </li>
                               </ul>
                             </li>

@@ -55,11 +55,11 @@ class ItemListView extends React.Component {
     const renderDescription = () => {
       let returnComponent = null
       if (type === 'lesson') {
-        returnComponent = <span></span>
+        returnComponent = <span>내 손으로 만드는 유러피안 스타일 작품</span>
       } else if (type === 'flower') {
-        returnComponent = <span></span>
+        returnComponent = <span>주문과 함께 만들어지는 싱싱한 꽃다발</span>
       } else if (type === 'wedding') {
-        returnComponent = <span></span>
+        returnComponent = <span>꽃하다가 제안하는 웨딩솔루션</span>
       }
       return returnComponent
     }

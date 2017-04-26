@@ -693,7 +693,7 @@ class CartView extends React.Component {
                   }
                   <br />
                   <div id='postWrapper'
-                    style={{ display: 'none', border: '1px solid', width: '500px', height: '300px', margin: '5px 0', position: 'relative' }}
+                    style={{ display: 'none', border: '1px solid', maxWidth: window.innerWidth, height: '300px', margin: '5px 0', position: 'relative' }}
                   >
                     <img src='//i1.daumcdn.net/localimg/localimages/07/postcode/320/close.png' id='btnFoldWrap'
                       style={{ cursor: 'pointer', position: 'absolute', right: '0px', top: '-1px', zIndex: '1' }}
