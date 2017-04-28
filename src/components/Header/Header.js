@@ -13,6 +13,7 @@ import { setMessageModalShow, setMessageModalMessage, setMessageModalCancelBtnTx
   setMessageModalOnConfirmClick } from 'store/messageModal'
 import cookie from 'cookie'
 import $ from 'jquery'
+import { isScreenSize } from 'common/util'
 
 const mapStateToProps = state => ({
   user: state.user,
@@ -66,7 +67,7 @@ class Header extends React.Component {
 		const delay = 0
     let setTimeoutConst
     const Modernizr = window.Modernizr
-		if ((Modernizr.mq('only all and (min-width: 768px)') && !Modernizr.touch) || $('html.ie8').length > 0) {
+		if ((!isScreenSize.xs() && !Modernizr.touch) || $('html.ie8').length > 0) {
 			$('.main-navigation:not(.onclick) .navbar-nav>li.dropdown, .main-navigation:not(.onclick) li.dropdown>ul>li.dropdown').hover(
 			() => {
 				const $this = $(this)
@@ -84,14 +85,17 @@ class Header extends React.Component {
 
 		//Show dropdown on click only for mobile devices
 		//-----------------------------------------------
-		// if (Modernizr.mq('only all and (max-width: 767px)') || Modernizr.touch || $('.main-navigation.onclick').length > 0 ) {
+		// if (isScreenSize.xs() || $('.main-navigation.onclick').length > 0 ) {
 		// 	$('.main-navigation [data-toggle=dropdown], .header-top [data-toggle=dropdown]').on('click', event => {
+    //     console.log('clicked')
 		// 	// Avoid following the href location when clicking
 		// 	event.preventDefault()
 		// 	// Avoid having the menu to close when clicking
 		// 	event.stopPropagation()
 		// 	// close all the siblings
 		// 	$(this).parent().siblings().removeClass('open')
+    //   console.log($(this))
+    //   console.log($(this).parent().siblings())
 		// 	// close all the submenus of siblings
 		// 	$(this).parent().siblings().find('[data-toggle=dropdown]').parent().removeClass('open')
 		// 	// opening the one you clicked on
@@ -327,17 +331,17 @@ class Header extends React.Component {
                       <CartWindow items={cartList && cartList.filter(cart => cart.type === '장바구니')} />
                     </div>
                   </div>
-                  {/* <div id='logo' className='logo hidden-sm' style={{ marginTop: '4px' }}>
+                  <div id='logo' className='logo hidden-sm' style={{ marginTop: '4px' }}>
                     <IndexLink to='/' style={{ textDecoration: 'none' }} onClick={this._collapseNav}>
-                      <i className='text-muted' style={{ fontFamily: 'Niconne, cursive', lineHeight: '28px', fontSize: '38px', fontStyle: 'normal' }}>Flower<span className='text-default'>hada</span></i>
+                      <i className='text-muted' style={{ fontFamily: 'Niconne, cursive', lineHeight: '28px', fontSize: '38px', fontStyle: 'normal' }}>flower<span className='text-default'>hada</span></i>
                     </IndexLink>
                   </div>
                   <div id='logo' className='logo visible-sm' style={{ marginTop: '4px', textAlign: 'center' }}>
                     <IndexLink to='/' style={{ textDecoration: 'none' }} onClick={this._collapseNav}>
-                      <i className='text-muted' style={{ fontFamily: 'Niconne, cursive', lineHeight: '28px', fontSize: '38px', fontStyle: 'normal' }}>Flower<span className='text-default'>hada</span></i>
+                      <i className='text-muted' style={{ fontFamily: 'Niconne, cursive', lineHeight: '28px', fontSize: '38px', fontStyle: 'normal' }}>flower<span className='text-default'>hada</span></i>
                     </IndexLink>
-                  </div> */}
-                  <div id='logo' className='logo hidden-sm' style={{ marginTop: '4px' }}>
+                  </div>
+                  {/* <div id='logo' className='logo hidden-sm' style={{ marginTop: '4px' }}>
                     <IndexLink to='/' style={{ textDecoration: 'none' }} onClick={this._collapseNav}>
                       <i className='text-muted' style={{ fontFamily: 'Raleway, sans-serif', lineHeight: '28px', fontSize: '32px', fontStyle: 'normal', fontWeight: '100' }}>flower<span className='text-default' style={{ fontWeight: '400' }}>hada</span></i>
                     </IndexLink>
@@ -346,8 +350,8 @@ class Header extends React.Component {
                     <IndexLink to='/' style={{ textDecoration: 'none' }} onClick={this._collapseNav}>
                       <i className='text-muted' style={{ fontFamily: 'Raleway, sans-serif', lineHeight: '28px', fontSize: '32px', fontStyle: 'normal', fontWeight: '100'  }}>flower<span className='text-default' style={{ fontWeight: '400' }}>hada</span></i>
                     </IndexLink>
-                  </div>
-                  <div className='site-slogan hidden-sm text-muted' style={{ marginLeft: '54px', textAlign: 'left' }}>live florally</div>
+                  </div> */}
+                  <div className='site-slogan hidden-sm text-muted' style={{ marginLeft: '45px', textAlign: 'left' }}>live florally</div>
                   <div className='site-slogan visible-sm text-muted' style={{ textAlign: 'center' }}>live florally</div>
                 </div>
               </div>

@@ -2,6 +2,8 @@ import React from 'react'
 import $ from 'jquery'
 import { postMainBanner, putMainBanner, deleteMainBanner } from 'common/MainBannerService'
 import { Link } from 'react-router'
+import { postLessonImage } from 'common/LessonService'
+import Button from 'components/Button'
 
 class MainBannerRegister extends React.Component {
   constructor (props) {
@@ -47,6 +49,7 @@ class MainBannerRegister extends React.Component {
     this.setState({ activated: e.target.checked })
   }
   _handleOnClickSubmit (e) {
+    this.setState({ process: true })
     e.preventDefault()
     const data = new URLSearchParams()
     data.append('title', $('#title').val())
@@ -54,12 +57,29 @@ class MainBannerRegister extends React.Component {
     data.append('detail', $('#detail').val())
     data.append('link', $('#link').val())
     data.append('activated', $('#activated').prop('checked'))
-    data.append('img', $('#img').val())
+    // data.append('img', $('#img').val())
     let action = null
     if (this.state.mode === 'register') action = postMainBanner
     else { action = putMainBanner }
-    action(data, this.props.params.id)
+    const file = document.getElementById('img').files[0]
+    let postImage
+    if (this.state.mode === 'register') {
+      postImage = () => postLessonImage(file)
+    } else {
+      postImage = file ? () => postLessonImage(file) : Promise.resolve()
+    }
+    postImage
+    .then(res => {
+      if (res) {
+        const imgUrl = res.data.data.link
+        data.append('img', imgUrl)
+      } else {
+        data.append('img', this.props.banner.img)
+      }
+      return action(data, this.props.params.id)
+    })
     .then(() => {
+      this.setState({ process: false })
       this.context.router.push('/admin/main-banner')
     })
   }
@@ -99,10 +119,8 @@ class MainBannerRegister extends React.Component {
               value={this.state.link} />
           </div>
           <div className='form-group'>
-            <label htmlFor='img'>이미지</label>
-            <input type='text' className='form-control'
-              id='img' onChange={this._handleOnChangeInput}
-              value={this.state.img} />
+            <label htmlFor='img'>이미지 : {this.props.banner && <a href={this.props.banner.img} target='_blank'>{this.props.banner.img}</a>}</label>
+            <input type='file' className='form-control' id='img' />
           </div>
           <div className='checkbox'>
             <label>
@@ -111,8 +129,10 @@ class MainBannerRegister extends React.Component {
                 checked={this.state.activated ? 'checked' : ''} /> 활성화
             </label>
           </div>
-          <button type='button' className='btn btn-default' style={{ marginRight: '3px' }}
-            onClick={this._handleOnClickSubmit}>{this.state.mode !== 'register' ? '수정' : '등록'}</button>
+          {/* <button type='button' className='btn btn-default' style={{ marginRight: '3px' }}
+            onClick={this._handleOnClickSubmit}>{this.state.mode !== 'register' ? '수정' : '등록'}</button> */}
+          <Button onClick={this._handleOnClickSubmit} process={this.state.process} style={{ marginRight: '3px' }}
+            textComponent={<span>{this.state.mode !== 'register' ? '수정' : '등록'}</span>} />
           {this.state.mode === 'update' &&
             <button type='button' className='btn btn-grey' style={{ marginRight: '3px' }}
               onClick={this._handleOnClickDelete}>삭제</button>}

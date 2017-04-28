@@ -51,7 +51,7 @@ class CartWindow extends React.Component {
                 </tbody>
               </table>
               <div className='panel-body text-right'>
-                <Link to='/cart/saved' className='btn btn-group btn-gray btn-sm'>
+                <Link to='/cart/saved' className='btn btn-group btn-gray btn-sm' onClick={() => console.log('clicked')}>
                   자세히보기
                 </Link>
                 <Link to='/cart/checkout' className='btn btn-group btn-gray btn-sm'>

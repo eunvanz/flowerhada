@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react'
 import MainContainer from 'components/MainContainer'
 import Navigation from 'components/Navigation'
 import PhoneNumberInput from 'components/PhoneNumberInput'
-import { assemblePhoneNumber, dividePhoneNumber } from 'common/util'
+import { assemblePhoneNumber, dividePhoneNumber, handleOnChangePhone } from 'common/util'
 import Button from 'components/Button'
 import validator from 'validator'
 import $ from 'jquery'
@@ -72,10 +72,7 @@ class MyPageView extends React.Component {
     this.setState({ [name]: value })
   }
   _handleOnChangePhone (e) {
-    const { index } = e.target.dataset
-    const phone = this.state.phone
-    phone[index] = e.target.value
-    this.setState({ phone })
+    handleOnChangePhone(e, this, 'phone')
   }
   _checkPasswordField () {
     const password = this.state.newPassword

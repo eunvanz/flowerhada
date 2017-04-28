@@ -19,7 +19,8 @@ const mapDispatchToProps = {
 }
 
 const mapStateToProps = (state) => ({
-  authUser: state.authUser
+  authUser: state.authUser,
+  user: state.user
 })
 
 /*  Note: mapStateToProps is where you should use `reselect` to create selectors, ie:

@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react'
 import PhoneNumberInput from 'components/PhoneNumberInput'
-import { assemblePhoneNumber, dividePhoneNumber } from 'common/util'
+import { assemblePhoneNumber, dividePhoneNumber, handleOnChangePhone } from 'common/util'
 import Button from 'components/Button'
 import validator from 'validator'
 import $ from 'jquery'
@@ -56,10 +56,7 @@ class ProfileView extends React.Component {
     this.setState({ [name]: value })
   }
   _handleOnChangePhone (e) {
-    const { index } = e.target.dataset
-    const phone = this.state.phone
-    phone[index] = e.target.value
-    this.setState({ phone })
+    handleOnChangePhone(e, this, 'phone')
   }
   _checkPasswordField () {
     const password = this.state.newPassword
@@ -67,9 +64,10 @@ class ProfileView extends React.Component {
     if (validator.isEmpty(password)) message = '비밀번호를 입력해주세요.'
     else if (!validator.isLength(password, { min: 6, max: 20 })) message = '6~20자의 비밀번호를 입력해주세요.'
     else if (validator.contains(password, ' ')) message = '공백이 없는 비밀번호를 입력해주세요.'
+    else if (password === this.state.oldPassword) message = '현재 비밀번호와 다른 비밀번호를 입력해주세요.'
     if (message !== '') {
       this._showErrorMessage($('#formGroupNewPassword'), $('#formGroupNewPassword i'),
-        $('#formGroupPassword .message'), message)
+        $('#formGroupNewPassword .message'), message)
       return false
     } else {
       this._convertSuccessForm($('#formGroupNewPassword'), $('#formGroupNewPassword i'),
@@ -117,6 +115,7 @@ class ProfileView extends React.Component {
     let message = ''
     if (validator.isEmpty(phone[1]) || validator.isEmpty(phone[2])) message = '휴대폰 번호를 입력해주세요.'
     else if (!validator.isNumeric(phone[1] + phone[2])) message = '휴대폰 번호는 숫자만 입력해주세요.'
+    else if (phone[1].length < 3 || phone[2].length < 4) message = '휴대폰 번호를 정확히 입력해주세요.'
     if (message !== '') {
       this._showErrorMessage($('#formGroupPhone'), $('#formGroupPhone i'), $('#formGroupPhone .message'), message)
       return false
@@ -143,37 +142,41 @@ class ProfileView extends React.Component {
     this.setState({ changePassword: !this.state.changePassword })
   }
   _handleOnClickSubmit () {
-    this.setState({ updateProcess: true })
-    const user = this.props.user
-    user.name = this.state.name
-    user.phone = assemblePhoneNumber(this.state.phone)
-    user.regDate = null
-    if (this.state.changePassword && this._checkPasswordField() && this._checkPasswordConfirmField()) {
-      const userInfo = {
-        email: user.email,
-        password: this.state.oldPassword
-      }
-      login(userInfo)
-      .then(() => {
-        user.password = this.state.newPassword
+    if (this._checkNameField() && this._checkPhoneField()) {
+      console.log('이름, 폰번호 정상 입력')
+      console.log('비밀번호 변경 모드')
+      this.setState({ updateProcess: true })
+      const user = this.props.user
+      user.name = this.state.name
+      user.phone = assemblePhoneNumber(this.state.phone)
+      user.regDate = null
+      if (this.state.changePassword && this._checkPasswordField() && this._checkPasswordConfirmField()) {
+        const userInfo = {
+          email: user.email,
+          password: this.state.oldPassword
+        }
+        login(userInfo)
+        .then(() => {
+          user.password = this.state.newPassword
+          return updateUser(user)
+        })
+        .then(() => {
+          this.setState({ messageModalMessage: '저장되었습니다.' })
+          this.setState({ showMessageModal: true, updateProcess: false, changePassword: false })
+          this.props.fetchUserByUserId(user.id)
+        })
+        .catch(() => {
+          this.setState({ messageModalMessage: '현재 비밀번호가 틀립니다.' })
+          this.setState({ showMessageModal: true, updateProcess: false })
+        })
+      } else {
         return updateUser(user)
-      })
-      .then(() => {
-        this.setState({ messageModalMessage: '저장되었습니다.' })
-        this.setState({ showMessageModal: true, updateProcess: false, changePassword: false })
-        this.props.fetchUserByUserId(user.id)
-      })
-      .catch(() => {
-        this.setState({ messageModalMessage: '현재 비밀번호가 틀립니다.' })
-        this.setState({ showMessageModal: true, updateProcess: false })
-      })
-    } else {
-      return updateUser(user)
-      .then(() => {
-        this.setState({ messageModalMessage: '저장되었습니다.' })
-        this.setState({ showMessageModal: true, updateProcess: false, changePassword: false })
-        this.props.fetchUserByUserId(user.id)
-      })
+        .then(() => {
+          this.setState({ messageModalMessage: '저장되었습니다.' })
+          this.setState({ showMessageModal: true, updateProcess: false, changePassword: false })
+          this.props.fetchUserByUserId(user.id)
+        })
+      }
     }
   }
   _closeMessageModal () {

@@ -4,7 +4,10 @@ class TextField extends React.Component {
   render () {
     return (
       <div className='form-group'>
-        <label htmlFor={this.props.id}>{this.props.label}</label>
+        <label htmlFor={this.props.id}>{this.props.label} {
+          this.props.imgInfo &&
+          <a href={this.props.imgInfo} target='_blank'> : {this.props.imgInfo}</a>
+        }</label>
         <input type={this.props.type ? this.props.type : 'text'} className='form-control'
           id={this.props.id} onChange={this.props.onChange} disabled={this.props.disabled}
           value={this.props.value} data-limit={this.props.limit} style={this.props.style}
@@ -31,7 +34,8 @@ TextField.propTypes = {
   style: React.PropTypes.object,
   disabled: React.PropTypes.bool,
   step: React.PropTypes.number,
-  placeholder: React.PropTypes.string
+  placeholder: React.PropTypes.string,
+  imgInfo: React.PropTypes.string
 }
 
 export default TextField

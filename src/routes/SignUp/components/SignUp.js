@@ -1,16 +1,16 @@
 import React from 'react'
-import { Link } from 'react-router'
 import backgroundImage from '../assets/images/background.jpg'
-import { setInlineScripts } from '../../../common/util'
-import { signUp, checkDupEmail } from '../../../common/UserService'
-import MessageModal from '../../../components/MessageModal'
+import { setInlineScripts, assemblePhoneNumber, handleOnChangePhone } from 'common/util'
+import { signUp, checkDupEmail } from 'common/UserService'
+import MessageModal from 'components/MessageModal'
 import validator from 'validator'
 import $ from 'jquery'
-import Loading from '../../../components/Loading'
+import Loading from 'components/Loading'
 import PhoneNumberInput from 'components/PhoneNumberInput'
 import keygen from 'keygenerator'
-import { assemblePhoneNumber } from 'common/util'
 import Button from 'components/Button'
+import ScrollModal from 'components/ScrollModal'
+import { policy, privacy } from 'common/constants'
 
 class SignUp extends React.Component {
   constructor (props) {
@@ -24,7 +24,9 @@ class SignUp extends React.Component {
       isAgreed: false,
       showMessagePopup: false,
       phone: ['010', '', ''],
-      process: false
+      process: false,
+      showPolicyPopup: false,
+      showPrivacyPopup: false
     }
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
     this._handleOnClickSubmit = this._handleOnClickSubmit.bind(this)
@@ -38,8 +40,13 @@ class SignUp extends React.Component {
     this._convertSuccessForm = this._convertSuccessForm.bind(this)
     this._checkPhoneField = this._checkPhoneField.bind(this)
     this._handleOnChangePhone = this._handleOnChangePhone.bind(this)
+    this._showPolicyPopup = this._showPolicyPopup.bind(this)
+    this._closePolicyPopup = this._closePolicyPopup.bind(this)
+    this._showPrivacyPopup = this._showPrivacyPopup.bind(this)
+    this._closePrivacyPopup = this._closePrivacyPopup.bind(this)
   }
   componentDidMount () {
+    if (this.props.user) this.context.router.push('/')
     const scripts = [
       'template/plugins/waypoints/jquery.waypoints.min.js',
       'template/plugins/jquery.countTo.js',
@@ -54,10 +61,7 @@ class SignUp extends React.Component {
     this.setState({ [e.target.name]: e.target.value })
   }
   _handleOnChangePhone (e) {
-    const { index } = e.target.dataset
-    const phone = this.state.phone
-    phone[index] = e.target.value
-    this.setState({ phone })
+    handleOnChangePhone(e, this, 'phone')
   }
   _handleOnChangeAgreed (e) {
     this.setState({ isAgreed: e.target.checked })
@@ -74,7 +78,6 @@ class SignUp extends React.Component {
         this.setState({ showMessagePopup: true })
         return
       }
-
       const userInfo = { email: this.state.email,
         password: this.state.password,
         name: this.state.name,
@@ -106,6 +109,7 @@ class SignUp extends React.Component {
       else if (!validator.isLength(email, { min: 5, max: 50 })) message = '5~50자의 이메일주소를 사용해주세요.'
       if (message !== '') {
         this._showErrorMessage($('#formGroupEmail'), $('#formGroupEmail i'), $('#formGroupEmail .message'), message)
+        $('#inputEmail').focus()
         return
       }
       email = validator.normalizeEmail(email)
@@ -114,6 +118,7 @@ class SignUp extends React.Component {
         if (res.data.email) {
           message = '이미 가입된 이메일주소입니다.'
           this._showErrorMessage($('#formGroupEmail'), $('#formGroupEmail i'), $('#formGroupEmail .message'), message)
+          $('#inputEmail').focus()
         } else {
           this._convertSuccessForm($('#formGroupEmail'), $('#formGroupEmail i'), $('#formGroupEmail .message'))
           resolve()
@@ -130,6 +135,7 @@ class SignUp extends React.Component {
     if (message !== '') {
       this._showErrorMessage($('#formGroupPassword'), $('#formGroupPassword i'),
         $('#formGroupPassword .message'), message)
+      $('#inputPassword').focus()
       return false
     } else {
       this._convertSuccessForm($('#formGroupPassword'), $('#formGroupPassword i'),
@@ -147,6 +153,7 @@ class SignUp extends React.Component {
     if (message !== '') {
       this._showErrorMessage($('#formGroupPasswordConfirm'), $('#formGroupPasswordConfirm i'),
         $('#formGroupPasswordConfirm .message'), message)
+      $('#inputPasswordConfirm').focus()
       return false
     } else {
       this._convertSuccessForm($('#formGroupPasswordConfirm'), $('#formGroupPasswordConfirm i'),
@@ -165,6 +172,7 @@ class SignUp extends React.Component {
     if (message !== '') {
       this._showErrorMessage($('#formGroupName'), $('#formGroupName i'),
         $('#formGroupName .message'), message)
+      $('#inputName').focus()
       return false
     } else {
       this._convertSuccessForm($('#formGroupName'), $('#formGroupName i'),
@@ -198,6 +206,20 @@ class SignUp extends React.Component {
     iconElement.attr('class', 'fa fa-check form-control-feedback')
     messageElement.text('')
     $('label').css('color', '#777777')
+  }
+  _showPolicyPopup (e) {
+    e.preventDefault()
+    this.setState({ showPolicyPopup: true })
+  }
+  _closePolicyPopup () {
+    this.setState({ showPolicyPopup: false })
+  }
+  _showPrivacyPopup (e) {
+    e.preventDefault()
+    this.setState({ showPrivacyPopup: true })
+  }
+  _closePrivacyPopup () {
+    this.setState({ showPrivacyPopup: false })
   }
   render () {
     return (
@@ -264,13 +286,13 @@ class SignUp extends React.Component {
                     </div>
                   </div>
                   <div className='form-group has-feedback' id='formGroupPasswordConfirm'>
-                    <label htmlFor='inputPassword' className='col-sm-3 control-label'>
+                    <label htmlFor='inputPasswordConfirm' className='col-sm-3 control-label'>
                       비밀번호 확인 <span className='text-danger small'>*</span>
                     </label>
                     <div className='col-sm-8'>
                       <input type='password' className='form-control' onChange={this._handleOnChangeInput}
                         onBlur={this._checkPasswordConfirmField}
-                        name='passwordConfirm' id='inputPassword' placeholder='6~20자의 영문, 숫자 및 특수문자' required
+                        name='passwordConfirm' id='inputPasswordConfirm' placeholder='6~20자의 영문, 숫자 및 특수문자' required
                       />
                       <i className='fa fa-lock form-control-feedback' />
                       <div className='text-right small message' />
@@ -308,7 +330,7 @@ class SignUp extends React.Component {
                       <div className='checkbox'>
                         <label>
                           <input type='checkbox' name='isAgreed' onChange={this._handleOnChangeAgreed} required />
-                          <Link to='#'>이용약관</Link>과 <Link to='#'>개인정보수집</Link>에 동의합니다.
+                          <a onClick={this._showPolicyPopup} style={{ cursor: 'pointer' }}>이용약관</a>과 <a onClick={this._showPrivacyPopup} style={{ cursor: 'pointer' }}>개인정보수집</a>에 동의합니다.
                         </label>
                       </div>
                     </div>
@@ -338,6 +360,20 @@ class SignUp extends React.Component {
           onConfirmClick={this._handleOnClickMessageClose}
           id={keygen._()}
         />
+        <ScrollModal
+          title='이용약관'
+          show={this.state.showPolicyPopup}
+          close={this._closePolicyPopup}
+          bodyComponent={<div dangerouslySetInnerHTML={{ __html: policy }} />}
+          id={keygen._()}
+        />
+        <ScrollModal
+          title='개인정보처리방침'
+          show={this.state.showPrivacyPopup}
+          close={this._closePrivacyPopup}
+          bodyComponent={<div dangerouslySetInnerHTML={{ __html: privacy }} />}
+          id={keygen._()}
+        />
       </div>
     )
   }
@@ -346,7 +382,8 @@ class SignUp extends React.Component {
 SignUp.propTypes = {
   authUser: React.PropTypes.object,
   fetchAuthUser: React.PropTypes.func.isRequired,
-  fetchUser: React.PropTypes.func.isRequired
+  fetchUser: React.PropTypes.func.isRequired,
+  user: React.PropTypes.object
 }
 
 SignUp.contextTypes = {

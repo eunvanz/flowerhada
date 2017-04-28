@@ -5,7 +5,7 @@ import { convertSqlDateToStringDateOnly } from 'common/util'
 import { Link } from 'react-router'
 import numeral from 'numeral'
 import Button from 'components/Button'
-import { cancelPayment, updateOrder } from 'common/OrderService'
+import { cancelPayment, updateOrder, getOrderById } from 'common/OrderService'
 import { putCart } from 'common/CartService'
 
 class OrderListView extends React.Component {
@@ -62,7 +62,17 @@ class OrderListView extends React.Component {
     const type = order.carts[0].lesson ? 'lesson' : 'product'
     const status = type === 'lesson' ? '등록취소' : '주문취소'
     const updatedOrder = Object.assign({}, order, { status })
-    cancelPayment(updatedOrder)
+    getOrderById(order.id)
+    .then(res => {
+      if (res.data.status === '수강완료' || res.data.status === '배송완료') {
+        return Promise.reject({ data: { message: '취소할 수 없는 상품입니다.' } })
+      } else {
+        return Promise.resolve()
+      }
+    })
+    .then(res => {
+      return cancelPayment(updatedOrder)
+    })
     .then(res => {
       if (res.data.code !== 0) return Promise.reject(res)
       // cart 업데이트

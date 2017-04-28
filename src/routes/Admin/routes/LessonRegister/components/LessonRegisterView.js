@@ -9,6 +9,7 @@ import TimePicker from 'components/TimePicker'
 import { putLesson, postLesson, deleteLesson, postLessonImage } from 'common/LessonService'
 import { postLessonDay, putLessonDay, deleteLessonDay } from 'common/LessonDayService'
 import $ from 'jquery'
+import Button from 'components/Button'
 
 class LessonListView extends React.Component {
   constructor (props) {
@@ -41,7 +42,8 @@ class LessonListView extends React.Component {
       weekLong: '',
       activated: true,
       groupName: '',
-      mode: this.props.params.id === 'register' ? 'register' : 'update'
+      mode: this.props.params.id === 'register' ? 'register' : 'update',
+      process: false
     }
     this._handleOnChangeCheckbox = this._handleOnChangeCheckbox.bind(this)
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
@@ -483,6 +485,7 @@ class LessonListView extends React.Component {
             label='대표이미지'
             type='file'
             accept='image/*'
+            imgInfo={this.props.lesson ? this.props.lesson.titleImg : null}
           />
           <TextField
             id='price'
@@ -557,8 +560,10 @@ class LessonListView extends React.Component {
             checked={this.state.activated ? 'checked' : ''}
             label='노출활성화'
           />
-          <button type='button' className='btn btn-default' style={{ marginRight: '3px' }}
-            onClick={this._handleOnClickSubmit}>{this.state.mode !== 'register' ? '수정' : '등록'}</button>
+          {/* <button type='button' className='btn btn-default' style={{ marginRight: '3px' }}
+            onClick={this._handleOnClickSubmit}>{this.state.mode !== 'register' ? '수정' : '등록'}</button> */}
+          <Button onClick={this._handleOnClickSubmit} process={this.state.process} style={{ marginRight: '3px' }}
+            textComponent={<span>{this.state.mode !== 'register' ? '수정' : '등록'}</span>} />
           {this.state.mode === 'update' &&
             <button type='button' className='btn btn-grey' style={{ marginRight: '3px' }}
               onClick={this._handleOnClickDelete}>삭제</button>}

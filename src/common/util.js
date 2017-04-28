@@ -1,4 +1,5 @@
 import numeral from 'numeral'
+import validator from 'validator'
 
 export const clearInlineScripts = () => {
   const scriptElements = document.body.getElementsByTagName('SCRIPT')
@@ -312,4 +313,14 @@ export const isScreenSize = {
   sm: () => window.innerWidth < 992 && window.innerWidth >= 768,
   md: () => window.innerWidth < 1200 && window.innerWidth >= 992,
   lg: () => window.innerWidth >= 1200
+}
+
+export const handleOnChangePhone = (e, component, stateName) => {
+  const { index } = e.target.dataset
+  const phone = component.state[stateName]
+  let { value } = e.target
+  if (value !== '' && !validator.isNumeric(value)) return
+  if (value.length > 4) value = value.slice(0, 4)
+  phone[index] = value
+  component.setState({ [stateName]: phone })
 }

@@ -3,7 +3,7 @@ import CustomModal from 'components/CustomModal'
 import PhoneNumberInput from 'components/PhoneNumberInput'
 import Button from 'components/Button'
 import { getUserByPhone, resetUserPassword, getUserByEmail } from 'common/UserService'
-import { assemblePhoneNumber } from 'common/util'
+import { assemblePhoneNumber, handleOnChangePhone } from 'common/util'
 import keygen from 'keygenerator'
 
 class FindPasswordModal extends React.Component {
@@ -36,10 +36,7 @@ class FindPasswordModal extends React.Component {
     }
   }
   _handleOnChangePhone (e) {
-    const { index } = e.target.dataset
-    const phone = this.state.phone
-    phone[index] = e.target.value
-    this.setState({ phone })
+    handleOnChangePhone(e, this, 'phone')
   }
   _handleOnChangeInput (e) {
     const { value } = e.target

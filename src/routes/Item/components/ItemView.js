@@ -583,40 +583,49 @@ class ItemView extends React.Component {
         return (
           <table className='table' style={{ marginBottom: '0px' }}>
             <tbody>
-              <tr>
-                <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령일</strong></td>
-                <td>
-                  <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>희망 수령일</strong></div>
-                  <DatePicker
-                    id='receiveDate'
-                    onChange={this._handleOnChangeDate}
-                    value={this.state.receiveDateISO}
-                  />
-                  <small><i className='fa fa-exclamation-circle' /> 주문과 함께 만들어지기 때문에 최소 이틀이 소요됩니다.</small>
-                </td>
-              </tr>
-              <tr>
-                <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령시간</strong></td>
-                <td>
-                  <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>희망 수령시간</strong></div>
-                  <select className='form-control' id='receiveTime' style={{ width: '200px' }}
-                    value={this.state.receiveTime} onChange={this._handleOnChangeInput}>
-                    {renderTimeOptions()}
-                  </select>
-                </td>
-              </tr>
-              <tr>
-                <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령지역</strong></td>
-                <td>
-                  <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>희망 수령지역</strong></div>
-                  <select className='form-control' id='receiveArea' style={{ width: '300px' }}
-                    value={`${this.state.receiveArea.name}:${this.state.receiveArea.price}`}
-                    onChange={this._handleOnChangeInput}>
-                    {renderAreaOptions()}
-                  </select>
-                  <small><i className='fa fa-exclamation-circle' /> 현재 배송은 서울 및 수도권(일부지역 제외)만 가능합니다.</small>
-                </td>
-              </tr>
+              {
+                item.deliveryType === '퀵' &&
+                <tr>
+                  <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령일</strong></td>
+                  <td>
+                    <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>희망 수령일</strong></div>
+                    <DatePicker
+                      id='receiveDate'
+                      onChange={this._handleOnChangeDate}
+                      value={this.state.receiveDateISO}
+                    />
+                    <small><i className='fa fa-exclamation-circle' /> 주문과 함께 만들어지기 때문에 최소 이틀이 소요됩니다.</small>
+                  </td>
+                </tr>
+              }
+              {
+                item.deliveryType === '퀵' &&
+                <tr>
+                  <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령시간</strong></td>
+                  <td>
+                    <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>희망 수령시간</strong></div>
+                    <select className='form-control' id='receiveTime' style={{ width: '200px' }}
+                      value={this.state.receiveTime} onChange={this._handleOnChangeInput}>
+                      {renderTimeOptions()}
+                    </select>
+                  </td>
+                </tr>
+              }
+              {
+                item.deliveryType === '퀵' &&
+                <tr>
+                  <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령지역</strong></td>
+                  <td>
+                    <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>희망 수령지역</strong></div>
+                    <select className='form-control' id='receiveArea' style={{ width: '300px' }}
+                      value={`${this.state.receiveArea.name}:${this.state.receiveArea.price}`}
+                      onChange={this._handleOnChangeInput}>
+                      {renderAreaOptions()}
+                    </select>
+                    <small><i className='fa fa-exclamation-circle' /> 현재 배송은 서울 및 수도권(일부지역 제외)만 가능합니다.</small>
+                  </td>
+                </tr>
+              }
               <tr>
                 <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>옵션</strong></td>
                 <td>
@@ -637,28 +646,34 @@ class ItemView extends React.Component {
         return (
           <table className='table' style={{ marginBottom: '0px' }}>
             <tbody>
-              <tr>
-                <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령일</strong></td>
-                <td>
-                  <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>희망 수령일</strong></div>
-                  <DatePicker
-                    id='receiveDate'
-                    onChange={this._handleOnChangeDate}
-                    value={this.state.receiveDateISO}
-                  />
-                  <small><i className='fa fa-exclamation-circle' /> 주문과 함께 만들어지기 때문에 최소 이틀이 소요됩니다.</small>
-                </td>
-              </tr>
-              <tr>
-                <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령시간</strong></td>
-                <td>
-                  <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>희망 수령시간</strong></div>
-                  <select className='form-control' id='receiveTime' style={{ width: '200px' }}
-                    value={this.state.receiveTime} onChange={this._handleOnChangeInput}>
-                    {renderTimeOptions()}
-                  </select>
-                </td>
-              </tr>
+              {
+                item.deliveryType === '퀵' &&
+                <tr>
+                  <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령일</strong></td>
+                  <td>
+                    <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>희망 수령일</strong></div>
+                    <DatePicker
+                      id='receiveDate'
+                      onChange={this._handleOnChangeDate}
+                      value={this.state.receiveDateISO}
+                    />
+                    <small><i className='fa fa-exclamation-circle' /> 주문과 함께 만들어지기 때문에 최소 이틀이 소요됩니다.</small>
+                  </td>
+                </tr>
+              }
+              {
+                item.deliveryType === '퀵' &&
+                <tr>
+                  <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>희망 수령시간</strong></td>
+                  <td>
+                    <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>희망 수령시간</strong></div>
+                    <select className='form-control' id='receiveTime' style={{ width: '200px' }}
+                      value={this.state.receiveTime} onChange={this._handleOnChangeInput}>
+                      {renderTimeOptions()}
+                    </select>
+                  </td>
+                </tr>
+              }
               {
                 item.deliveryType === '퀵' &&
                 <tr>

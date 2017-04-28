@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router'
 import { setInlineScripts, removeEmptyIndex } from 'common/util'
+import Button from 'components/Button'
 import TextField from 'components/TextField'
 import Checkbox from 'components/Checkbox'
 import { putProduct, postProduct, deleteProduct } from 'common/ProductService'
@@ -16,8 +17,8 @@ class ProductListView extends React.Component {
       mainCategory: '',
       subCategory: '',
       content: '내용을 입력해주세요.',
-      titleImg: '',
-      images: ['', '', '', '', ''],
+      // titleImg: '',
+      // images: ['', '', '', '', ''],
       price: '',
       discountedPrice: '',
       groupName: '',
@@ -25,19 +26,20 @@ class ProductListView extends React.Component {
       soldout: false,
       activated: true,
       deliveryType: '퀵',
-      mode: this.props.params.id === 'register' ? 'register' : 'update'
+      mode: this.props.params.id === 'register' ? 'register' : 'update',
+      process: false
     }
     this._handleOnChangeCheckbox = this._handleOnChangeCheckbox.bind(this)
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
     this._handleOnClickSubmit = this._handleOnClickSubmit.bind(this)
     this._handleOnClickDelete = this._handleOnClickDelete.bind(this)
-    this._handleOnChangeImage = this._handleOnChangeImage.bind(this)
+    // this._handleOnChangeImage = this._handleOnChangeImage.bind(this)
   }
   componentDidMount () {
     if (this.state.mode === 'update') {
       this.props.fetchProduct(this.props.params.id)
       .then(() => {
-        this.setState(Object.assign({}, this.props.product, { images: JSON.parse(this.props.product.images) }))
+        this.setState(Object.assign({}, this.props.product, { images: this.props.product.images.indexOf('[') > -1 ? JSON.parse(this.props.product.images) : ['', '', ''] }))
         $('#content').val(this.state.content)
         const scripts = ['//cdn.tinymce.com/4/tinymce.min.js',
           '/template/js/inline-lesson-register-view.js']
@@ -55,16 +57,17 @@ class ProductListView extends React.Component {
   _handleOnChangeInput (e) {
     e.preventDefault()
     this.setState({ [e.target.id]: e.target.value })
-    if (e.target.id === 'titleImg') {
-      const images = this.state.images.slice(0)
-      images[0] = e.target.value
-      this.setState({ images })
-    }
+    // if (e.target.id === 'titleImg') {
+    //   const images = this.state.images.slice(0)
+    //   images[0] = e.target.value
+    //   this.setState({ images })
+    // }
   }
   _handleOnChangeCheckbox (e) {
     this.setState({ [e.target.id]: e.target.checked })
   }
   _handleOnClickSubmit (e) {
+    this.setState({ process: true })
     e.preventDefault()
     const product = new URLSearchParams()
     product.append('title', $('#title').val())
@@ -77,13 +80,61 @@ class ProductListView extends React.Component {
     product.append('discountedPrice', $('#discountedPrice').val())
     product.append('soldout', $('#soldout').prop('checked'))
     product.append('content', window.tinymce.get('content').getContent())
-    product.append('titleImg', $('#titleImg').val())
-    product.append('images', JSON.stringify(removeEmptyIndex(this.state.images)))
+    product.append('activated', $('#activated').prop('checked'))
+    // product.append('titleImg', $('#titleImg').val())
+    // product.append('images', JSON.stringify(removeEmptyIndex(this.state.images)))
     product.append('deliveryType', this.state.deliveryType)
     let action = putProduct
     if (this.state.mode === 'register') action = postProduct
-    action(product, this.props.params.id)
+
+    const titleImgFile = document.getElementById('titleImg').files[0]
+    const imageFiles = []
+    for (let i = 0; i < 3; i++) {
+      imageFiles.push(document.getElementById(`images${i + 1}`).files[0])
+    }
+    const postTitleImg = titleImgFile ? postLessonImage(titleImgFile) : Promise.resolve()
+    const postImages = imageFiles.map(imageFile => {
+      if (imageFile) {
+        return postLessonImage(imageFile)
+      } else {
+        return imageFile
+      }
+    })
+    const images = ['', '', '', '']
+    postTitleImg
+    .then(res => {
+      if (res) {
+        const imgUrl = res.data.data.link
+        product.append('titleImg', imgUrl)
+        images[0] = imgUrl
+      } else {
+        product.append('titleImg', this.props.product.titleImg)
+        images[0] = this.props.product.titleImg
+      }
+      return Promise.resolve()
+    })
     .then(() => {
+      return postImages.reduce((prev, postImage, idx) => {
+        return prev.then(() => {
+          if (!postImage) {
+            images[idx + 1] = this.props.product ? JSON.parse(this.props.product.images)[idx + 1] : ''
+            return Promise.resolve()
+          } else {
+            return postImage.then(res => {
+              const imgUrl = res.data.data.link
+              images[idx + 1] = imgUrl
+              return Promise.resolve()
+            })
+          }
+        })
+      }, Promise.resolve())
+    })
+    .then(() => {
+      product.append('images', JSON.stringify(images))
+      return action(product, this.props.params.id)
+    })
+    .then(() => {
+      this.setState({ process: false })
       this.context.router.push('/admin/product')
     })
   }
@@ -96,12 +147,12 @@ class ProductListView extends React.Component {
       this.context.router.push('/admin/product')
     })
   }
-  _handleOnChangeImage (e) {
-    const idx = e.target.id.substr(-1)
-    const images = this.state.images.slice(0)
-    images[idx] = e.target.value
-    this.setState({ images })
-  }
+  // _handleOnChangeImage (e) {
+  //   const idx = e.target.id.substr(-1)
+  //   const images = this.state.images.slice(0)
+  //   images[idx] = e.target.value
+  //   this.setState({ images })
+  // }
   render () {
     return (
       <div>
@@ -150,24 +201,28 @@ class ProductListView extends React.Component {
             label='대표이미지'
             type='file'
             accept='image/*'
+            imgInfo={this.props.product ? this.props.product.titleImg : null}
           />
           <TextField
             id='images1'
             label='이미지1'
             type='file'
             accept='image/*'
+            imgInfo={this.props.product ? JSON.parse(this.props.product.images)[1] : null}
           />
           <TextField
             id='images2'
             label='이미지2'
             type='file'
             accept='image/*'
+            imgInfo={this.props.product ? JSON.parse(this.props.product.images)[2] : null}
           />
           <TextField
             id='images3'
             label='이미지3'
             type='file'
             accept='image/*'
+            imgInfo={this.props.product ? JSON.parse(this.props.product.images)[3] : null}
           />
           <TextField
             id='price'
@@ -206,8 +261,10 @@ class ProductListView extends React.Component {
           </div>
           <label htmlFor='content'>내용</label>
           <textarea id='content' defaultValue={this.state.content} />
-          <button type='button' className='btn btn-default' style={{ marginRight: '3px' }}
-            onClick={this._handleOnClickSubmit}>{this.state.mode !== 'register' ? '수정' : '등록'}</button>
+          {/* <button type='button' className='btn btn-default' style={{ marginRight: '3px' }}
+            onClick={this._handleOnClickSubmit}>{this.state.mode !== 'register' ? '수정' : '등록'}</button> */}
+          <Button onClick={this._handleOnClickSubmit} process={this.state.process} style={{ marginRight: '3px' }}
+            textComponent={<span>{this.state.mode !== 'register' ? '수정' : '등록'}</span>} />
           {this.state.mode === 'update' &&
             <button type='button' className='btn btn-grey' style={{ marginRight: '3px' }}
               onClick={this._handleOnClickDelete}>삭제</button>}

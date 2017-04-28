@@ -15,8 +15,7 @@ class PhoneNumberInput extends React.Component {
           <option value='019'>019</option>
         </select>-
         <input type={isMobile.any() ? 'number' : 'text'} className='form-control' data-index={1} data-seq={this.props.seq} style={{ width: '80px', display: 'inline', padding: '6px 12px' }}
-          maxLength='4' pattern='[0-9]{4}'
-          value={this.props.valueMid} onChange={this.props.onChange} />-
+          maxLength='4' pattern='[0-9]{4}' value={this.props.valueMid} onChange={this.props.onChange} />-
         <input type={isMobile.any() ? 'number' : 'text'} className='form-control' data-index={2} data-seq={this.props.seq} style={{ width: '80px', display: 'inline', padding: '6px 12px' }}
           maxLength='4' pattern='[0-9]{4}' onBlur={this.props.onBlur}
           value={this.props.valueEnd} onChange={this.props.onChange} />

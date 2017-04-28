@@ -48,11 +48,11 @@ class CoreLayout extends React.Component {
               'type': 'text/css',
               'href': 'https://fonts.googleapis.com/css?family=Niconne'
             },
-            {
-              'rel': 'stylesheet',
-              'type': 'text/css',
-              'href': 'https://fonts.googleapis.com/css?family=Raleway:100,400'
-            },
+            // {
+            //   'rel': 'stylesheet',
+            //   'type': 'text/css',
+            //   'href': 'https://fonts.googleapis.com/css?family=Raleway:100,400'
+            // },
             {
               'rel': 'stylesheet',
               'href': `/template/fonts/font-awesome/css/font-awesome.css`

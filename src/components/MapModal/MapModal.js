@@ -23,17 +23,19 @@ class MapModal extends React.Component {
         position: mapCenter,
         map: map
       })
-      const label = new window.daum.maps.InfoWindow({
-        position: mapCenter,
-        content: this.props.label
-      })
-      label.open(map, marker)
+      // const label = new window.daum.maps.InfoWindow({
+      //   position: mapCenter,
+      //   content: this.props.label
+      // })
+      // label.open(map, marker)
+      marker.setMap(map)
     }
   }
   render () {
     const bodyComponent = () => {
+      const { innerHeight } = window
       return (
-        <div id='map' style={{ height: '500px' }}></div>
+        <div id='map' style={{ height: innerHeight - 250 > 500 ? '500px' : `${innerHeight - 250}px` }}></div>
       )
     }
     const footerComponent = () => {
