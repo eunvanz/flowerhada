@@ -10,6 +10,7 @@ import GlobalMessageModal from 'components/GlobalMessageModal'
 import GoBack from 'components/GoBack'
 import $ from 'jquery'
 import { isMobile } from 'common/util'
+import { LOGO_FONT } from 'common/constants'
 
 class CoreLayout extends React.Component {
   componentDidMount () {
@@ -46,13 +47,8 @@ class CoreLayout extends React.Component {
             {
               'rel': 'stylesheet',
               'type': 'text/css',
-              'href': 'https://fonts.googleapis.com/css?family=Niconne'
+              'href': `https://fonts.googleapis.com/css?family=${LOGO_FONT}`
             },
-            // {
-            //   'rel': 'stylesheet',
-            //   'type': 'text/css',
-            //   'href': 'https://fonts.googleapis.com/css?family=Raleway:100,400'
-            // },
             {
               'rel': 'stylesheet',
               'href': `/template/fonts/font-awesome/css/font-awesome.css`

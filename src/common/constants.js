@@ -17,6 +17,13 @@ export const orderStatus = ['주문확인중', '배송준비중', '배송완료'
 export const IAMPORT_REST_KEY = '6649166650148853'
 export const IAMPORT_REST_SECRET = 'rjFQ9gKNUeI5TpKquWRiPsGTumjKL2Adlf3vvOjq32vWrgnVdee2GUVbheV2gwgCLj8h8rIbtd8UtwQH'
 
+// export const LOGO_FONT = 'Niconne'
+export const LOGO_FONT = 'Damion'
+// export const LOGO_FONT = 'Sacramento'
+// export const LOGO_FONT = 'Allura'
+// export const LOGO_FONT = 'Yesteryear'
+export const NAVER_CLIENT_ID = 'Vn6ijHFRNI4K0dJh9PiH'
+
 export const policy = `
 <p class="m_8758384000600110668gmail-1">제<span lang="EN-US">1</span>조<span lang="EN-US">(</span>목적<span lang="EN-US">)</span> 이 약관은 <span lang="EN-US">"</span>꽃하다<span lang="EN-US">" </span>회사<span lang="EN-US">(</span>전자상거래 사업자<span lang="EN-US">)</span>가 운영하는 <span lang="EN-US">"</span>꽃하다<span lang="EN-US">" </span>사이버 몰<span lang="EN-US">(</span>이하 <span lang="EN-US">&ldquo;</span>몰<span lang="EN-US">&rdquo;</span>이라 한다<span lang="EN-US">)</span>에서 제공하는 인터넷 관련 서비스<span lang="EN-US">(</span>이하 <span lang="EN-US">&ldquo;</span>서비스<span lang="EN-US">&rdquo;</span>라 한다<span lang="EN-US">)</span>를 이용함에 있어 사이버 몰과 이용자의 권리․의무 및 책임사항을 규정함을 목적으로 합니다<span lang="EN-US">.</span></p>
 <p class="m_8758384000600110668gmail-1">&nbsp;</p>

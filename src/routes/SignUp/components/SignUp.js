@@ -10,7 +10,7 @@ import PhoneNumberInput from 'components/PhoneNumberInput'
 import keygen from 'keygenerator'
 import Button from 'components/Button'
 import ScrollModal from 'components/ScrollModal'
-import { policy, privacy } from 'common/constants'
+import { policy, privacy, NAVER_CLIENT_ID } from 'common/constants'
 
 class SignUp extends React.Component {
   constructor (props) {
@@ -44,18 +44,26 @@ class SignUp extends React.Component {
     this._closePolicyPopup = this._closePolicyPopup.bind(this)
     this._showPrivacyPopup = this._showPrivacyPopup.bind(this)
     this._closePrivacyPopup = this._closePrivacyPopup.bind(this)
+    this._handleOnClickLoginWithNaver = this._handleOnClickLoginWithNaver.bind(this)
   }
   componentDidMount () {
     if (this.props.user) this.context.router.push('/')
     const scripts = [
-      'template/plugins/waypoints/jquery.waypoints.min.js',
-      'template/plugins/jquery.countTo.js',
-      'template/plugins/jquery.validate.js',
-      'template/plugins/jquery.browser.js',
-      'template/plugins/SmoothScroll.js',
-      'template/js/template.js'
+      '/template/plugins/waypoints/jquery.waypoints.min.js',
+      '/template/plugins/jquery.countTo.js',
+      '/template/plugins/jquery.validate.js',
+      '/template/plugins/jquery.browser.js',
+      '/template/plugins/SmoothScroll.js',
+      '/template/js/template.js'
     ]
     setInlineScripts(scripts)
+    const naver_id_login = new window.naver_id_login(NAVER_CLIENT_ID, 'http://flowerhada.com')
+    const state = naver_id_login.getUniqState()
+    naver_id_login.setButton('white', 2, 40)
+    naver_id_login.setDomain('http://flowerhada.com')
+    naver_id_login.setState(state)
+    naver_id_login.setPopup()
+    naver_id_login.init_naver_id_login()
   }
   _handleOnChangeInput (e) {
     this.setState({ [e.target.name]: e.target.value })
@@ -221,6 +229,9 @@ class SignUp extends React.Component {
   _closePrivacyPopup () {
     this.setState({ showPrivacyPopup: false })
   }
+  _handleOnClickLoginWithNaver () {
+    $('#naver_id_login > a').click()
+  }
   render () {
     return (
       <div className='main-container dark-translucent-bg'
@@ -232,12 +243,12 @@ class SignUp extends React.Component {
               <div className='form-block center-block p-30 light-gray-bg border-clear'>
                 <h2 className='title'>회원가입</h2>
                 <form className='form-horizontal' role='form'>
-                  {/* <div className='form-group has-feedback'>
-                    <label htmlFor='inputEmail' className='col-sm-3 control-label'>
-                      소셜계정으로 가입
+                  <div className='form-group has-feedback'>
+                    <label className='col-sm-3 control-label'>
+                      소셜계정 로그인
                     </label>
                     <div className='col-sm-8'>
-                      <button className='btn btn-sm btn-animated facebook' style={{ marginRight: '3px' }}>
+                      {/* <button className='btn btn-sm btn-animated facebook' style={{ marginRight: '3px' }}>
                         페이스북 <i className='pl-10 fa fa-facebook-square' />
                       </button>
                       <button className='btn btn-sm btn-animated kakao'
@@ -246,16 +257,18 @@ class SignUp extends React.Component {
                         }}
                       >
                         카카오 <i className='pl-10 fa fa-comment' />
-                      </button>
+                      </button> */}
+                      <div id='naver_id_login' style={{ display: 'none' }}></div>
                       <button className='btn btn-sm btn-animated naver'
                         style={{
                           backgroundColor: '#34b700', borderColor: '#34b700', color: '#ffffff'
                         }}
+                        onClick={this._handleOnClickLoginWithNaver}
                       >
                         네이버 <i style={{ fontFamily: 'Archivo Black', lineHeight: '28px', fontStyle: 'normal' }}>N</i>
                       </button>
                     </div>
-                  </div> */}
+                  </div>
                   <div className='separator' />
                   <div className='form-group has-feedback' id='formGroupEmail'>
                     <label htmlFor='inputEmail' className='col-sm-3 control-label'>
@@ -383,7 +396,8 @@ SignUp.propTypes = {
   authUser: React.PropTypes.object,
   fetchAuthUser: React.PropTypes.func.isRequired,
   fetchUser: React.PropTypes.func.isRequired,
-  user: React.PropTypes.object
+  user: React.PropTypes.object,
+  setNaverLogin: React.PropTypes.func.isRequired
 }
 
 SignUp.contextTypes = {

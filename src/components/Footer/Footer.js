@@ -1,5 +1,5 @@
 import React from 'react'
-import { address, phone, email, facebook, instagram } from 'common/constants'
+import { address, phone, email, facebook, instagram, LOGO_FONT } from 'common/constants'
 
 class Footer extends React.Component {
   render () {
@@ -12,7 +12,7 @@ class Footer extends React.Component {
                 <div className='col-md-6 col-md-offset-3'>
                   <div className='footer-content text-center padding-ver-clear'>
                     <div className='logo-footer'>
-                      <i className='text-muted' style={{ fontFamily: 'Niconne, cursive', lineHeight: '28px', fontSize: '38px', fontStyle: 'normal' }}>flower<span className='text-default'>hada</span></i>
+                      <i className='text-muted' style={{ fontFamily: `${LOGO_FONT}, cursive`, lineHeight: '28px', fontSize: '38px', fontStyle: 'normal' }}>flower<span className='text-default'>hada</span></i>
                     </div>
                     <ul className='list-inline mb-20'>
                       <li>

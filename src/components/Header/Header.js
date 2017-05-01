@@ -3,7 +3,7 @@ import { IndexLink, Link, browserHistory } from 'react-router'
 import { connect } from 'react-redux'
 import { removeUser, fetchUser } from 'store/user'
 import { removeAuthUser, receiveAuthUser } from 'store/authUser'
-import { address, phone, email, facebook, instagram } from 'common/constants'
+import { address, phone, email, facebook, instagram, LOGO_FONT } from 'common/constants'
 import { fetchCartsByUserId, clearCarts } from 'store/cart'
 import WishList from 'components/WishList'
 import CartWindow from 'components/CartWindow'
@@ -186,12 +186,20 @@ class Header extends React.Component {
   }
   _collapseNav () {
     const navToggleBtn = $('.navbar-toggle')
-    if (!navToggleBtn.hasClass('collapsed')) {
+    if (navToggleBtn.attr('aria-expanded') !== 'false') {
       navToggleBtn.click()
     }
   }
   render () {
     const { cartList } = this.props
+    const getMarginFromFont = () => {
+      if (LOGO_FONT === 'Niccone') {
+        return 45
+      } else if (LOGO_FONT === 'Damion') {
+        return 52
+      }
+      return 45
+    }
     return (
       <div className='header-container'>
         <div className='header-top dark'>
@@ -333,25 +341,15 @@ class Header extends React.Component {
                   </div>
                   <div id='logo' className='logo hidden-sm' style={{ marginTop: '4px' }}>
                     <IndexLink to='/' style={{ textDecoration: 'none' }} onClick={this._collapseNav}>
-                      <i className='text-muted' style={{ fontFamily: 'Niconne, cursive', lineHeight: '28px', fontSize: '38px', fontStyle: 'normal' }}>flower<span className='text-default'>hada</span></i>
+                      <i className='text-muted' style={{ fontFamily: `${LOGO_FONT}, cursive`, lineHeight: '28px', fontSize: '38px', fontStyle: 'normal' }}>flower<span className='text-default'>hada</span></i>
                     </IndexLink>
                   </div>
                   <div id='logo' className='logo visible-sm' style={{ marginTop: '4px', textAlign: 'center' }}>
                     <IndexLink to='/' style={{ textDecoration: 'none' }} onClick={this._collapseNav}>
-                      <i className='text-muted' style={{ fontFamily: 'Niconne, cursive', lineHeight: '28px', fontSize: '38px', fontStyle: 'normal' }}>flower<span className='text-default'>hada</span></i>
+                      <i className='text-muted' style={{ fontFamily: `${LOGO_FONT}, cursive`, lineHeight: '28px', fontSize: '38px', fontStyle: 'normal' }}>flower<span className='text-default'>hada</span></i>
                     </IndexLink>
                   </div>
-                  {/* <div id='logo' className='logo hidden-sm' style={{ marginTop: '4px' }}>
-                    <IndexLink to='/' style={{ textDecoration: 'none' }} onClick={this._collapseNav}>
-                      <i className='text-muted' style={{ fontFamily: 'Raleway, sans-serif', lineHeight: '28px', fontSize: '32px', fontStyle: 'normal', fontWeight: '100' }}>flower<span className='text-default' style={{ fontWeight: '400' }}>hada</span></i>
-                    </IndexLink>
-                  </div>
-                  <div id='logo' className='logo visible-sm' style={{ marginTop: '4px', textAlign: 'center' }}>
-                    <IndexLink to='/' style={{ textDecoration: 'none' }} onClick={this._collapseNav}>
-                      <i className='text-muted' style={{ fontFamily: 'Raleway, sans-serif', lineHeight: '28px', fontSize: '32px', fontStyle: 'normal', fontWeight: '100'  }}>flower<span className='text-default' style={{ fontWeight: '400' }}>hada</span></i>
-                    </IndexLink>
-                  </div> */}
-                  <div className='site-slogan hidden-sm text-muted' style={{ marginLeft: '45px', textAlign: 'left' }}>live florally</div>
+                  <div className='site-slogan hidden-sm text-muted' style={{ marginLeft: `${getMarginFromFont()}px`, textAlign: 'left' }}>live florally</div>
                   <div className='site-slogan visible-sm text-muted' style={{ textAlign: 'center' }}>live florally</div>
                 </div>
               </div>

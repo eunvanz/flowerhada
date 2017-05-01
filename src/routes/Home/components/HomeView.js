@@ -6,6 +6,7 @@ import ItemList from 'components/ItemList'
 import LessonRequestActionBlock from 'components/LessonRequestActionBlock'
 import Loading from 'components/Loading'
 import Button from 'components/Button'
+import { NAVER_CLIENT_ID } from 'common/constants'
 // import 'template/plugins/rs-plugin/js/jquery.themepunch.tools.min.js'
 // import 'template/plugins/rs-plugin/js/jquery.themepunch.revolution.min.js'
 // import 'template/plugins/owl-carousel/owl.carousel.js'
@@ -51,6 +52,19 @@ class HomeView extends React.Component {
         `/template/js/inline-home-view.js`
       ]
       setInlineScripts(scripts)
+      const naver_id_login = new window.naver_id_login(NAVER_CLIENT_ID, 'http://flowerhada.com')
+      console.log('token', naver_id_login.oauthParams.access_token)
+      function naverSignInCallback () {
+        console.log('여기왔다')
+        console.log(naver_id_login.getProfileData('email'))
+    		console.log(naver_id_login.getProfileData('nickname'))
+      }
+      console.log('1')
+      naver_id_login.get_naver_userprofile(naverSignInCallback)
+      console.log('2')
+      naver_id_login.get_naver_userprofile(() => naverSignInCallback())
+      console.log('3')
+      naver_id_login.get_naver_userprofile(naverSignInCallback())
     })
   }
   componentWillUnmount () {
@@ -279,7 +293,8 @@ HomeView.propTypes = {
   fetchLessons: React.PropTypes.func.isRequired,
   products: React.PropTypes.array,
   fetchProducts: React.PropTypes.func.isRequired,
-  user: React.PropTypes.object
+  user: React.PropTypes.object,
+  naver: React.PropTypes.object
 }
 
 export default HomeView
