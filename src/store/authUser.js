@@ -1,4 +1,4 @@
-import { login } from '../common/UserService'
+import { login, socialLogin, getUserByEmailAndSocialType } from '../common/UserService'
 
 // ------------------------------------
 // Constants
@@ -24,9 +24,31 @@ export function loadAuthUser () {
   }
 }
 
-export const fetchAuthUser = userInfo => {
+export const fetchAuthUser = (email, password) => {
   return dispatch => {
-    return login(userInfo)
+    return getUserByEmailAndSocialType(email, null)
+    .then(res => {
+      let { data } = res
+      console.log('res', res)
+      console.log('password', password)
+      console.log('data', data)
+      data.password = password
+      return login(data)
+    })
+    .then(res => {
+      return dispatch(receiveAuthUser(res.data))
+    })
+  }
+}
+
+export const fetchSocialAuthUser = (email, password, socialType) => {
+  return dispatch => {
+    return getUserByEmailAndSocialType(email, socialType)
+    .then(res => {
+      let { data } = res
+      data.password = password
+      return socialLogin(data, socialType)
+    })
     .then(res => {
       return dispatch(receiveAuthUser(res.data))
     })

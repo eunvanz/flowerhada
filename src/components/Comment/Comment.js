@@ -178,7 +178,7 @@ class Comment extends React.Component {
         <div className='comment-avatar'>
           <img
             className='img-circle'
-            src={`${imgRoute}/${item.user.image}`}
+            src={`${item.user.image}`}
             alt='avatar'
             style={{ width: '50px', height: '50px' }}
           />

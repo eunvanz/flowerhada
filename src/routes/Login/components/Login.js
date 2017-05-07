@@ -6,6 +6,8 @@ import validator from 'validator'
 import $ from 'jquery'
 import FindPasswordModal from 'components/FindPasswordModal'
 import Button from 'components/Button'
+import { NAVER_CLIENT_ID, SOCIAL_LOGIN_CALLBACK_URL, SOCIAL_PASSWORD } from 'common/constants'
+import { getUserByEmailAndSocialType, signUp } from 'common/UserService'
 
 class Login extends React.Component {
   constructor (props) {
@@ -22,6 +24,8 @@ class Login extends React.Component {
     this._checkEmailField = this._checkEmailField.bind(this)
     this._checkPasswordField = this._checkPasswordField.bind(this)
     this._showErrorMessage = this._showErrorMessage.bind(this)
+    this._loginProcess = this._loginProcess.bind(this)
+    this._handleOnClickLoginWithNaver = this._handleOnClickLoginWithNaver.bind(this)
   }
   componentDidMount () {
     const scripts = [
@@ -36,6 +40,49 @@ class Login extends React.Component {
         this._handleOnClickSubmit(e)
       }
     })
+    // 소셜로그인 처리
+    const naver_id_login = new window.naver_id_login(NAVER_CLIENT_ID, SOCIAL_LOGIN_CALLBACK_URL)
+    const state = naver_id_login.getUniqState()
+    naver_id_login.setButton('white', 2, 40)
+    naver_id_login.setState(state)
+    naver_id_login.setPopup()
+    naver_id_login.init_naver_id_login()
+    // console.log(naver_id_login.oauthParams.access_token)
+    if (naver_id_login.oauthParams.access_token) {
+      window.naverSignInCallback = () => {
+        this.setState({ process: true })
+        const socialType = 'naver'
+        const email = naver_id_login.getProfileData('email')
+        const name = naver_id_login.getProfileData('name')
+        const image = naver_id_login.getProfileData('profile_image')
+        getUserByEmailAndSocialType(email, socialType)
+        .then(res => {
+          const { data } = res
+          if (data && data !== '') {
+            console.log('로그인처리')
+            // 로그인처리
+            const userInfo = { email, password: SOCIAL_PASSWORD }
+            this._loginProcess(userInfo, socialType)
+          } else {
+            console.log('회원가입처리')
+            // 회원가입처리
+            const userInfo = {
+              email,
+              password: SOCIAL_PASSWORD,
+              name,
+              image,
+              socialType
+            }
+            console.log('userInfo', userInfo)
+            signUp(userInfo)
+            .then((res) => {
+              this._loginProcess(userInfo, socialType)
+            })
+          }
+        })
+      }
+      naver_id_login.get_naver_userprofile('naverSignInCallback()')
+    }
   }
   _handleOnChangeInput (e) {
     this.setState({ [e.target.name]: e.target.value })
@@ -48,19 +95,26 @@ class Login extends React.Component {
     }
     this.setState({ process: true })
     const userInfo = { email: this.state.email, password: this.state.password }
-    this.props.fetchAuthUser(userInfo)
+    this._loginProcess(userInfo, null)
+  }
+  _loginProcess (userInfo, socialType) {
+    console.log('socialType', socialType)
+    let authUserFetcher = () => this.props.fetchAuthUser(userInfo.email, userInfo.password)
+    if (socialType) authUserFetcher = () => this.props.fetchSocialAuthUser(userInfo.email, userInfo.password, socialType)
+    authUserFetcher()
     .then(() => {
       document.cookie = `authUser=${JSON.stringify(this.props.authUser.data)}; max-age=${60 * 60 * 24}; path=/;`
       return Promise.resolve()
     })
     .then(() => {
-      return this.props.fetchUser(this.props.authUser.data.email)
+      return this.props.fetchUser(this.props.authUser.data.id)
     })
     .then(() => {
       return this.props.fetchCartsByUserId(this.props.user.id)
     })
     .then(() => {
       this.setState({ process: false })
+      this.context.router.push('/')
       // this.context.router.goBack()
     })
     .catch((res) => {
@@ -87,6 +141,10 @@ class Login extends React.Component {
     messageElement.text('')
     $('label').css('color', '#777777')
   }
+  _handleOnClickLoginWithNaver (e) {
+    e.preventDefault()
+    $('#naver_id_login img').click()
+  }
   render () {
     if (this.props.user) {
       this.context.router.goBack()
@@ -101,12 +159,12 @@ class Login extends React.Component {
               <div className='form-block center-block p-30 light-gray-bg border-clear'>
                 <h2 className='title'>로그인</h2>
                 <form className='form-horizontal' role='form'>
-                  {/* <div className='form-group has-feedback'>
-                    <label htmlFor='inputEmail' className='col-sm-3 control-label'>
+                  <div className='form-group has-feedback'>
+                    <label className='col-sm-3 control-label'>
                       소셜계정 로그인
                     </label>
                     <div className='col-sm-8'>
-                      <button className='btn btn-sm btn-animated facebook' style={{ marginRight: '3px' }}>
+                      {/* <button className='btn btn-sm btn-animated facebook' style={{ marginRight: '3px' }}>
                         페이스북 <i className='pl-10 fa fa-facebook-square' />
                       </button>
                       <button className='btn btn-sm btn-animated kakao'
@@ -115,8 +173,9 @@ class Login extends React.Component {
                         }}
                       >
                         카카오 <i className='pl-10 fa fa-comment' />
-                      </button>
-                      <button className='btn btn-sm btn-animated naver'
+                      </button> */}
+                      <div id='naver_id_login' style={{ display: 'none' }}></div>
+                      <button className='btn btn-sm btn-animated naver' onClick={this._handleOnClickLoginWithNaver}
                         style={{
                           backgroundColor: '#34b700', borderColor: '#34b700', color: '#ffffff'
                         }}
@@ -125,7 +184,7 @@ class Login extends React.Component {
                       </button>
                     </div>
                   </div>
-                  <div className='separator' /> */}
+                  <div className='separator' />
                   <div className='form-group has-feedback' id='formGroupEmail'>
                     <label htmlFor='inputEmail' className='col-sm-3 control-label'>
                       이메일주소
@@ -190,7 +249,8 @@ Login.propTypes = {
   fetchAuthUser: React.PropTypes.func.isRequired,
   fetchUser: React.PropTypes.func.isRequired,
   fetchCartsByUserId: React.PropTypes.func.isRequired,
-  user: React.PropTypes.object
+  user: React.PropTypes.object,
+  fetchSocialAuthUser: React.PropTypes.func.isRequired
 }
 
 Login.contextTypes = {

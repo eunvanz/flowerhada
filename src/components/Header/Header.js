@@ -55,7 +55,7 @@ class Header extends React.Component {
     if (cookies.authUser && cookies.authUser.indexOf('{') !== -1) authUser = JSON.parse(cookies.authUser)
     if (authUser) { // 세션에 authUser가 있을 경우 store에 세팅하고 db에서 user 가져옴
       this.props.receiveAuthUser(authUser)
-      this.props.fetchUser(authUser.email)
+      this.props.fetchUser(authUser.id)
       .then(() => {
         this.props.fetchCartsByUserId(this.props.user.id)
       })
@@ -430,10 +430,10 @@ class Header extends React.Component {
                               </Link>
                               <ul className='dropdown-menu'>
                                 <li>
-                                  <Link to='/lessons/hobby' onClick={this._collapseNav}>브랜드스토리</Link>
+                                  <Link to='/lessons/hobby' onClick={this._collapseNav}>브랜드 스토리</Link>
                                 </li>
                                 <li>
-                                  <Link to='/lessons/business' onClick={this._collapseNav}>발자취</Link>
+                                  <Link to='/lessons/business' onClick={this._collapseNav}>hada NEWS</Link>
                                 </li>
                               </ul>
                             </li>

@@ -8,7 +8,7 @@ import cartReducer from './cart'
 import orderReducer from './order'
 import inquiryReducer from './inquiry'
 import messageModalReducer from './messageModal'
-import naverReducer from './naver'
+import socialReducer from './social'
 
 export const makeRootReducer = (asyncReducers) => {
   return combineReducers({
@@ -21,7 +21,7 @@ export const makeRootReducer = (asyncReducers) => {
     order: orderReducer,
     inquiry: inquiryReducer,
     messageModal: messageModalReducer,
-    naver: naverReducer,
+    social: socialReducer,
     ...asyncReducers
   })
 }

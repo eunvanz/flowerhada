@@ -47,7 +47,7 @@ class ProfileView extends React.Component {
   _initialize () {
     this.setState({
       name: this.props.user.name,
-      phone: dividePhoneNumber(this.props.user.phone),
+      phone: this.props.user.phone ? dividePhoneNumber(this.props.user.phone) : ['010', '', ''],
       initialized: true
     })
   }
@@ -143,8 +143,6 @@ class ProfileView extends React.Component {
   }
   _handleOnClickSubmit () {
     if (this._checkNameField() && this._checkPhoneField()) {
-      console.log('이름, 폰번호 정상 입력')
-      console.log('비밀번호 변경 모드')
       this.setState({ updateProcess: true })
       const user = this.props.user
       user.name = this.state.name
@@ -245,7 +243,7 @@ class ProfileView extends React.Component {
                 이메일주소
               </label>
               <div className='col-sm-8' style={{ paddingTop: '7px' }}>
-                {user.email}
+                {user.email} {user.socialType && '(소셜계정)'}
               </div>
             </div>
             <div className='form-group has-feedback' id='formGroupName'>
@@ -275,17 +273,19 @@ class ProfileView extends React.Component {
                 <div className='text-right small message' />
               </div>
             </div>
-            <div className='col-sm-offset-2'>
-              <Button
-                link
-                textComponent={
-                  <span>
-                    {this.state.changePassword ? '비밀번호 변경 안함' : '비밀번호 변경'} <i className={this.state.changePassword ? 'fa fa-caret-up' : 'fa fa-caret-down'} />
-                  </span>
-                }
-                onClick={this._handleOnClickChangePassword}
-              />
-            </div>
+            {!user.socialType &&
+              <div className='col-sm-offset-2'>
+                <Button
+                  link
+                  textComponent={
+                    <span>
+                      {this.state.changePassword ? '비밀번호 변경 안함' : '비밀번호 변경'} <i className={this.state.changePassword ? 'fa fa-caret-up' : 'fa fa-caret-down'} />
+                    </span>
+                  }
+                  onClick={this._handleOnClickChangePassword}
+                />
+              </div>
+            }
             <div style={{ marginTop: '15px' }}></div>
             {renderPasswordField()}
             <div className='form-group'>

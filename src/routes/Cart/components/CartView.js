@@ -25,7 +25,7 @@ class CartView extends React.Component {
       pointSpent: 0,
       receiver: '',
       receiverPhoneNumber: ['010', '', ''],
-      senderPhoneNumber: this.props.user ? dividePhoneNumber(this.props.user.phone) : ['010', '', ''],
+      senderPhoneNumber: this.props.user && this.props.user.phone ? dividePhoneNumber(this.props.user.phone) : ['010', '', ''],
       postCode: '',
       address: '',
       restAddress: '',
@@ -114,13 +114,13 @@ class CartView extends React.Component {
     for (let i = 0; i < quantity; i++) {
       if (i === 0) {
         studentNames.push(this.props.user ? this.props.user.name : '')
-        studentPhoneNumbers.push(this.props.user ? dividePhoneNumber(this.props.user.phone) : ['010', '', ''])
+        studentPhoneNumbers.push(this.props.user && this.props.user.phone ? dividePhoneNumber(this.props.user.phone) : ['010', '', ''])
       } else {
         studentNames.push('')
         studentPhoneNumbers.push(['010', '', ''])
       }
     }
-    const senderPhoneNumber = this.props.user ? dividePhoneNumber(this.props.user.phone) : ['010', '', '']
+    const senderPhoneNumber = this.props.user && this.props.user.phone ? dividePhoneNumber(this.props.user.phone) : ['010', '', '']
     // 최근 주소 리스트 가지고 오기
     getAddressHistoryByUserId(user.id)
     .then(res => {
@@ -287,7 +287,7 @@ class CartView extends React.Component {
           amount: this._getTotalPrice() - this.state.pointSpent,
           buyer_name: this.props.user.name,
           buyer_email: this.props.user.email,
-          buyer_tel: assemblePhoneNumber(this.props.user.phone),
+          buyer_tel: this.props.user.phone ? assemblePhoneNumber(this.props.user.phone) : this.props.orderItem.product ? assemblePhoneNumber(this.state.senderPhoneNumber) : assemblePhoneNumber(this.state.studentPhoneNumbers[0]),
           m_redirect_url: `http://flowerhada.com/order-complete?order_transaction=${JSON.stringify(orderTransaction)}`
         }
         const view = this
@@ -307,7 +307,7 @@ class CartView extends React.Component {
               return view.props.fetchCartsByUserId(view.props.user.id)
             })
             .then(() => {
-              return view.props.fetchUser(view.props.user.email)
+              return view.props.fetchUser(view.props.user.id)
             })
             .then(() => {
               view.context.router.push('/order-complete')
@@ -491,9 +491,9 @@ class CartView extends React.Component {
     } else {
       this.setState({
         receiver: this.props.user.name,
-        receiverPhoneNumber: dividePhoneNumber(this.props.user.phone),
+        receiverPhoneNumber: this.props.user.phone ? dividePhoneNumber(this.props.user.phone) : ['010', '', ''],
         sender: this.props.user.name,
-        senderPhoneNumber: dividePhoneNumber(this.props.user.phone)
+        senderPhoneNumber: this.props.user.phone ? dividePhoneNumber(this.props.user.phone) : ['010', '', '']
       })
     }
   }

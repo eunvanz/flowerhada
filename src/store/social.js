@@ -1,34 +1,34 @@
 // ------------------------------------
 // Constants
 // ------------------------------------
-export const RECEIVE_NAVER_LOGIN = 'RECEIVE_NAVER_LOGIN'
+export const RECEIVE_SOCIAL_TYPE = 'RECEIVE_SOCIAL_TYPE'
 
 // ------------------------------------
 // Actions
 // ------------------------------------
-export function receiveNaverLogin (login = null) {
+export function receiveSocialType (type = null) {
   return {
-    type    : RECEIVE_NAVER_LOGIN,
-    payload : { login }
+    type    : RECEIVE_SOCIAL_TYPE,
+    payload : { type }
   }
 }
 
-export function setNaverLogin (login) {
+export function setSocialType (type) {
   return dispatch => {
-    return dispatch(receiveNaverLogin(login))
+    return dispatch(receiveSocialType(type))
   }
 }
 
 export const actions = {
-  receiveNaverLogin,
-  setNaverLogin
+  receiveSocialType,
+  setSocialType
 }
 
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [RECEIVE_NAVER_LOGIN] : (state, action) => {
+  [RECEIVE_SOCIAL_TYPE] : (state, action) => {
     return action.payload
   }
 }
@@ -36,7 +36,7 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 // Reducer
 // ------------------------------------
-const initialState = { login: null }
+const initialState = { type: null }
 export default function naverReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
 

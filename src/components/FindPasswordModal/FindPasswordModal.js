@@ -2,9 +2,10 @@ import React, { PropTypes } from 'react'
 import CustomModal from 'components/CustomModal'
 import PhoneNumberInput from 'components/PhoneNumberInput'
 import Button from 'components/Button'
-import { getUserByPhone, resetUserPassword, getUserByEmail } from 'common/UserService'
+import { getUserByPhone, resetUserPassword, getUserByEmailAndSocialType } from 'common/UserService'
 import { assemblePhoneNumber, handleOnChangePhone } from 'common/util'
 import keygen from 'keygenerator'
+import $ from 'jquery'
 
 class FindPasswordModal extends React.Component {
   constructor (props) {
@@ -46,7 +47,7 @@ class FindPasswordModal extends React.Component {
     const { mode, phone, email } = this.state
     if (mode === '비밀번호찾기') {
       this.setState({ process: true })
-      getUserByEmail(email)
+      getUserByEmailAndSocialType(email, null)
       .then(res => {
         if (res.data.email) {
           return resetUserPassword(email)
@@ -71,7 +72,7 @@ class FindPasswordModal extends React.Component {
       if (this.state.renderResultMessage) {
         if (this.state.mode === '아이디찾기') {
           const { resultEmails } = this.state
-          if (resultEmails.length > 0) {
+          if (resultEmails && resultEmails.length > 0) {
             return (
               <div className='col-sm-offset-3'>
                 <p className='text-default'>아래의 아이디로 가입하셨습니다.</p>

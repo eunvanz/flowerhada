@@ -10,7 +10,7 @@ import PhoneNumberInput from 'components/PhoneNumberInput'
 import keygen from 'keygenerator'
 import Button from 'components/Button'
 import ScrollModal from 'components/ScrollModal'
-import { policy, privacy, NAVER_CLIENT_ID } from 'common/constants'
+import { policy, privacy, NAVER_CLIENT_ID, SOCIAL_LOGIN_CALLBACK_URL } from 'common/constants'
 
 class SignUp extends React.Component {
   constructor (props) {
@@ -57,10 +57,9 @@ class SignUp extends React.Component {
       '/template/js/template.js'
     ]
     setInlineScripts(scripts)
-    const naver_id_login = new window.naver_id_login(NAVER_CLIENT_ID, 'http://flowerhada.com')
+    const naver_id_login = new window.naver_id_login(NAVER_CLIENT_ID, SOCIAL_LOGIN_CALLBACK_URL)
     const state = naver_id_login.getUniqState()
     naver_id_login.setButton('white', 2, 40)
-    naver_id_login.setDomain('http://flowerhada.com')
     naver_id_login.setState(state)
     naver_id_login.setPopup()
     naver_id_login.init_naver_id_login()
@@ -90,15 +89,16 @@ class SignUp extends React.Component {
         password: this.state.password,
         name: this.state.name,
         phone: assemblePhoneNumber(this.state.phone),
-        image: 'avatar.jpg'
+        image: '/images/avatar.jpg'
       }
       signUp(userInfo)
       .then((res) => {
-        return this.props.fetchAuthUser(userInfo)
+        console.log('res', res)
+        return this.props.fetchAuthUser(userInfo.email, userInfo.password)
       })
       .then((res) => {
         document.cookie = `authUser=${JSON.stringify(this.props.authUser.data)}; max-age=${60 * 60 * 24}; path=/;`
-        return this.props.fetchUser(this.props.authUser.data.email)
+        return this.props.fetchUser(this.props.authUser.data.id)
       })
       .then((res) => {
         this.context.router.push('/')
@@ -229,8 +229,9 @@ class SignUp extends React.Component {
   _closePrivacyPopup () {
     this.setState({ showPrivacyPopup: false })
   }
-  _handleOnClickLoginWithNaver () {
-    $('#naver_id_login > a').click()
+  _handleOnClickLoginWithNaver (e) {
+    e.preventDefault()
+    $('#naver_id_login img').click()
   }
   render () {
     return (
@@ -277,7 +278,7 @@ class SignUp extends React.Component {
                     <div className='col-sm-8'>
                       <input type='email' className='form-control' onChange={this._handleOnChangeInput}
                         onBlur={this._checkEmailField} name='email' id='inputEmail'
-                        placeholder='email@example.com' required />
+                        placeholder='email@example.com' />
                       <i className='fa fa-envelope form-control-feedback' />
                       {this.props.authUser.isLoading &&
                         <Loading />
@@ -292,7 +293,7 @@ class SignUp extends React.Component {
                     <div className='col-sm-8'>
                       <input type='password' className='form-control' onChange={this._handleOnChangeInput}
                         onBlur={this._checkPasswordField}
-                        name='password' id='inputPassword' placeholder='6~20자의 영문, 숫자 및 특수문자' required
+                        name='password' id='inputPassword' placeholder='6~20자의 영문, 숫자 및 특수문자'
                       />
                       <i className='fa fa-lock form-control-feedback' />
                       <div className='text-right small message' />
@@ -305,7 +306,7 @@ class SignUp extends React.Component {
                     <div className='col-sm-8'>
                       <input type='password' className='form-control' onChange={this._handleOnChangeInput}
                         onBlur={this._checkPasswordConfirmField}
-                        name='passwordConfirm' id='inputPasswordConfirm' placeholder='6~20자의 영문, 숫자 및 특수문자' required
+                        name='passwordConfirm' id='inputPasswordConfirm' placeholder='6~20자의 영문, 숫자 및 특수문자'
                       />
                       <i className='fa fa-lock form-control-feedback' />
                       <div className='text-right small message' />
@@ -318,14 +319,14 @@ class SignUp extends React.Component {
                     <div className='col-sm-8'>
                       <input type='text' className='form-control' id='inputName' onChange={this._handleOnChangeInput}
                         onBlur={this._checkNameField}
-                        name='name' placeholder='실명을 기입해주세요.' required />
+                        name='name' placeholder='실명을 기입해주세요.' />
                       <i className='fa fa-user form-control-feedback' />
                       <div className='text-right small message' />
                     </div>
                   </div>
                   <div className='form-group has-feedback' id='formGroupPhone'>
                     <label htmlFor='inputPhone' className='col-sm-3 control-label'>
-                      휴대폰 번호 <span className='text-danger small'>*</span>
+                      휴대폰번호 <span className='text-danger small'>*</span>
                     </label>
                     <div className='col-sm-8'>
                       <PhoneNumberInput
@@ -342,7 +343,7 @@ class SignUp extends React.Component {
                     <div className='col-sm-offset-3 col-sm-8'>
                       <div className='checkbox'>
                         <label>
-                          <input type='checkbox' name='isAgreed' onChange={this._handleOnChangeAgreed} required />
+                          <input type='checkbox' name='isAgreed' onChange={this._handleOnChangeAgreed} />
                           <a onClick={this._showPolicyPopup} style={{ cursor: 'pointer' }}>이용약관</a>과 <a onClick={this._showPrivacyPopup} style={{ cursor: 'pointer' }}>개인정보수집</a>에 동의합니다.
                         </label>
                       </div>
@@ -396,8 +397,7 @@ SignUp.propTypes = {
   authUser: React.PropTypes.object,
   fetchAuthUser: React.PropTypes.func.isRequired,
   fetchUser: React.PropTypes.func.isRequired,
-  user: React.PropTypes.object,
-  setNaverLogin: React.PropTypes.func.isRequired
+  user: React.PropTypes.object
 }
 
 SignUp.contextTypes = {

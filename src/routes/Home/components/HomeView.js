@@ -6,7 +6,6 @@ import ItemList from 'components/ItemList'
 import LessonRequestActionBlock from 'components/LessonRequestActionBlock'
 import Loading from 'components/Loading'
 import Button from 'components/Button'
-import { NAVER_CLIENT_ID } from 'common/constants'
 // import 'template/plugins/rs-plugin/js/jquery.themepunch.tools.min.js'
 // import 'template/plugins/rs-plugin/js/jquery.themepunch.revolution.min.js'
 // import 'template/plugins/owl-carousel/owl.carousel.js'
@@ -48,23 +47,12 @@ class HomeView extends React.Component {
         `/template/plugins/waypoints/jquery.waypoints.min.js`,
         `/template/plugins/magnific-popup/jquery.magnific-popup.min.js`,
         `/template/plugins/isotope/isotope.pkgd.min.js`,
-        `/template/js/template.js`,
-        `/template/js/inline-home-view.js`
+        `/template/js/template.js`
       ]
       setInlineScripts(scripts)
-      const naver_id_login = new window.naver_id_login(NAVER_CLIENT_ID, 'http://flowerhada.com')
-      console.log('token', naver_id_login.oauthParams.access_token)
-      function naverSignInCallback () {
-        console.log('여기왔다')
-        console.log(naver_id_login.getProfileData('email'))
-    		console.log(naver_id_login.getProfileData('nickname'))
-      }
-      console.log('1')
-      naver_id_login.get_naver_userprofile(naverSignInCallback)
-      console.log('2')
-      naver_id_login.get_naver_userprofile(() => naverSignInCallback())
-      console.log('3')
-      naver_id_login.get_naver_userprofile(naverSignInCallback())
+      window.addEventListener('popstate', () => {
+        if (location.pathname !== '/') window.$('#main-banner').revkill()
+      })
     })
   }
   componentWillUnmount () {

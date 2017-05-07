@@ -16,9 +16,9 @@ export function receiveUser (user = null) {
   }
 }
 
-export const fetchUser = email => {
+export const fetchUser = id => {
   return dispatch => {
-    return getUserByEmail(email)
+    return getUserById(id)
     .then(res => {
       return dispatch(receiveUser(res.data))
     })
