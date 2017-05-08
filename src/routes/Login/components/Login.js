@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router'
 import backgroundImage from '../assets/images/background.jpg'
-import { setInlineScripts } from 'common/util'
+import { setInlineScripts, isMobile } from 'common/util'
 import validator from 'validator'
 import $ from 'jquery'
 import FindPasswordModal from 'components/FindPasswordModal'
@@ -28,6 +28,10 @@ class Login extends React.Component {
     this._handleOnClickLoginWithNaver = this._handleOnClickLoginWithNaver.bind(this)
   }
   componentDidMount () {
+    if (this.props.user) {
+      this.context.router.push('/')
+      return
+    }
     const scripts = [
       '/template/plugins/waypoints/jquery.waypoints.min.js',
       '/template/js/template.js',
@@ -45,7 +49,7 @@ class Login extends React.Component {
     const state = naver_id_login.getUniqState()
     naver_id_login.setButton('white', 2, 40)
     naver_id_login.setState(state)
-    naver_id_login.setPopup()
+    // if (isMobile.any()) naver_id_login.setPopup()
     naver_id_login.init_naver_id_login()
     // console.log(naver_id_login.oauthParams.access_token)
     if (naver_id_login.oauthParams.access_token) {
@@ -59,12 +63,12 @@ class Login extends React.Component {
         .then(res => {
           const { data } = res
           if (data && data !== '') {
-            console.log('로그인처리')
+            // console.log('로그인처리')
             // 로그인처리
             const userInfo = { email, password: SOCIAL_PASSWORD }
             this._loginProcess(userInfo, socialType)
           } else {
-            console.log('회원가입처리')
+            // console.log('회원가입처리')
             // 회원가입처리
             const userInfo = {
               email,
@@ -73,7 +77,7 @@ class Login extends React.Component {
               image,
               socialType
             }
-            console.log('userInfo', userInfo)
+            // console.log('userInfo', userInfo)
             signUp(userInfo)
             .then((res) => {
               this._loginProcess(userInfo, socialType)
@@ -83,6 +87,9 @@ class Login extends React.Component {
       }
       naver_id_login.get_naver_userprofile('naverSignInCallback()')
     }
+  }
+  componentWillUpdate (nextProps, nextState) {
+    if (nextProps.user) this.context.router.push('/')
   }
   _handleOnChangeInput (e) {
     this.setState({ [e.target.name]: e.target.value })
@@ -98,7 +105,7 @@ class Login extends React.Component {
     this._loginProcess(userInfo, null)
   }
   _loginProcess (userInfo, socialType) {
-    console.log('socialType', socialType)
+    // console.log('socialType', socialType)
     let authUserFetcher = () => this.props.fetchAuthUser(userInfo.email, userInfo.password)
     if (socialType) authUserFetcher = () => this.props.fetchSocialAuthUser(userInfo.email, userInfo.password, socialType)
     authUserFetcher()
@@ -114,8 +121,11 @@ class Login extends React.Component {
     })
     .then(() => {
       this.setState({ process: false })
-      this.context.router.push('/')
-      // this.context.router.goBack()
+      if (socialType) {
+        this.context.router.push('/')
+      } else {
+        this.context.router.goBack()
+      }
     })
     .catch((res) => {
       this.setState({ process: false })
@@ -146,9 +156,6 @@ class Login extends React.Component {
     $('#naver_id_login img').click()
   }
   render () {
-    if (this.props.user) {
-      this.context.router.goBack()
-    }
     return (
       <div className='main-container dark-translucent-bg'
         style={{ backgroundImage: 'url(' + backgroundImage + ')' }}

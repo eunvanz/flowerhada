@@ -1,6 +1,6 @@
 import React from 'react'
 import backgroundImage from '../assets/images/background.jpg'
-import { setInlineScripts, assemblePhoneNumber, handleOnChangePhone } from 'common/util'
+import { setInlineScripts, assemblePhoneNumber, handleOnChangePhone, isMobile } from 'common/util'
 import { signUp, checkDupEmail } from 'common/UserService'
 import MessageModal from 'components/MessageModal'
 import validator from 'validator'
@@ -61,7 +61,7 @@ class SignUp extends React.Component {
     const state = naver_id_login.getUniqState()
     naver_id_login.setButton('white', 2, 40)
     naver_id_login.setState(state)
-    naver_id_login.setPopup()
+    // if (isMobile.any()) naver_id_login.setPopup()
     naver_id_login.init_naver_id_login()
   }
   _handleOnChangeInput (e) {

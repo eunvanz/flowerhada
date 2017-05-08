@@ -23,6 +23,7 @@ export const LOGO_FONT = 'Damion'
 // export const LOGO_FONT = 'Allura'
 // export const LOGO_FONT = 'Yesteryear'
 export const NAVER_CLIENT_ID = 'Vn6ijHFRNI4K0dJh9PiH'
+// export const SOCIAL_LOGIN_CALLBACK_URL = 'http://127.0.0.1:3000/login'
 export const SOCIAL_LOGIN_CALLBACK_URL = 'http://flowerhada.com/login'
 export const SOCIAL_PASSWORD = 'lDu@Q8&(d!F'
 
