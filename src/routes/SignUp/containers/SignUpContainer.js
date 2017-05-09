@@ -1,12 +1,15 @@
 import { connect } from 'react-redux'
-import { fetchAuthUser } from 'store/authUser'
+import { fetchAuthUser, fetchSocialAuthUser } from 'store/authUser'
+import { fetchCartsByUserId } from 'store/cart'
 import { fetchUser } from 'store/user'
 
 import SignUp from '../components/SignUp'
 
 const mapDispatchToProps = {
   fetchAuthUser,
-  fetchUser
+  fetchUser,
+  fetchSocialAuthUser,
+  fetchCartsByUserId
 }
 
 const mapStateToProps = (state) => ({

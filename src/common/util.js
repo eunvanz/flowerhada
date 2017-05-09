@@ -3,7 +3,7 @@ import validator from 'validator'
 
 export const clearInlineScripts = () => {
   const scriptElements = document.body.getElementsByTagName('SCRIPT')
-  while (scriptElements.length > 10) {
+  while (scriptElements.length > 14) {
     const length = scriptElements.length
     document.body.removeChild(scriptElements[length - 1])
   }

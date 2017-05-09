@@ -39,14 +39,14 @@ class HomeView extends React.Component {
     })
     .then(() => {
       const scripts = [
-        `/template/plugins/rs-plugin/js/jquery.themepunch.tools.min.js`,
-        `/template/plugins/rs-plugin/js/jquery.themepunch.revolution.js`,
-        `/template/plugins/owl-carousel/owl.carousel.js`,
-        `/template/plugins/jquery.browser.js`,
-        `/template/plugins/SmoothScroll.js`,
-        `/template/plugins/waypoints/jquery.waypoints.min.js`,
-        `/template/plugins/magnific-popup/jquery.magnific-popup.min.js`,
-        `/template/plugins/isotope/isotope.pkgd.min.js`,
+        // `/template/plugins/rs-plugin/js/jquery.themepunch.tools.min.js`,
+        // `/template/plugins/rs-plugin/js/jquery.themepunch.revolution.js`,
+        // `/template/plugins/owl-carousel/owl.carousel.js`,
+        // `/template/plugins/jquery.browser.js`,
+        // `/template/plugins/SmoothScroll.js`,
+        // `/template/plugins/waypoints/jquery.waypoints.min.js`,
+        // `/template/plugins/magnific-popup/jquery.magnific-popup.min.js`,
+        // `/template/plugins/isotope/isotope.pkgd.min.js`,
         `/template/js/template.js`
       ]
       setInlineScripts(scripts)

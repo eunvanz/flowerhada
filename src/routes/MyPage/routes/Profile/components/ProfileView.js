@@ -243,7 +243,7 @@ class ProfileView extends React.Component {
                 이메일주소
               </label>
               <div className='col-sm-8' style={{ paddingTop: '7px' }}>
-                {user.email} {user.socialType && '(소셜계정)'}
+                {user.email} {user.socialType && user.socialType === 'naver' ? '(네이버계정)' : '(페이스북계정)'}
               </div>
             </div>
             <div className='form-group has-feedback' id='formGroupName'>

@@ -6,12 +6,12 @@
 			$("body").removeClass("no-trans");
 		});
 		// Enable Smooth Scroll only on Chrome and only on Win and Linux Systems
-		var platform = navigator.platform.toLowerCase();
-		if ((platform.indexOf('win') == 0 || platform.indexOf('linux') == 0) && !Modernizr.touch) {
-			if ($.browser.webkit) {
-				$.webkitSmoothScroll();
-			}
-		};
+		// var platform = navigator.platform.toLowerCase();
+		// if ((platform.indexOf('win') == 0 || platform.indexOf('linux') == 0) && !Modernizr.touch) {
+		// 	if ($.browser.webkit) {
+		// 		$.webkitSmoothScroll();
+		// 	}
+		// };
 		// //Show dropdown on hover only for desktop devices
 		// //-----------------------------------------------
 		// var delay=0, setTimeoutConst;

@@ -1,6 +1,6 @@
 import React from 'react'
 import backgroundImage from '../assets/images/background.jpg'
-import { setInlineScripts, assemblePhoneNumber, handleOnChangePhone, isMobile } from 'common/util'
+import { setInlineScripts, assemblePhoneNumber, handleOnChangePhone } from 'common/util'
 import { signUp, checkDupEmail } from 'common/UserService'
 import MessageModal from 'components/MessageModal'
 import validator from 'validator'
@@ -11,6 +11,7 @@ import keygen from 'keygenerator'
 import Button from 'components/Button'
 import ScrollModal from 'components/ScrollModal'
 import { policy, privacy, NAVER_CLIENT_ID, SOCIAL_LOGIN_CALLBACK_URL } from 'common/constants'
+import { Facebook } from 'common/socialUtil'
 
 class SignUp extends React.Component {
   constructor (props) {
@@ -26,7 +27,8 @@ class SignUp extends React.Component {
       phone: ['010', '', ''],
       process: false,
       showPolicyPopup: false,
-      showPrivacyPopup: false
+      showPrivacyPopup: false,
+      showForm: false
     }
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
     this._handleOnClickSubmit = this._handleOnClickSubmit.bind(this)
@@ -45,15 +47,18 @@ class SignUp extends React.Component {
     this._showPrivacyPopup = this._showPrivacyPopup.bind(this)
     this._closePrivacyPopup = this._closePrivacyPopup.bind(this)
     this._handleOnClickLoginWithNaver = this._handleOnClickLoginWithNaver.bind(this)
+    this._handleOnClickShowForm = this._handleOnClickShowForm.bind(this)
+    this._handleOnClickLoginWithFacebook = this._handleOnClickLoginWithFacebook.bind(this)
+    this._loginProcess = this._loginProcess.bind(this)
   }
   componentDidMount () {
     if (this.props.user) this.context.router.push('/')
     const scripts = [
-      '/template/plugins/waypoints/jquery.waypoints.min.js',
-      '/template/plugins/jquery.countTo.js',
-      '/template/plugins/jquery.validate.js',
-      '/template/plugins/jquery.browser.js',
-      '/template/plugins/SmoothScroll.js',
+      // '/template/plugins/waypoints/jquery.waypoints.min.js',
+      // '/template/plugins/jquery.countTo.js',
+      // '/template/plugins/jquery.validate.js',
+      // '/template/plugins/jquery.browser.js',
+      // '/template/plugins/SmoothScroll.js',
       '/template/js/template.js'
     ]
     setInlineScripts(scripts)
@@ -63,6 +68,7 @@ class SignUp extends React.Component {
     naver_id_login.setState(state)
     // if (isMobile.any()) naver_id_login.setPopup()
     naver_id_login.init_naver_id_login()
+    Facebook.init()
   }
   _handleOnChangeInput (e) {
     this.setState({ [e.target.name]: e.target.value })
@@ -103,6 +109,34 @@ class SignUp extends React.Component {
       .then((res) => {
         this.context.router.push('/')
       })
+    })
+  }
+  _loginProcess (userInfo, socialType) {
+    // console.log('socialType', socialType)
+    let authUserFetcher = () => this.props.fetchAuthUser(userInfo.email, userInfo.password)
+    if (socialType) authUserFetcher = () => this.props.fetchSocialAuthUser(userInfo.email, userInfo.password, socialType)
+    authUserFetcher()
+    .then(() => {
+      document.cookie = `authUser=${JSON.stringify(this.props.authUser.data)}; max-age=${60 * 60 * 24}; path=/;`
+      return Promise.resolve()
+    })
+    .then(() => {
+      return this.props.fetchUser(this.props.authUser.data.id)
+    })
+    .then(() => {
+      return this.props.fetchCartsByUserId(this.props.user.id)
+    })
+    .then(() => {
+      this.setState({ process: false })
+      if (socialType) {
+        this.context.router.push('/')
+      } else {
+        this.context.router.goBack()
+      }
+    })
+    .catch((res) => {
+      this.setState({ process: false })
+      this._showErrorMessage('이메일 혹은 비밀번호가 잘못되었습니다.')
     })
   }
   _handleOnClickMessageClose () {
@@ -233,6 +267,13 @@ class SignUp extends React.Component {
     e.preventDefault()
     $('#naver_id_login img').click()
   }
+  _handleOnClickShowForm () {
+    this.setState({ showForm: true })
+  }
+  _handleOnClickLoginWithFacebook (e) {
+    e.preventDefault()
+    Facebook.login(this._loginProcess)
+  }
   render () {
     return (
       <div className='main-container dark-translucent-bg'
@@ -244,123 +285,146 @@ class SignUp extends React.Component {
               <div className='form-block center-block p-30 light-gray-bg border-clear'>
                 <h2 className='title'>회원가입</h2>
                 <form className='form-horizontal' role='form'>
-                  <div className='form-group has-feedback'>
-                    <label className='col-sm-3 control-label'>
-                      소셜계정 로그인
-                    </label>
-                    <div className='col-sm-8'>
-                      {/* <button className='btn btn-sm btn-animated facebook' style={{ marginRight: '3px' }}>
-                        페이스북 <i className='pl-10 fa fa-facebook-square' />
-                      </button>
-                      <button className='btn btn-sm btn-animated kakao'
-                        style={{
-                          backgroundColor: '#ffcc00', borderColor: '#ffcc00', color: '#422d00', marginRight: '3px'
-                        }}
-                      >
-                        카카오 <i className='pl-10 fa fa-comment' />
-                      </button> */}
-                      <div id='naver_id_login' style={{ display: 'none' }}></div>
-                      <button className='btn btn-sm btn-animated naver'
-                        style={{
-                          backgroundColor: '#34b700', borderColor: '#34b700', color: '#ffffff'
-                        }}
-                        onClick={this._handleOnClickLoginWithNaver}
-                      >
-                        네이버 <i style={{ fontFamily: 'Archivo Black', lineHeight: '28px', fontStyle: 'normal' }}>N</i>
-                      </button>
-                    </div>
-                  </div>
-                  <div className='separator' />
-                  <div className='form-group has-feedback' id='formGroupEmail'>
-                    <label htmlFor='inputEmail' className='col-sm-3 control-label'>
-                      이메일주소 <span className='text-danger small'>*</span>
-                    </label>
-                    <div className='col-sm-8'>
-                      <input type='email' className='form-control' onChange={this._handleOnChangeInput}
-                        onBlur={this._checkEmailField} name='email' id='inputEmail'
-                        placeholder='email@example.com' />
-                      <i className='fa fa-envelope form-control-feedback' />
-                      {this.props.authUser.isLoading &&
-                        <Loading />
-                      }
-                      <div className='text-right small message' />
-                    </div>
-                  </div>
-                  <div className='form-group has-feedback' id='formGroupPassword'>
-                    <label htmlFor='inputPassword' className='col-sm-3 control-label'>
-                      비밀번호 <span className='text-danger small'>*</span>
-                    </label>
-                    <div className='col-sm-8'>
-                      <input type='password' className='form-control' onChange={this._handleOnChangeInput}
-                        onBlur={this._checkPasswordField}
-                        name='password' id='inputPassword' placeholder='6~20자의 영문, 숫자 및 특수문자'
-                      />
-                      <i className='fa fa-lock form-control-feedback' />
-                      <div className='text-right small message' />
-                    </div>
-                  </div>
-                  <div className='form-group has-feedback' id='formGroupPasswordConfirm'>
-                    <label htmlFor='inputPasswordConfirm' className='col-sm-3 control-label'>
-                      비밀번호 확인 <span className='text-danger small'>*</span>
-                    </label>
-                    <div className='col-sm-8'>
-                      <input type='password' className='form-control' onChange={this._handleOnChangeInput}
-                        onBlur={this._checkPasswordConfirmField}
-                        name='passwordConfirm' id='inputPasswordConfirm' placeholder='6~20자의 영문, 숫자 및 특수문자'
-                      />
-                      <i className='fa fa-lock form-control-feedback' />
-                      <div className='text-right small message' />
-                    </div>
-                  </div>
-                  <div className='form-group has-feedback' id='formGroupName'>
-                    <label htmlFor='inputName' className='col-sm-3 control-label'>
-                      이름 <span className='text-danger small'>*</span>
-                    </label>
-                    <div className='col-sm-8'>
-                      <input type='text' className='form-control' id='inputName' onChange={this._handleOnChangeInput}
-                        onBlur={this._checkNameField}
-                        name='name' placeholder='실명을 기입해주세요.' />
-                      <i className='fa fa-user form-control-feedback' />
-                      <div className='text-right small message' />
-                    </div>
-                  </div>
-                  <div className='form-group has-feedback' id='formGroupPhone'>
-                    <label htmlFor='inputPhone' className='col-sm-3 control-label'>
-                      휴대폰번호 <span className='text-danger small'>*</span>
-                    </label>
-                    <div className='col-sm-8'>
-                      <PhoneNumberInput
-                        valueStart={this.state.phone[0]}
-                        valueMid={this.state.phone[1]}
-                        valueEnd={this.state.phone[2]}
-                        onChange={this._handleOnChangePhone}
-                        onBlur={this._checkPhoneField}
-                      />
-                      <div className='text-right small message' />
-                    </div>
-                  </div>
-                  <div className='form-group'>
-                    <div className='col-sm-offset-3 col-sm-8'>
-                      <div className='checkbox'>
-                        <label>
-                          <input type='checkbox' name='isAgreed' onChange={this._handleOnChangeAgreed} />
-                          <a onClick={this._showPolicyPopup} style={{ cursor: 'pointer' }}>이용약관</a>과 <a onClick={this._showPrivacyPopup} style={{ cursor: 'pointer' }}>개인정보수집</a>에 동의합니다.
-                        </label>
+                  { !this.state.showForm &&
+                    <div className='form-group has-feedback'>
+                      <label className='col-sm-3 control-label'>
+                        소셜계정 로그인
+                      </label>
+                      <div className='col-sm-8'>
+                        <button className='btn btn-animated facebook btn-block' onClick={this._handleOnClickLoginWithFacebook}>
+                          페이스북계정으로 로그인 <i className='pl-10 fa fa-facebook-square' />
+                        </button>
+                        {/* <button className='btn btn-animated kakao btn-block'
+                          style={{
+                            backgroundColor: '#ffcc00', borderColor: '#ffcc00', color: '#422d00',
+                          }}
+                        >
+                          카카오계정으로 로그인 <i className='pl-10 fa fa-comment' />
+                        </button> */}
+                        <div id='naver_id_login' style={{ display: 'none' }}></div>
+                        <button className='btn btn-animated naver btn-block'
+                          style={{
+                            backgroundColor: '#34b700', borderColor: '#34b700', color: '#ffffff'
+                          }}
+                          onClick={this._handleOnClickLoginWithNaver}
+                        >
+                          네이버계정으로 로그인 <i style={{ fontFamily: 'Archivo Black', lineHeight: '32px', fontStyle: 'normal' }}>N</i>
+                        </button>
                       </div>
                     </div>
-                  </div>
-                  <div className='form-group'>
-                    <div className='col-sm-offset-3 col-sm-8'>
-                      <Button
-                        textComponent={<span>가입하기 <i className='fa fa-check' /></span>}
-                        animated
-                        className='btn-block'
-                        style={{ color: 'white' }}
-                        onClick={this._handleOnClickSubmit}
-                        process={this.state.process}
-                      />
+                  }
+                  {
+                    !this.state.showForm &&
+                    <div className='form-group has-feedback'>
+                      <label className='col-sm-3 control-label'>
+                        직접 회원가입
+                      </label>
+                      <div className='col-sm-8'>
+                        <Button
+                          textComponent={<span>이메일로 회원가입 <i className='fa fa-envelope' /></span>}
+                          animated
+                          className='btn-block'
+                          style={{ color: 'white' }}
+                          onClick={this._handleOnClickShowForm}
+                        />
+                      </div>
                     </div>
-                  </div>
+                  }
+                  {
+                    this.state.showForm &&
+                    <div>
+                      <div className='form-group has-feedback' id='formGroupEmail'>
+                        <label htmlFor='inputEmail' className='col-sm-3 control-label'>
+                          이메일주소 <span className='text-danger small'>*</span>
+                        </label>
+                        <div className='col-sm-8'>
+                          <input type='email' className='form-control' onChange={this._handleOnChangeInput}
+                            onBlur={this._checkEmailField} name='email' id='inputEmail'
+                            placeholder='email@example.com' />
+                          <i className='fa fa-envelope form-control-feedback' />
+                          {this.props.authUser.isLoading &&
+                            <Loading />
+                          }
+                          <div className='text-right small message' />
+                        </div>
+                      </div>
+                      <div className='form-group has-feedback' id='formGroupPassword'>
+                        <label htmlFor='inputPassword' className='col-sm-3 control-label'>
+                          비밀번호 <span className='text-danger small'>*</span>
+                        </label>
+                        <div className='col-sm-8'>
+                          <input type='password' className='form-control' onChange={this._handleOnChangeInput}
+                            onBlur={this._checkPasswordField}
+                            name='password' id='inputPassword' placeholder='6~20자의 영문, 숫자 및 특수문자'
+                          />
+                          <i className='fa fa-lock form-control-feedback' />
+                          <div className='text-right small message' />
+                        </div>
+                      </div>
+                      <div className='form-group has-feedback' id='formGroupPasswordConfirm'>
+                        <label htmlFor='inputPasswordConfirm' className='col-sm-3 control-label'>
+                          비밀번호 확인 <span className='text-danger small'>*</span>
+                        </label>
+                        <div className='col-sm-8'>
+                          <input type='password' className='form-control' onChange={this._handleOnChangeInput}
+                            onBlur={this._checkPasswordConfirmField}
+                            name='passwordConfirm' id='inputPasswordConfirm' placeholder='6~20자의 영문, 숫자 및 특수문자'
+                          />
+                          <i className='fa fa-lock form-control-feedback' />
+                          <div className='text-right small message' />
+                        </div>
+                      </div>
+                      <div className='form-group has-feedback' id='formGroupName'>
+                        <label htmlFor='inputName' className='col-sm-3 control-label'>
+                          이름 <span className='text-danger small'>*</span>
+                        </label>
+                        <div className='col-sm-8'>
+                          <input type='text' className='form-control' id='inputName' onChange={this._handleOnChangeInput}
+                            onBlur={this._checkNameField}
+                            name='name' placeholder='실명을 기입해주세요.' />
+                          <i className='fa fa-user form-control-feedback' />
+                          <div className='text-right small message' />
+                        </div>
+                      </div>
+                      <div className='form-group has-feedback' id='formGroupPhone'>
+                        <label htmlFor='inputPhone' className='col-sm-3 control-label'>
+                          휴대폰번호 <span className='text-danger small'>*</span>
+                        </label>
+                        <div className='col-sm-8'>
+                          <PhoneNumberInput
+                            valueStart={this.state.phone[0]}
+                            valueMid={this.state.phone[1]}
+                            valueEnd={this.state.phone[2]}
+                            onChange={this._handleOnChangePhone}
+                            onBlur={this._checkPhoneField}
+                          />
+                          <div className='text-right small message' />
+                        </div>
+                      </div>
+                      <div className='form-group'>
+                        <div className='col-sm-offset-3 col-sm-8'>
+                          <div className='checkbox'>
+                            <label>
+                              <input type='checkbox' name='isAgreed' onChange={this._handleOnChangeAgreed} />
+                              <a onClick={this._showPolicyPopup} style={{ cursor: 'pointer' }}>이용약관</a>과 <a onClick={this._showPrivacyPopup} style={{ cursor: 'pointer' }}>개인정보수집</a>에 동의합니다.
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      <div className='form-group'>
+                        <div className='col-sm-offset-3 col-sm-8'>
+                          <Button
+                            textComponent={<span>가입하기 <i className='fa fa-check' /></span>}
+                            animated
+                            className='btn-block'
+                            style={{ color: 'white' }}
+                            onClick={this._handleOnClickSubmit}
+                            process={this.state.process}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  }
                 </form>
               </div>
             </div>
@@ -397,7 +461,9 @@ SignUp.propTypes = {
   authUser: React.PropTypes.object,
   fetchAuthUser: React.PropTypes.func.isRequired,
   fetchUser: React.PropTypes.func.isRequired,
-  user: React.PropTypes.object
+  user: React.PropTypes.object,
+  fetchSocialAuthUser: React.PropTypes.func.isRequired,
+  fetchCartsByUserId: React.PropTypes.func.isRequired
 }
 
 SignUp.contextTypes = {

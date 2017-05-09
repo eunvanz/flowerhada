@@ -152,7 +152,7 @@ class ItemView extends React.Component {
     return fetchItem(this.props.params.id)
     .then(() => {
       // console.log('아이템 로드 완료')
-      if (!this.props.item) {
+      if (!this.props.item || !this.props.item.activated) {
         this.context.router.push('/not-found')
         return
       }

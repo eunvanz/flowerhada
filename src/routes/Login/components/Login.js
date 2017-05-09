@@ -1,13 +1,14 @@
 import React from 'react'
 import { Link } from 'react-router'
 import backgroundImage from '../assets/images/background.jpg'
-import { setInlineScripts, isMobile } from 'common/util'
+import { setInlineScripts } from 'common/util'
 import validator from 'validator'
 import $ from 'jquery'
 import FindPasswordModal from 'components/FindPasswordModal'
 import Button from 'components/Button'
 import { NAVER_CLIENT_ID, SOCIAL_LOGIN_CALLBACK_URL, SOCIAL_PASSWORD } from 'common/constants'
 import { getUserByEmailAndSocialType, signUp } from 'common/UserService'
+import { Facebook } from 'common/socialUtil'
 
 class Login extends React.Component {
   constructor (props) {
@@ -26,6 +27,7 @@ class Login extends React.Component {
     this._showErrorMessage = this._showErrorMessage.bind(this)
     this._loginProcess = this._loginProcess.bind(this)
     this._handleOnClickLoginWithNaver = this._handleOnClickLoginWithNaver.bind(this)
+    this._handleOnClickLoginWithFacebook = this._handleOnClickLoginWithFacebook.bind(this)
   }
   componentDidMount () {
     if (this.props.user) {
@@ -33,9 +35,9 @@ class Login extends React.Component {
       return
     }
     const scripts = [
-      '/template/plugins/waypoints/jquery.waypoints.min.js',
-      '/template/js/template.js',
-      '/template/js/naverLogin_implicit-1.0.2-min.js'
+      // '/template/plugins/waypoints/jquery.waypoints.min.js',
+      '/template/js/template.js'
+      // '/template/js/naverLogin_implicit-1.0.2-min.js'
     ]
     setInlineScripts(scripts)
     $('#inputPassword').keypress((e) => {
@@ -45,6 +47,9 @@ class Login extends React.Component {
       }
     })
     // 소셜로그인 처리
+    // 페이스북
+    Facebook.init()
+    // 네이버
     const naver_id_login = new window.naver_id_login(NAVER_CLIENT_ID, SOCIAL_LOGIN_CALLBACK_URL)
     const state = naver_id_login.getUniqState()
     naver_id_login.setButton('white', 2, 40)
@@ -155,6 +160,10 @@ class Login extends React.Component {
     e.preventDefault()
     $('#naver_id_login img').click()
   }
+  _handleOnClickLoginWithFacebook (e) {
+    e.preventDefault()
+    Facebook.login(this._loginProcess)
+  }
   render () {
     return (
       <div className='main-container dark-translucent-bg'
@@ -166,39 +175,13 @@ class Login extends React.Component {
               <div className='form-block center-block p-30 light-gray-bg border-clear'>
                 <h2 className='title'>로그인</h2>
                 <form className='form-horizontal' role='form'>
-                  <div className='form-group has-feedback'>
-                    <label className='col-sm-3 control-label'>
-                      소셜계정 로그인
-                    </label>
-                    <div className='col-sm-8'>
-                      {/* <button className='btn btn-sm btn-animated facebook' style={{ marginRight: '3px' }}>
-                        페이스북 <i className='pl-10 fa fa-facebook-square' />
-                      </button>
-                      <button className='btn btn-sm btn-animated kakao'
-                        style={{
-                          backgroundColor: '#ffcc00', borderColor: '#ffcc00', color: '#422d00', marginRight: '3px'
-                        }}
-                      >
-                        카카오 <i className='pl-10 fa fa-comment' />
-                      </button> */}
-                      <div id='naver_id_login' style={{ display: 'none' }}></div>
-                      <button className='btn btn-sm btn-animated naver' onClick={this._handleOnClickLoginWithNaver}
-                        style={{
-                          backgroundColor: '#34b700', borderColor: '#34b700', color: '#ffffff'
-                        }}
-                      >
-                        네이버 <i style={{ fontFamily: 'Archivo Black', lineHeight: '28px', fontStyle: 'normal' }}>N</i>
-                      </button>
-                    </div>
-                  </div>
-                  <div className='separator' />
                   <div className='form-group has-feedback' id='formGroupEmail'>
                     <label htmlFor='inputEmail' className='col-sm-3 control-label'>
                       이메일주소
                     </label>
                     <div className='col-sm-8'>
                       <input type='email' className='form-control' onChange={this._handleOnChangeInput}
-                        onBlur={this._checkEmailField} name='email' id='inputEmail' required />
+                        onBlur={this._checkEmailField} name='email' id='inputEmail' />
                       <i className='fa fa-user form-control-feedback' />
                     </div>
                   </div>
@@ -224,6 +207,32 @@ class Login extends React.Component {
                         animated
                         process={this.state.process}
                       />
+                    </div>
+                  </div>
+                  <div className='form-group has-feedback'>
+                    <label className='col-sm-3 control-label'>
+                      소셜계정 로그인
+                    </label>
+                    <div className='col-sm-8'>
+                      <button className='btn btn-animated facebook btn-block' onClick={this._handleOnClickLoginWithFacebook} >
+                        페이스북계정으로 로그인 <i className='pl-10 fa fa-facebook-square' />
+                      </button>
+                      {/* <button className='btn btn-animated kakao btn-block'
+                        style={{
+                          backgroundColor: '#ffcc00', borderColor: '#ffcc00', color: '#422d00'
+                        }}
+                        onClick={this._handleOnClickLoginWithKakao}
+                      >
+                        카카오계정으로 로그인 <i className='pl-10 fa fa-comment' />
+                      </button> */}
+                      <div id='naver_id_login' style={{ display: 'none' }}></div>
+                      <button className='btn btn-animated naver btn-block' onClick={this._handleOnClickLoginWithNaver}
+                        style={{
+                          backgroundColor: '#34b700', borderColor: '#34b700', color: '#ffffff'
+                        }}
+                      >
+                        네이버계정으로 로그인 <i style={{ fontFamily: 'Archivo Black', lineHeight: '32px', fontStyle: 'normal' }}>N</i>
+                      </button>
                     </div>
                   </div>
                   <div className='form-group'>
