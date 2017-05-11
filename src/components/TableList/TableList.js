@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react'
 import Loading from 'components/Loading'
 import Button from 'components/Button'
+import keygen from 'keygenerator'
 
 class TableList extends React.Component {
   constructor (props) {
@@ -37,14 +38,14 @@ class TableList extends React.Component {
           return element.map(elem => {
             idx++
             return (
-              <td className={`${align()} ${hide()}`}>
+              <td key={keygen._()} className={`${align()} ${hide()}`}>
                 {elem}
               </td>
             )
           })
         }
         return (
-          <tr>
+          <tr key={keygen._()}>
             {renderElement()}
           </tr>
         )

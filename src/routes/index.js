@@ -10,6 +10,7 @@ import NotFound from './NotFound'
 import Cart from './Cart'
 import OrderComplete from './OrderComplete'
 import MyPage from './MyPage'
+import News from './News'
 
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
@@ -27,6 +28,7 @@ export const createRoutes = (store) => ({
     Cart(store),
     OrderComplete(store),
     MyPage(store),
+    News(store),
     // 이곳에 추가해야 함
     NotFound(store)
   ]

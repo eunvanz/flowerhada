@@ -9,6 +9,7 @@ import orderReducer from './order'
 import inquiryReducer from './inquiry'
 import messageModalReducer from './messageModal'
 import socialReducer from './social'
+import boardReducer from './board'
 
 export const makeRootReducer = (asyncReducers) => {
   return combineReducers({
@@ -22,6 +23,7 @@ export const makeRootReducer = (asyncReducers) => {
     inquiry: inquiryReducer,
     messageModal: messageModalReducer,
     social: socialReducer,
+    board: boardReducer,
     ...asyncReducers
   })
 }

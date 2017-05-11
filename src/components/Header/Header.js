@@ -424,18 +424,23 @@ class Header extends React.Component {
                                 갤러리
                               </Link>
                             </li> */}
-                            <li className='dropdown'>
-                              <Link to='/lessons' className='dropdown-toggle' data-toggle='dropdown'>
-                                hada STORY
+                            <li
+                              // className='dropdown'
+                            >
+                              <Link to='/news' onClick={this._collapsNav}
+                                // className='dropdown-toggle'
+                                // data-toggle='dropdown'
+                              >
+                                hada NEWS
                               </Link>
-                              <ul className='dropdown-menu'>
+                              {/* <ul className='dropdown-menu'>
                                 <li>
                                   <Link to='/lessons/hobby' onClick={this._collapseNav}>브랜드 스토리</Link>
                                 </li>
                                 <li>
                                   <Link to='/lessons/business' onClick={this._collapseNav}>hada NEWS</Link>
                                 </li>
-                              </ul>
+                              </ul> */}
                             </li>
                             <li>
                               <a id='inquiryBtn' onClick={this._handleOnClickInquiry} style={{ cursor: 'pointer' }}>

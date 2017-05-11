@@ -14,6 +14,7 @@ import MessageModal from 'components/MessageModal'
 import PhoneNumberInput from 'components/PhoneNumberInput'
 import CustomModal from 'components/CustomModal'
 import { getAddressHistoryByUserId } from 'common/AddressHistoryService'
+import { updateUser } from 'common/UserService'
 import { postError } from 'common/ErrorService'
 
 class CartView extends React.Component {
@@ -41,7 +42,8 @@ class CartView extends React.Component {
       recentAddress: [],
       same: false,
       orderProcess: false,
-      anonymous: false
+      anonymous: false,
+      savePhoneNumber: false
     }
     this._handleOnClickDelete = this._handleOnClickDelete.bind(this)
     this._handleOnChangeQuantity = this._handleOnChangeQuantity.bind(this)
@@ -165,6 +167,7 @@ class CartView extends React.Component {
 
       const orderTransaction = {}
       orderTransaction.userId = this.props.user.id
+
       // Order post
       const order = {}
       order.paymentMethod = this.state.paymentMethod
@@ -279,6 +282,11 @@ class CartView extends React.Component {
       this.props.receiveOrderTransaction(orderTransaction)
 
       if (this._isValid()) {
+        // 휴대폰번호 저장
+        if (this.state.savePhoneNumber) {
+          const user = Object.assign({}, this.props.user, { phone: this.props.orderItem.product ? assemblePhoneNumber(this.state.senderPhoneNumber) : assemblePhoneNumber(this.state.studentPhoneNumbers[0]), regDate: null })
+          updateUser(user)
+        }
         const settings = {
           pg: isIE() ? 'inicis' : 'html5_inicis',
           pay_method: this.state.paymentMethod,
@@ -660,8 +668,8 @@ class CartView extends React.Component {
                   <input type='text' className='form-control' id='receiver' placeholder='실명을 입력해주세요.'
                     value={this.state.receiver} onChange={this._handleOnChangeInput} />
                   <label style={{ marginLeft: '5px' }}>
-                    <input type='checkbox' checked={this.state.same}
-                      onChange={this._handleOnChangeSameReceiver} /> 발신인과 동일
+                    <input type='checkbox' checked={this.state.same} id='same'
+                      onChange={this._handleOnChangeSameReceiver} /> <label htmlFor='same'>발신인과 동일</label>
                   </label>
                 </div>
               </div>
@@ -753,6 +761,12 @@ class CartView extends React.Component {
                   onChange={this._handleOnChangeStudentPhoneNumber}
                   seq={i}
                 />
+                {i === 0 && !this.props.user.phone &&
+                  <p style={{ marginTop: '5px', marginLeft: '5px' }}>
+                    <input type='checkbox' checked={this.state.savePhoneNumber} id='save-default'
+                      onChange={() => this.setState({ savePhoneNumber: !this.state.savePhoneNumber })} /> <label htmlFor='save-default'> 내 휴대폰번호로 등록</label>
+                  </p>
+                }
               </div>
             </div>
           </div>
@@ -810,8 +824,8 @@ class CartView extends React.Component {
                 <div className='col-md-10 form-inline'>
                   <input type='text' className='form-control' id='sender'
                     value={this.state.anonymous ? '익명' : this.state.sender} onChange={this._handleOnChangeInput} />
-                  <input type='checkbox' checked={this.state.anonymous} style={{ marginLeft: '5px' }}
-                    onChange={() => this.setState({ anonymous: !this.state.anonymous })} /> 익명으로 보내기
+                  <input type='checkbox' checked={this.state.anonymous} style={{ marginLeft: '5px' }} id='anonymous'
+                    onChange={() => this.setState({ anonymous: !this.state.anonymous })} /> <label htmlFor='anonymous'>익명으로 보내기</label>
                 </div>
               </div>
               <div className='form-group'>
@@ -834,6 +848,13 @@ class CartView extends React.Component {
                   <input type='text' className='form-control' data-index={2} style={{ width: '80px', display: 'inline' }}
                     maxLength='4' pattern='[0-9]{4}'
                     value={this.state.senderPhoneNumber[2]} onChange={this._handleOnChangeSenderPhoneNumber} />
+                  {
+                    !this.props.user.phone &&
+                    <p style={{ marginTop: '5px', marginLeft: '5px' }}>
+                      <input type='checkbox' checked={this.state.savePhoneNumber} id='save-default'
+                        onChange={() => this.setState({ savePhoneNumber: !this.state.savePhoneNumber })} /> <label htmlFor='save-default'> 내 휴대폰번호로 등록</label>
+                    </p>
+                  }
                 </div>
               </div>
               {renderMessageForm()}

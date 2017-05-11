@@ -9,6 +9,7 @@ class Parallax extends React.Component {
         className='dark-translucent-bg'
         strength={isMobile.any() ? 50 : 300}
         bgImage={this.props.backgroundImage}
+        blur={5}
       >
         <div className='container' style={{ paddingTop: '30px', paddingBottom: '30px' }}>
           <div className='row'>

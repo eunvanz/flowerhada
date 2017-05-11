@@ -267,7 +267,7 @@
 			// console.log($('.slider-banner-container .slider-banner-fullwidth-big-height'))
 
 			var bannerDiv = $('.slider-banner-container .slider-banner-fullwidth-big-height');
-			if (bannerDiv.length > 0) {
+			if (bannerDiv.length > 0 && bannerDiv.revolution) {
 				bannerDiv.show().revolution({
 					delay:8000,
 					startwidth:1140,

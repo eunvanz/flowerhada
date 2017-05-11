@@ -52,19 +52,45 @@ tinymce.init({
     // just in case, and visually hide it. And do not forget do remove it
     // once you do not need it anymore.
 
+    // input.onchange = function () {
+    //   var file = this.files[0]
+    //
+    //   // Note: Now we need to register the blob in TinyMCEs image blob
+    //   // registry. In the next release this part hopefully won't be
+    //   // necessary, as we are looking to handle it internally.
+    //   var id = 'blobid' + (new Date()).getTime()
+    //   console.log('blobid', id)
+    //   var blobCache = tinymce.activeEditor.editorUpload.blobCache
+    //   console.log('blobCache', blobCache)
+    //   console.log('file', file)
+    //   var blobInfo = blobCache.create(id, file)
+    //   blobCache.add(blobInfo)
+    //   console.log('filename', file.name)
+    //   console.log('blobinfo', blobInfo)
+    //
+    //   // call the callback and populate the Title field with the file name
+    //   cb(blobInfo.blobUri(), { title: file.name })
+    // }
+    //
+    // input.click()
+
     input.onchange = function () {
       var file = this.files[0]
 
-      // Note: Now we need to register the blob in TinyMCEs image blob
-      // registry. In the next release this part hopefully won't be
-      // necessary, as we are looking to handle it internally.
-      var id = 'blobid' + (new Date()).getTime()
-      var blobCache = tinymce.activeEditor.editorUpload.blobCache
-      var blobInfo = blobCache.create(id, file)
-      blobCache.add(blobInfo)
+      var reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = function () {
+        // Note: Now we need to register the blob in TinyMCEs image blob
+        // registry. In the next release this part hopefully won't be
+        // necessary, as we are looking to handle it internally.
+        var id = 'blobid' + (new Date()).getTime()
+        var blobCache =  tinymce.activeEditor.editorUpload.blobCache
+        var blobInfo = blobCache.create(id, file, reader.result)
+        blobCache.add(blobInfo)
 
-      // call the callback and populate the Title field with the file name
-      cb(blobInfo.blobUri(), { title: file.name })
+        // call the callback and populate the Title field with the file name
+        cb(blobInfo.blobUri(), { title: file.name })
+      }
     }
 
     input.click()

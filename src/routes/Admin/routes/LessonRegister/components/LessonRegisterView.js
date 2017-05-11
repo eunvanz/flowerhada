@@ -73,12 +73,12 @@ class LessonListView extends React.Component {
           lessonTimes: this.state.lessonDays.length
         })
         $('#content').val(this.state.content)
-        const scripts = ['//cdn.tinymce.com/4/tinymce.min.js',
+        const scripts = ['//cdn.tinymce.com/4/tinymce.js',
           '/template/js/inline-lesson-register-view.js']
         setInlineScripts(scripts)
       })
     } else {
-      const scripts = ['//cdn.tinymce.com/4/tinymce.min.js',
+      const scripts = ['//cdn.tinymce.com/4/tinymce.js',
         '/template/js/inline-lesson-register-view.js']
       setInlineScripts(scripts)
     }

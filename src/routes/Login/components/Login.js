@@ -7,7 +7,7 @@ import $ from 'jquery'
 import FindPasswordModal from 'components/FindPasswordModal'
 import Button from 'components/Button'
 import { NAVER_CLIENT_ID, SOCIAL_LOGIN_CALLBACK_URL, SOCIAL_PASSWORD } from 'common/constants'
-import { getUserByEmailAndSocialType, signUp } from 'common/UserService'
+import { getUserByEmailAndSocialType, signUp, updateUser } from 'common/UserService'
 import { Facebook } from 'common/socialUtil'
 
 class Login extends React.Component {
@@ -70,7 +70,7 @@ class Login extends React.Component {
           if (data && data !== '') {
             // console.log('로그인처리')
             // 로그인처리
-            const userInfo = { email, password: SOCIAL_PASSWORD }
+            const userInfo = { email, password: SOCIAL_PASSWORD, name, image }
             this._loginProcess(userInfo, socialType)
           } else {
             // console.log('회원가입처리')
@@ -122,11 +122,22 @@ class Login extends React.Component {
       return this.props.fetchUser(this.props.authUser.data.id)
     })
     .then(() => {
+      if (this.props.user.socialType && (this.props.user.name !== userInfo.name || this.props.user.image !== userInfo.image)) {
+        const user = Object.assign({}, this.props.user, { name: userInfo.name, image: userInfo.image, regDate: null })
+        return updateUser(user)
+        .then(() => {
+          return this.props.fetchUser(this.props.authUser.data.id)
+        })
+      } else {
+        return Promise.resolve()
+      }
+    })
+    .then(() => {
       return this.props.fetchCartsByUserId(this.props.user.id)
     })
     .then(() => {
       this.setState({ process: false })
-      if (socialType) {
+      if (socialType === 'naver') {
         this.context.router.push('/')
       } else {
         this.context.router.goBack()

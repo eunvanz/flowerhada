@@ -34,7 +34,7 @@ export const Facebook = {
             if (data && data !== '') {
               // console.log('로그인처리')
               // 로그인처리
-              const userInfo = { email, password: SOCIAL_PASSWORD }
+              const userInfo = { email, password: SOCIAL_PASSWORD, image, name }
               loginProcess(userInfo, 'facebook')
             } else {
               // console.log('회원가입처리')

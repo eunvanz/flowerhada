@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react'
-import { imgRoute } from 'common/constants'
 import { shortenContent, maskName, convertSqlDateToString } from 'common/util'
 import CommentModal from 'components/CommentModal'
 import keygen from 'keygenerator'
