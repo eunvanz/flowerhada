@@ -168,7 +168,6 @@ class MyPageView extends React.Component {
       login(userInfo)
       .then(() => {
         user.password = this.state.newPassword
-        console.log(user)
         return updateUser(user)
       })
       .then(() => {

@@ -55,11 +55,11 @@ class ItemListView extends React.Component {
     const renderDescription = () => {
       let returnComponent = null
       if (type === 'lesson') {
-        returnComponent = <span>내 손으로 만드는 유러피안 스타일 작품</span>
+        returnComponent = <span>유러피안 감성의 작품들을 직접 만들어보세요. 출장레슨 신청은 언제나 환영입니다.</span>
       } else if (type === 'flower') {
-        returnComponent = <span>주문과 함께 만들어지는 싱싱한 꽃다발</span>
+        returnComponent = <span>꽃하다는 꽃다발 주문 이후 꽃시장에서 장을 보기 때문에, 가장 신선한 상태의 꽃다발을 받아보실 수 있습니다.</span>
       } else if (type === 'wedding') {
-        returnComponent = <span>꽃하다가 제안하는 웨딩솔루션</span>
+        returnComponent = <span>꽃하다가 제안하는 웨딩 & 파티 솔루션으로 더욱 반짝이는 추억을 만들어 보세요.</span>
       }
       return returnComponent
     }
@@ -68,6 +68,8 @@ class ItemListView extends React.Component {
         return ['전체', '원데이레슨', '취미반', '창업반', '웨딩반']
       } else if (type === 'flower') {
         return ['전체', '단체꽃다발', '이벤트꽃다발']
+      } else if (type === 'wedding') {
+        return ['전체', '부케', '공간장식']
       }
     }
     const setTabIcons = () => {
@@ -75,6 +77,8 @@ class ItemListView extends React.Component {
         return ['fa fa-list', 'fa fa-scissors', 'fa fa-heart', 'fa fa-graduation-cap', 'fa fa-diamond']
       } else if (type === 'flower') {
         return ['fa fa-list', 'fa fa-users', 'fa fa-gift']
+      } else if (type === 'wedding') {
+        return ['fa fa-list', 'fa fa-asterisk', 'fa fa-glass']
       }
     }
     const setTabLinks = () => {
@@ -83,6 +87,8 @@ class ItemListView extends React.Component {
           '/item-list/lesson/취미반', '/item-list/lesson/창업반', '/item-list/lesson/웨딩반']
       } else if (type === 'flower') {
         return ['/item-list/flower/all', '/item-list/flower/단체꽃다발', '/item-list/flower/이벤트꽃다발']
+      } else if (type === 'wedding') {
+        return ['/item-list/wedding/all', '/item-list/wedding/부케', '/item-list/wedding/공간장식']
       }
     }
     const filterItems = () => {
@@ -108,7 +114,7 @@ class ItemListView extends React.Component {
       }
     }
     const renderNavigation = () => {
-      if (type === 'lesson' || type === 'flower') {
+      if (type === 'lesson' || type === 'flower' || type === 'wedding') {
         return (
           <Navigation
             tabTitles={setTabTitles()}

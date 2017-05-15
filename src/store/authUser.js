@@ -29,9 +29,9 @@ export const fetchAuthUser = (email, password) => {
     return getUserByEmailAndSocialType(email, null)
     .then(res => {
       let { data } = res
-      console.log('res', res)
-      console.log('password', password)
-      console.log('data', data)
+      // console.log('res', res)
+      // console.log('password', password)
+      // console.log('data', data)
       data.password = password
       return login(data)
     })

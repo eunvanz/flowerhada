@@ -122,8 +122,8 @@ class Login extends React.Component {
       return this.props.fetchUser(this.props.authUser.data.id)
     })
     .then(() => {
-      if (this.props.user.socialType && (this.props.user.name !== userInfo.name || this.props.user.image !== userInfo.image)) {
-        const user = Object.assign({}, this.props.user, { name: userInfo.name, image: userInfo.image, regDate: null })
+      if (this.props.user.socialType && (this.props.user.image !== userInfo.image)) {
+        const user = Object.assign({}, this.props.user, { image: userInfo.image, regDate: null })
         return updateUser(user)
         .then(() => {
           return this.props.fetchUser(this.props.authUser.data.id)

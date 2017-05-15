@@ -411,7 +411,7 @@ class Header extends React.Component {
                             </li>
                             <li>
                               <Link to='/item-list/wedding/all' onClick={this._collapseNav}>
-                                웨딩
+                                웨딩 & 파티
                               </Link>
                             </li>
                             {/* <li>
@@ -427,7 +427,7 @@ class Header extends React.Component {
                             <li
                               // className='dropdown'
                             >
-                              <Link to='/news' onClick={this._collapsNav}
+                              <Link to='/news' onClick={this._collapseNav}
                                 // className='dropdown-toggle'
                                 // data-toggle='dropdown'
                               >

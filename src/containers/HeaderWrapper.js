@@ -8,9 +8,6 @@ export default (ComposedComponent, store) => {
       super(props)
       this.displayName = 'HeaderWrapper'
     }
-    componentDidMount () {
-      console.log('wrapper')
-    }
     render () {
       return (
         <div>

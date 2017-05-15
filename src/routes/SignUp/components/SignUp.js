@@ -1,7 +1,7 @@
 import React from 'react'
 import backgroundImage from '../assets/images/background.jpg'
 import { setInlineScripts, assemblePhoneNumber, handleOnChangePhone } from 'common/util'
-import { signUp, checkDupEmail } from 'common/UserService'
+import { signUp, checkDupEmail, updateUser } from 'common/UserService'
 import MessageModal from 'components/MessageModal'
 import validator from 'validator'
 import $ from 'jquery'
@@ -99,7 +99,7 @@ class SignUp extends React.Component {
       }
       signUp(userInfo)
       .then((res) => {
-        console.log('res', res)
+        // console.log('res', res)
         return this.props.fetchAuthUser(userInfo.email, userInfo.password)
       })
       .then((res) => {
@@ -122,6 +122,17 @@ class SignUp extends React.Component {
     })
     .then(() => {
       return this.props.fetchUser(this.props.authUser.data.id)
+    })
+    .then(() => {
+      if (this.props.user.socialType && (this.props.user.image !== userInfo.image)) {
+        const user = Object.assign({}, this.props.user, { image: userInfo.image, regDate: null })
+        return updateUser(user)
+        .then(() => {
+          return this.props.fetchUser(this.props.authUser.data.id)
+        })
+      } else {
+        return Promise.resolve()
+      }
     })
     .then(() => {
       return this.props.fetchCartsByUserId(this.props.user.id)
@@ -195,7 +206,6 @@ class SignUp extends React.Component {
     if (message !== '') {
       this._showErrorMessage($('#formGroupPasswordConfirm'), $('#formGroupPasswordConfirm i'),
         $('#formGroupPasswordConfirm .message'), message)
-      $('#inputPasswordConfirm').focus()
       return false
     } else {
       this._convertSuccessForm($('#formGroupPasswordConfirm'), $('#formGroupPasswordConfirm i'),

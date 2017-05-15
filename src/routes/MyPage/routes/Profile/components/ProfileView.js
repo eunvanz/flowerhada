@@ -260,7 +260,7 @@ class ProfileView extends React.Component {
             </div>
             <div className='form-group has-feedback' id='formGroupPhone'>
               <label htmlFor='inputPhone' className='col-sm-2 control-label'>
-                휴대폰 번호
+                휴대폰번호
               </label>
               <div className='col-sm-8'>
                 <PhoneNumberInput
@@ -270,7 +270,7 @@ class ProfileView extends React.Component {
                   onChange={this._handleOnChangePhone}
                   onBlur={this._checkPhoneField}
                 />
-                <div className='text-right small message' />
+                <div className='text-right small message' style={{ width: '258px' }} />
               </div>
             </div>
             {!user.socialType &&
