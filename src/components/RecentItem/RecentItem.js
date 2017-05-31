@@ -25,7 +25,7 @@ class RecentItem extends React.Component {
                 {item.type === 'lesson' ? '플라워레슨' : item.mainCategory} <i className='fa fa-angle-right' /> {item.type === 'lesson' ? item.mainCategory : item.subCategory}
               </small>
             </p>
-            <p className='price' style={{ marginBottom: '0px' }}>￦{numeral(item.price).format('0,0')}</p>
+            <p className='price' style={{ marginBottom: '0px' }}>￦{item.price === 0 ? '별도 문의' : numeral(item.price).format('0,0')}</p>
           </div>
         </div>
       )

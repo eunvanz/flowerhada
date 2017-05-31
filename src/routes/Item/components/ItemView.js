@@ -70,6 +70,7 @@ class ItemView extends React.Component {
     this._reviewSubmitAuthorityValidator = this._reviewSubmitAuthorityValidator.bind(this)
     this._changeFlagRecursively = this._changeFlagRecursively.bind(this)
     this._handleOnBlurQuantity = this._handleOnBlurQuantity.bind(this)
+    this._handleOnClickInquiry = this._handleOnClickInquiry.bind(this)
   }
   componentDidMount () {
     window.scrollTo(0, 0)
@@ -456,6 +457,34 @@ class ItemView extends React.Component {
     if (quantity < 1) quantity = 1
     this.setState({ quantity })
   }
+  _handleOnClickInquiry () {
+    const inquiryModal = {
+      mode: 'post',
+      defaultCategory: '기타',
+      inquiry: {
+        title: `${this.props.item.title} 관련 문의`,
+        content:
+`상품명 : ${this.props.item.title}
+신청자이름 : ${this.props.user ? this.props.user.name : ''}
+연락처 : ${this.props.user ? this.props.user.phone : ''}
+문의내용: `
+      },
+      afterSubmit: () => {
+        const messageModal = {
+          show: true,
+          message: '문의가 완료되었습니다. 빠른 시일내에 답변드리겠습니다.',
+          cancelBtnTxt: null,
+          confirmBtnTxt: '확인',
+          onConfirmClick: () => this.props.setMessageModalShow(false),
+          process: false
+        }
+        this.props.setMessageModal(messageModal)
+      },
+      show: true,
+      process: false
+    }
+    this.props.setInquiryModal(inquiryModal)
+  }
   render () {
     const { type } = this.props.params
     const { item } = this.props
@@ -728,6 +757,8 @@ class ItemView extends React.Component {
             </tbody>
           </table>
         )
+      } else if (item.subCategory === '공간장식') {
+        return null
       }
     }
     const renderLessonQuantity = () => {
@@ -779,6 +810,15 @@ class ItemView extends React.Component {
         return <Alert type='warning' text='일시적으로 품절된 상품입니다. 다음 번엔 좀 더 서두르세요!' />
       } else if (type === 'lesson' && item.maxParty <= item.currParty) {
         return <Alert type='warning' text='인원이 모두 차버렸네요. 다른 레슨을 찾아보세요.' />
+      } else if (!item.price || item.price === 0) {
+        return <Alert type='info' text='개별적으로 문의가 필요한 상품입니다.' button={
+          <Button
+            textComponent={<span>1:1 문의하기</span>}
+            size='sm'
+            color='dark'
+            onClick={this._handleOnClickInquiry}
+          />
+        } />
       } else {
         /* eslint-disable */
         return (

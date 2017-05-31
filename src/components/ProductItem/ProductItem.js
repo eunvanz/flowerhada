@@ -68,6 +68,10 @@ class ProductItem extends React.Component {
             <del>￦{`${numeral(item.price).format('0,0')}`}</del> ￦<span>{`${numeral(item.discountedPrice).format('0,0')}`}</span>
           </span>
         )
+      } else if (item.price === 0) {
+        returnComponent = (
+          <span className='price'>￦ 별도문의</span>
+        )
       } else {
         returnComponent = (
           <span className='price'>￦<span>{`${numeral(item.price).format('0,0')}`}</span></span>

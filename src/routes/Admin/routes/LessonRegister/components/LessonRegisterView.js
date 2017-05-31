@@ -17,7 +17,7 @@ class LessonListView extends React.Component {
     this.state = {
       title: '',
       detail: '',
-      mainCategory: '',
+      mainCategory: '분류선택',
       subCategory: '',
       oneday: '',
       content: '내용을 입력해주세요.',
@@ -28,7 +28,7 @@ class LessonListView extends React.Component {
       latitude: '',
       longitude: '',
       maxParty: '',
-      currParty: '',
+      currParty: '0',
       titleImg: '',
       price: '',
       discountedPrice: '',
@@ -59,6 +59,7 @@ class LessonListView extends React.Component {
     this._handleOnChangeLessonDay = this._handleOnChangeLessonDay.bind(this)
     this._handleOnClickSubmit = this._handleOnClickSubmit.bind(this)
     this._handleOnClickDelete = this._handleOnClickDelete.bind(this)
+    this._isValidForm = this._isValidForm.bind(this)
   }
   componentDidMount () {
     if (this.state.mode === 'update') {
@@ -88,7 +89,20 @@ class LessonListView extends React.Component {
   }
   _handleOnChangeInput (e) {
     e.preventDefault()
-    this.setState({ [e.target.id]: e.target.value })
+    const { id, value } = e.target
+    if (id === 'mainCategory') {
+      if (value === '원데이레슨') {
+        this.setState({ oneday: true })
+      } else {
+        this.setState({ oneday: false })
+      }
+    } else if (id === 'price') {
+      if (this.state.discountedPrice === '' || this.state.discountedPrice === value.slice(0, -1) ||
+        this.state.discountedPrice.slice(0, -1) === value) {
+        this.setState({ discountedPrice: value })
+      }
+    }
+    this.setState({ [id]: value })
   }
   _handleOnChangeCheckbox (e) {
     this.setState({ [e.target.id]: e.target.checked })
@@ -165,15 +179,41 @@ class LessonListView extends React.Component {
     }
     this.setState({ [e.target.id]: e.target.value })
   }
+  _isValidForm () {
+    let message = ''
+    const { title, detail, mainCategory, location, postCode, address,
+      latitude, longitude, maxParty, currParty, price, discountedPrice, lessonDate } = this.state
+    const titleImage = document.getElementById('titleImg').files[0] || this.props.lesson
+    if (title === '') message = '레슨제목을 입력해주세요.'
+    else if (detail === '') message = '레슨설명을 입력해주세요.'
+    else if (mainCategory === '분류선택') message = '분류를 선택해주세요.'
+    else if (location === '') message = '지역을 선택해주세요.'
+    else if (postCode === '') message = '우편번호를 입력해주세요.'
+    else if (address === '') message = '주소를 입력해주세요.'
+    else if (latitude === '' || longitude === '') message = '우편번호를 다시 한 번 선택해주세요.'
+    else if (maxParty === '') message = '최대인원을 입력해주세요.'
+    else if (currParty === '') message = '현재인원을 입력해주세요.'
+    else if (!titleImage) message = '대표이미지를 선택해주세요.'
+    else if (price === '') message = '가격을 입력해주세요.'
+    else if (discountedPrice === '') message = '할인가를 입력해주세요.'
+    else if (lessonDate === '') message = '레슨시작일(레슨날짜)을 입력해주세요.'
+    if (message !== '') {
+      alert(message)
+      return false
+    }
+    return true
+  }
   _handleOnClickSubmit (e) {
     e.preventDefault()
+    if (!this._isValidForm()) return
+    this.setState({ process: true })
     const lesson = new URLSearchParams()
     lesson.append('title', $('#title').val())
     lesson.append('detail', $('#detail').val())
     lesson.append('mainCategory', $('#mainCategory').val())
     lesson.append('subCategory', $('#subCategory').val())
-    lesson.append('groupName', $('#groupName').val())
-    lesson.append('oneday', $('#oneday').prop('checked'))
+    lesson.append('groupName', $('#groupName').val() === '' ? this.state.title : this.state.groupName)
+    lesson.append('oneday', this.state.oneday)
     lesson.append('location', $('#location').val())
     lesson.append('postCode', $('#postCode').val())
     lesson.append('address', $('#address').val())
@@ -205,7 +245,7 @@ class LessonListView extends React.Component {
     } else {
       postImage = file ? () => postLessonImage(file) : Promise.resolve()
     }
-    postImage
+    postImage()
     .then(res => {
       if (res) {
         const imgUrl = res.data.data.link
@@ -292,13 +332,13 @@ class LessonListView extends React.Component {
             var lng = result.addr[0].lng
             latitude.value = lat
             longitude.value = lng
+            view.setState({
+              postCode: postCode.value,
+              address: address.value,
+              latitude: latitude.value,
+              longitude: longitude.value
+            })
           }
-        })
-        view.setState({
-          postCode: postCode.value,
-          address: address.value,
-          latitude: latitude.value,
-          longitude: longitude.value
         })
 
         // iframe을 넣은 element를 안보이게 한다.
@@ -417,20 +457,24 @@ class LessonListView extends React.Component {
           </div>
           <div className='form-group'>
             <label htmlFor='mainCategory'>메인카테고리</label>
-            <input type='text' className='form-control'
-              id='mainCategory' onChange={this._handleOnChangeInput}
-              value={this.state.mainCategory} />
+            <select className='form-control' id='mainCategory'
+              onChange={this._handleOnChangeInput} value={this.state.mainCategory}>
+              <option value='분류선택' disabled>분류선택</option>
+              <option value='취미반'>취미반</option>
+              <option value='창업반'>창업반</option>
+              <option value='원데이레슨'>원데이레슨</option>
+            </select>
           </div>
-          <div className='form-group'>
+          {/* <div className='form-group'>
             <label htmlFor='subCategory'>서브카테고리</label>
             <input type='text' className='form-control'
               id='subCategory' onChange={this._handleOnChangeInput}
               value={this.state.subCategory} />
-          </div>
+          </div> */}
           <div className='form-group'>
             <label htmlFor='groupName'>그룹이름</label>
             <input type='text' className='form-control'
-              id='groupName' onChange={this._handleOnChangeInput}
+              id='groupName' onChange={this._handleOnChangeInput} placeholder='입력하지 않을 경우 레슨제목과 같음'
               value={this.state.groupName} />
           </div>
           <div className='form-group'>
@@ -496,17 +540,17 @@ class LessonListView extends React.Component {
           />
           <TextField
             id='discountedPrice'
-            label='할인가'
+            label='할인가 (할인해서 판매할 경우만 수정, 할인 안할 경우 가격과 같음)'
             onChange={this._handleOnChangeInput}
             value={this.state.discountedPrice}
             type='number'
           />
-          <Checkbox
+          {/* <Checkbox
             id='oneday'
             onChange={this._handleOnChangeCheckbox}
             checked={this.state.oneday ? 'checked' : ''}
             label='원데이레슨'
-          />
+          /> */}
           <label htmlFor='lessonDate'>{this.state.oneday ? '레슨날짜' : '레슨시작일'}</label>
           <DatePicker
             id='lessonDate'

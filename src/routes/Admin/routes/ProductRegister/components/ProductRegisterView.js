@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router'
-import { setInlineScripts, removeEmptyIndex } from 'common/util'
+import { setInlineScripts } from 'common/util'
 import Button from 'components/Button'
 import TextField from 'components/TextField'
 import Checkbox from 'components/Checkbox'
@@ -14,7 +14,7 @@ class ProductListView extends React.Component {
     this.state = {
       title: '',
       detail: '',
-      mainCategory: '',
+      mainCategory: '꽃다발',
       subCategory: '',
       content: '내용을 입력해주세요.',
       // titleImg: '',
@@ -33,6 +33,7 @@ class ProductListView extends React.Component {
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
     this._handleOnClickSubmit = this._handleOnClickSubmit.bind(this)
     this._handleOnClickDelete = this._handleOnClickDelete.bind(this)
+    this._isValidForm = this._isValidForm.bind(this)
     // this._handleOnChangeImage = this._handleOnChangeImage.bind(this)
   }
   componentDidMount () {
@@ -56,17 +57,39 @@ class ProductListView extends React.Component {
   }
   _handleOnChangeInput (e) {
     e.preventDefault()
-    this.setState({ [e.target.id]: e.target.value })
-    // if (e.target.id === 'titleImg') {
-    //   const images = this.state.images.slice(0)
-    //   images[0] = e.target.value
-    //   this.setState({ images })
-    // }
+    const { id, value } = e.target
+    if (id === 'price') {
+      if (this.state.discountedPrice === '' || this.state.discountedPrice === value.slice(0, -1) ||
+        this.state.discountedPrice.slice(0, -1) === value) {
+        this.setState({ discountedPrice: value })
+      }
+    }
+    this.setState({ [id]: value })
   }
   _handleOnChangeCheckbox (e) {
     this.setState({ [e.target.id]: e.target.checked })
   }
+  _isValidForm () {
+    let message = ''
+    const { title, detail, price, discountedPrice } = this.state
+    const titleImage = document.getElementById('titleImg').files[0] || this.props.product
+    const images1 = document.getElementById('images1').files[0] || this.props.product
+    const images2 = document.getElementById('images2').files[0] || this.props.product
+    const images3 = document.getElementById('images3').files[0] || this.props.product
+    if (title === '') message = '레슨제목을 입력해주세요.'
+    else if (detail === '') message = '레슨설명을 입력해주세요.'
+    else if (!titleImage) message = '대표이미지를 선택해주세요.'
+    else if (!images1 || !images2 || !images3) message = '이미지를 모두 선택해주세요.'
+    else if (price === '') message = '가격을 입력해주세요.'
+    else if (discountedPrice === '') message = '할인가를 입력해주세요.'
+    if (message !== '') {
+      alert(message)
+      return false
+    }
+    return true
+  }
   _handleOnClickSubmit (e) {
+    if (!this._isValidForm()) return
     this.setState({ process: true })
     e.preventDefault()
     const product = new URLSearchParams()
@@ -74,7 +97,7 @@ class ProductListView extends React.Component {
     product.append('detail', $('#detail').val())
     product.append('mainCategory', $('#mainCategory').val())
     product.append('subCategory', $('#subCategory').val())
-    product.append('groupName', $('#groupName').val())
+    product.append('groupName', $('#groupName').val() === '' ? this.state.title : this.state.groupName)
     product.append('relationName', $('#relationName').val())
     product.append('price', $('#price').val())
     product.append('discountedPrice', $('#discountedPrice').val())
@@ -154,6 +177,19 @@ class ProductListView extends React.Component {
   //   this.setState({ images })
   // }
   render () {
+    const renderSubCategory = () => {
+      if (this.state.mainCategory === '꽃다발') {
+        return [
+          <option key='1' value='이벤트꽃다발'>이벤트꽃다발</option>,
+          <option key='2' value='단체꽃다발'>단체꽃다발</option>
+        ]
+      } else if (this.state.mainCategory === '웨딩') {
+        return [
+          <option key='1' value='부케'>부케</option>,
+          <option key='2' value='공간장식'>공간장식</option>
+        ]
+      }
+    }
     return (
       <div>
         <form role='form'>
@@ -173,19 +209,22 @@ class ProductListView extends React.Component {
           </div>
           <div className='form-group'>
             <label htmlFor='mainCategory'>메인카테고리</label>
-            <input type='text' className='form-control'
-              id='mainCategory' onChange={this._handleOnChangeInput}
-              value={this.state.mainCategory} />
+            <select id='mainCategory' className='form-control' style={{ marginRight: '3px' }}
+              onChange={this._handleOnChangeInput} value={this.state.mainCategory}>
+              <option value='꽃다발'>꽃다발</option>
+              <option value='웨딩'>웨딩</option>
+            </select>
           </div>
           <div className='form-group'>
             <label htmlFor='subCategory'>서브카테고리</label>
-            <input type='text' className='form-control'
-              id='subCategory' onChange={this._handleOnChangeInput}
-              value={this.state.subCategory} />
+            <select id='subCategory' className='form-control' style={{ marginRight: '3px' }}
+              onChange={this._handleOnChangeInput} value={this.state.subCategory}>
+              {renderSubCategory()}
+            </select>
           </div>
           <div className='form-group'>
             <label htmlFor='groupName'>그룹이름</label>
-            <input type='text' className='form-control'
+            <input type='text' className='form-control' placeholder='입력하지 않을 경우 상품명과 같음'
               id='groupName' onChange={this._handleOnChangeInput}
               value={this.state.groupName} />
           </div>
@@ -201,28 +240,28 @@ class ProductListView extends React.Component {
             label='대표이미지'
             type='file'
             accept='image/*'
-            imgInfo={this.props.product ? this.props.product.titleImg : null}
+            imgInfo={this.props.product && this.props.product.titleImg ? this.props.product.titleImg : null}
           />
           <TextField
             id='images1'
             label='이미지1'
             type='file'
             accept='image/*'
-            imgInfo={this.props.product ? JSON.parse(this.props.product.images)[1] : null}
+            imgInfo={this.props.product && this.props.product.images ? JSON.parse(this.props.product.images)[1] : null}
           />
           <TextField
             id='images2'
             label='이미지2'
             type='file'
             accept='image/*'
-            imgInfo={this.props.product ? JSON.parse(this.props.product.images)[2] : null}
+            imgInfo={this.props.product && this.props.product.images ? JSON.parse(this.props.product.images)[2] : null}
           />
           <TextField
             id='images3'
             label='이미지3'
             type='file'
             accept='image/*'
-            imgInfo={this.props.product ? JSON.parse(this.props.product.images)[3] : null}
+            imgInfo={this.props.product && this.props.product.images ? JSON.parse(this.props.product.images)[3] : null}
           />
           <TextField
             id='price'

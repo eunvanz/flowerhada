@@ -193,7 +193,7 @@ class ImageCarousel extends React.Component {
             {renderThumbnails()}
           </div>
         </div> */}
-        <div className='row' style={{ marginTop: '10px' }}>
+        <div className='row' style={{ marginTop: '10px', marginRight: '0px', marginLeft: '0px' }}>
           {renderThumbnails()}
         </div>
       </div>

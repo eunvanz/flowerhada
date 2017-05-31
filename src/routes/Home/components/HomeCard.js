@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router'
 import { imgRoute } from '../../../common/constants'
+import { isScreenSize } from 'common/util'
 
 class HomeCard extends React.Component {
   constructor (props) {
@@ -9,7 +10,7 @@ class HomeCard extends React.Component {
   }
   render () {
     return (
-      <div className='col-sm-3'>
+      <div className='col-sm-6 col-md-3' style={{ padding: isScreenSize.xs() ? '0px' : '0px 20px' }}>
         <div className='pv-30 ph-20 feature-box bordered
           shadow text-center object-non-visible animated object-visible fadeInDownSmall'
           data-animation-effect='fadeInDownSmall' data-effect-delay='100'>

@@ -17,6 +17,7 @@ export const orderStatus = ['주문확인중', '배송준비중', '배송완료'
 export const IAMPORT_REST_KEY = '6649166650148853'
 export const IAMPORT_REST_SECRET = 'rjFQ9gKNUeI5TpKquWRiPsGTumjKL2Adlf3vvOjq32vWrgnVdee2GUVbheV2gwgCLj8h8rIbtd8UtwQH'
 
+// export const LOGO_FONT = 'Pacifico'
 // export const LOGO_FONT = 'Niconne'
 export const LOGO_FONT = 'Damion'
 // export const LOGO_FONT = 'Sacramento'
