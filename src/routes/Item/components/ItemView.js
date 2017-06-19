@@ -1110,11 +1110,43 @@ class ItemView extends React.Component {
         </section>
       )
     }
+    const renderTutorSection = () => {
+      return (
+        <section className='section pv-40 stats'>
+          <div className='container'>
+            <div className='row'>
+              <div className='main col-md-12'>
+                <h2 className='page-title'>강사소개</h2>
+                <div className='separator-2' />
+                <div className='image-box team-member style-3-b'>
+                  <div className='row'>
+                    <div className='col-sm-6 col-md-4 col-lg-3'>
+                      <div className='overlay-container overlay-visible'>
+                        <img src={this.props.item.tutor.image} />
+                      </div>
+                    </div>
+                    <div className='col-sm-6 col-md-8 col-lg-9'>
+                      <div className='body'>
+                        <h3 className='title'>{this.props.item.tutor.name} - <small>플로리스트</small></h3>
+                        <div className='separator-2 mt-10' style={{ maxWidth: '300px' }} />
+                        <p style={{ lineHeight: '1.8', fontSize: '17px' }}
+                          dangerouslySetInnerHTML={{ __html: this.props.item.tutor.introduce }} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )
+    }
     const renderPage = () => {
       if (!this.state.loading.isLoading) {
         return (
           <div>
             {renderProductSection()}
+            {this.props.item.tutor && renderTutorSection()}
             {renderPolicySection()}
             {renderTabSection()}
           </div>

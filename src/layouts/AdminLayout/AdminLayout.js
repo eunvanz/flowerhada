@@ -2,10 +2,10 @@ import React, { PropTypes } from 'react'
 import Navigation from 'components/Navigation'
 import { connect } from 'react-redux'
 
-const tabTitles = ['메인배너관리', '레슨관리', '상품관리', '주문관리', '오류관리', '문의관리', '회원관리']
-const tabIcons = ['icon-star', 'icon-star', 'icon-star', 'icon-star', 'icon-star', 'icon-star', 'icon-star']
+const tabTitles = ['메인배너관리', '레슨관리', '상품관리', '주문관리', '오류관리', '문의관리', '회원관리', '강사관리']
+const tabIcons = ['icon-star', 'icon-star', 'icon-star', 'icon-star', 'icon-star', 'icon-star', 'icon-star', 'icon-star']
 const tabLinks = ['/admin/main-banner', '/admin/lesson', '/admin/product', '/admin/order-list', '/admin/error-list',
-  '/admin/inquiry-list', '/admin/user-list']
+  '/admin/inquiry-list', '/admin/user-list', '/admin/tutor']
 
 const mapStateToProps = (state) => ({
   isAdmin: state.authUser.data ? state.authUser.data.authorities.filter(obj => obj.authority === 'ADMIN').length > 0 : false

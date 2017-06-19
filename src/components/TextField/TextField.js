@@ -27,7 +27,7 @@ TextField.propTypes = {
   id: React.PropTypes.string.isRequired,
   label: React.PropTypes.string,
   onChange: React.PropTypes.func,
-  value: React.PropTypes.any.isRequired,
+  value: React.PropTypes.any,
   type: React.PropTypes.string,
   limit: React.PropTypes.number, // 글자수 제한
   length: React.PropTypes.number, // 현재 글자 수

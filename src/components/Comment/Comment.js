@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react'
-import { shortenContent, maskName, convertSqlDateToString } from 'common/util'
+import { shortenContent, convertSqlDateToString } from 'common/util'
 import CommentModal from 'components/CommentModal'
 import keygen from 'keygenerator'
 import Button from 'components/Button'
@@ -184,7 +184,7 @@ class Comment extends React.Component {
         </div>
         <header>
           <h4 style={{ marginTop: '3px' }}>{item.title}</h4>
-          <div className='comment-meta'>작성자 {maskName(item.user.name)} | {convertSqlDateToString(item.regDate)}</div>
+          <div className='comment-meta'>작성자 {item.user.name} | {convertSqlDateToString(item.regDate)}</div>
         </header>
         <div className='comment-content'>
           <div className='comment-body clearfix'>

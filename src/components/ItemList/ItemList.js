@@ -20,7 +20,7 @@ class ItemList extends React.Component {
       return returnComponent
     }
     return (
-      <div className='row masonry-grid-fitrows grid-space-10'>
+      <div className='row masonry-grid grid-space-10'>
         {renderItems()}
       </div>
     )

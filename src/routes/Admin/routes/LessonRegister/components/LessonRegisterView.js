@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router'
 import { setInlineScripts, convertTimeToString,
-  convertRawLessonDaysToLessonDays, sortLessonDaysByDayAsc, convertStringToTime } from 'common/util'
+  convertRawLessonDaysToLessonDays, sortLessonDaysByDayAsc, convertStringToTime, resizeImage } from 'common/util'
 import TextField from 'components/TextField'
 import Checkbox from 'components/Checkbox'
 import DatePicker from 'components/DatePicker'
@@ -10,6 +10,7 @@ import { putLesson, postLesson, deleteLesson, postLessonImage } from 'common/Les
 import { postLessonDay, putLessonDay, deleteLessonDay } from 'common/LessonDayService'
 import $ from 'jquery'
 import Button from 'components/Button'
+import { getAllTutors } from 'common/TutorService'
 
 class LessonListView extends React.Component {
   constructor (props) {
@@ -43,7 +44,9 @@ class LessonListView extends React.Component {
       activated: true,
       groupName: '',
       mode: this.props.params.id === 'register' ? 'register' : 'update',
-      process: false
+      process: false,
+      tutorList: [],
+      tutorId: 1
     }
     this._handleOnChangeCheckbox = this._handleOnChangeCheckbox.bind(this)
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
@@ -83,6 +86,10 @@ class LessonListView extends React.Component {
         '/template/js/inline-lesson-register-view.js']
       setInlineScripts(scripts)
     }
+    getAllTutors().then(res => {
+      const tutorList = res.data
+      this.setState({ tutorList })
+    })
   }
   componentWillUnmount () {
     this.props.clearLesson()
@@ -183,7 +190,8 @@ class LessonListView extends React.Component {
     let message = ''
     const { title, detail, mainCategory, location, postCode, address,
       latitude, longitude, maxParty, currParty, price, discountedPrice, lessonDate } = this.state
-    const titleImage = document.getElementById('titleImg').files[0] || this.props.lesson
+    let titleImage = document.getElementById('titleImg').files[0] || this.props.lesson
+    if (titleImage && titleImage.width !== 800) titleImage = resizeImage(titleImage, 800)
     if (title === '') message = '레슨제목을 입력해주세요.'
     else if (detail === '') message = '레슨설명을 입력해주세요.'
     else if (mainCategory === '분류선택') message = '분류를 선택해주세요.'
@@ -225,6 +233,7 @@ class LessonListView extends React.Component {
     lesson.append('price', $('#price').val())
     lesson.append('discountedPrice', $('#discountedPrice').val())
     lesson.append('lessonDate', this.state.lessonDate)
+    lesson.append('tutorId', this.state.tutorId)
     if (this.state.oneday) {
       lesson.append('startTime', convertTimeToString(this.state.startTime))
       lesson.append('endTime', convertTimeToString(this.state.endTime))
@@ -243,7 +252,7 @@ class LessonListView extends React.Component {
     if (this.state.mode === 'register') {
       postImage = () => postLessonImage(file)
     } else {
-      postImage = file ? () => postLessonImage(file) : Promise.resolve()
+      postImage = file ? () => postLessonImage(file) : () => Promise.resolve()
     }
     postImage()
     .then(res => {
@@ -438,6 +447,13 @@ class LessonListView extends React.Component {
       }
       return returnComponent
     }
+    const renderTutorList = () => {
+      const { tutorList } = this.state
+      if (tutorList.length === 0) return null
+      return tutorList.map(tutor => {
+        return <option key={tutor.id} value={tutor.id}>{tutor.name}</option>
+      })
+    }
     return (
       <div>
         <form role='form'>
@@ -463,6 +479,7 @@ class LessonListView extends React.Component {
               <option value='취미반'>취미반</option>
               <option value='창업반'>창업반</option>
               <option value='원데이레슨'>원데이레슨</option>
+              <option value='웨딩반'>웨딩반</option>
             </select>
           </div>
           {/* <div className='form-group'>
@@ -545,6 +562,13 @@ class LessonListView extends React.Component {
             value={this.state.discountedPrice}
             type='number'
           />
+          <div className='form-group'>
+            <label htmlFor='tutorId'>강사</label>
+            <select id='tutorId' className='form-control' value={this.state.tutorId}
+              onChange={this._handleOnChangeInput}>
+              {renderTutorList()}
+            </select>
+          </div>
           {/* <Checkbox
             id='oneday'
             onChange={this._handleOnChangeCheckbox}

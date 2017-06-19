@@ -72,6 +72,9 @@ class InquiryModal extends React.Component {
     } else if (category === '레슨재개설신청') {
       title = '레슨을 다시 개설해주세요.'
       content = `희망 레슨 : \n희망 지역 : \n희망일 : \n희망 인원 : \n신청자이름 : ${this.props.user ? this.props.user.name : ''}\n연락처 : ${this.props.user ? (this.props.user.phone ? this.props.user.phone : '') : ''}`
+    } else if (category === '공간장식문의') {
+      title = '공간장식 문의드립니다.'
+      content = `행사종류 : \n행사장소 : \n행사날짜 : \n행사규모 : \n문의자이름 : ${this.props.user ? this.props.user.name : ''}\n연락처 : ${this.props.user ? (this.props.user.phone ? this.props.user.phone : '') : ''}`
     } else if (category === '기타') {
       content = `문의 내용 : \n이름 : ${this.props.user ? this.props.user.name : ''}\n연락처 : ${this.props.user ? (this.props.user.phone ? this.props.user.phone : '') : ''}`
     }
@@ -117,6 +120,7 @@ class InquiryModal extends React.Component {
                 <option value='분류선택' disabled>분류선택</option>
                 <option value='출장레슨신청'>출장레슨신청</option>
                 <option value='레슨재개설신청'>레슨재개설신청</option>
+                <option value='공간장식문의'>공간장식문의</option>
                 <option value='기타'>기타</option>
               </select>
               <p />

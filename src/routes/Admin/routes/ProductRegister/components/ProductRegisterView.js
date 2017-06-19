@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router'
-import { setInlineScripts } from 'common/util'
+import { setInlineScripts, resizeImage } from 'common/util'
 import Button from 'components/Button'
 import TextField from 'components/TextField'
 import Checkbox from 'components/Checkbox'
@@ -110,7 +110,8 @@ class ProductListView extends React.Component {
     let action = putProduct
     if (this.state.mode === 'register') action = postProduct
 
-    const titleImgFile = document.getElementById('titleImg').files[0]
+    let titleImgFile = document.getElementById('titleImg').files[0]
+    if (titleImgFile) titleImgFile = resizeImage(titleImgFile, 800)
     const imageFiles = []
     for (let i = 0; i < 3; i++) {
       imageFiles.push(document.getElementById(`images${i + 1}`).files[0])
@@ -118,6 +119,7 @@ class ProductListView extends React.Component {
     const postTitleImg = titleImgFile ? postLessonImage(titleImgFile) : Promise.resolve()
     const postImages = imageFiles.map(imageFile => {
       if (imageFile) {
+        imageFile = resizeImage(imageFile)
         return postLessonImage(imageFile)
       } else {
         return imageFile

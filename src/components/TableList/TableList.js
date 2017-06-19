@@ -21,7 +21,7 @@ class TableList extends React.Component {
   render () {
     const renderHeaders = () => {
       return this.props.headers.map(header => {
-        return <th className='text-center'>{header}</th>
+        return <th key={keygen._()} className='text-center'>{header}</th>
       })
     }
     const renderElements = () => {

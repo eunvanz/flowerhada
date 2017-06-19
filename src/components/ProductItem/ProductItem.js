@@ -165,11 +165,11 @@ class ProductItem extends React.Component {
       }
     }
     return (
-      <div className='col-md-4 masonry-grid-item'>
+      <div className={`col-md-4 masonry-grid-item ${this.props.type === 'lesson' ? this.props.item.mainCategory : this.props.item.subCategory}`}>
         <div className='listing-item white-bg bordered mb-20'>
           <div className='overlay-container'>
             <img src={item.titleImg} />
-            <Link to={`/item/${this.props.type}/${item.id}`} className='overlay-link'>
+            <Link to={this.props.link || `/item/${this.props.type}/${item.id}`} className='overlay-link'>
               <i className='fa fa-search-plus' />
             </Link>
             {renderBadges()}
@@ -183,7 +183,8 @@ class ProductItem extends React.Component {
           <div className='body'>
             {renderCategory()}
             <h3 className='text-default'>
-              <Link to={`/item/${this.props.type}/${item.id}`} className='text-default'>{item.title}</Link>
+              <Link to={this.props.link || `/item/${this.props.type}/${item.id}`}
+                className='text-default'>{item.title}</Link>
             </h3>
             <p>
               {item.detail}
@@ -212,7 +213,8 @@ ProductItem.propTypes = {
   type: React.PropTypes.string.isRequired,
   user: React.PropTypes.object,
   fetchCartsByUserId: React.PropTypes.func.isRequired,
-  cartList: React.PropTypes.array
+  cartList: React.PropTypes.array,
+  link: React.PropTypes.string
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProductItem)

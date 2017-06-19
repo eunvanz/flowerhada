@@ -3,7 +3,7 @@ import validator from 'validator'
 
 export const clearInlineScripts = () => {
   const scriptElements = document.body.getElementsByTagName('SCRIPT')
-  while (scriptElements.length > 14) {
+  while (scriptElements.length > 15) {
     const length = scriptElements.length
     document.body.removeChild(scriptElements[length - 1])
   }
@@ -323,4 +323,12 @@ export const handleOnChangePhone = (e, component, stateName) => {
   if (value.length > 4) value = value.slice(0, 4)
   phone[index] = value
   component.setState({ [stateName]: phone })
+}
+
+export const resizeImage = (image, width) => {
+  const originWidth = image.width
+  const originHeight = image.height
+  image.width = width
+  image.height = originHeight * (width / originWidth)
+  return image
 }

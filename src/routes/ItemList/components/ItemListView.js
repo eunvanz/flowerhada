@@ -9,6 +9,9 @@ class ItemListView extends React.Component {
     super(props)
     this._loadItems = this._loadItems.bind(this)
     this._clearItems = this._clearItems.bind(this)
+    this._applyMasonry = this._applyMasonry.bind(this)
+    this._filter = this._filter.bind(this)
+    this._initMasonry = this._initMasonry.bind(this)
   }
   componentDidMount () {
     this._loadItems()
@@ -17,6 +20,8 @@ class ItemListView extends React.Component {
     if (prevProps.params.type !== this.props.params.type) {
       this._clearItems()
       this._loadItems()
+    } else if (prevProps.params.filter !== this.props.params.filter) {
+      this._filter(this.props.params.filter)
     }
   }
   componentWillUnmount () {
@@ -29,14 +34,33 @@ class ItemListView extends React.Component {
   _loadItems () {
     const { type } = this.props.params
     if (type === 'lesson') {
-      this.props.fetchLessons()
+      this.props.fetchLessons().then(() => this._applyMasonry())
     } else if (type === 'flower') {
-      this.props.fetchProductsByMainCategory('꽃다발')
+      this.props.fetchProductsByMainCategory('꽃다발').then(() => this._initMasonry())
     } else if (type === 'wedding') {
-      this.props.fetchProductsByMainCategory('웨딩')
+      this.props.fetchProductsByMainCategory('웨딩').then(() => this._initMasonry())
     } else {
       this.context.router.push('/not-found')
     }
+  }
+  _initMasonry () {
+    this._applyMasonry()
+    this._filter(this.props.params.filter)
+  }
+  _applyMasonry () {
+    /* eslint-disable */
+    const $ = window.$
+    $('.masonry-grid').isotope({
+    	itemSelector: '.masonry-grid-item',
+    	layoutMode: 'masonry'
+    });
+    /* eslint-enable */
+  }
+  _filter (filter) {
+    const $ = window.$
+    if (filter === 'all') filter = '*'
+    else filter = `.${filter}`
+    $('.masonry-grid').isotope({ filter })
   }
   render () {
     const { type } = this.props.params
@@ -48,7 +72,7 @@ class ItemListView extends React.Component {
       } else if (type === 'flower') {
         returnComponent = <span>꽃다발</span>
       } else if (type === 'wedding') {
-        returnComponent = <span>웨딩</span>
+        returnComponent = <span>웨딩 & 파티</span>
       }
       return returnComponent
     }
@@ -88,20 +112,21 @@ class ItemListView extends React.Component {
       } else if (type === 'flower') {
         return ['/item-list/flower/all', '/item-list/flower/단체꽃다발', '/item-list/flower/이벤트꽃다발']
       } else if (type === 'wedding') {
-        return ['/item-list/wedding/all', '/item-list/wedding/부케', '/item-list/wedding/공간장식']
+        return ['/item-list/wedding/all', '/item-list/wedding/부케', '/party']
       }
     }
     const filterItems = () => {
-      const { type, filter } = this.props.params
+      // const { type, filter } = this.props.params
       return items.filter(item => {
         if (!item.activated) return false
-        else if (type === 'lesson') {
-          if (filter === 'all') return true
-          return item.mainCategory === filter
-        } else {
-          if (filter === 'all') return true
-          return item.subCategory === filter
-        }
+        else return true
+        // else if (type === 'lesson') {
+        //   if (filter === 'all') return true
+        //   return item.mainCategory === filter
+        // } else {
+        //   if (filter === 'all') return true
+        //   return item.subCategory === filter
+        // }
       })
     }
     const renderBackgroundImage = () => {
