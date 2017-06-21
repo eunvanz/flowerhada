@@ -96,6 +96,10 @@ class CoreLayout extends React.Component {
             {
               'rel': 'stylesheet',
               'href': `/template/css/custom.css`
+            },
+            {
+              'rel': 'stylesheet',
+              'href': `https://cdnjs.cloudflare.com/ajax/libs/Swiper/3.4.2/css/swiper.min.css`
             }
           ]}
         />

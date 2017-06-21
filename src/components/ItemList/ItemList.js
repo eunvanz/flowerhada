@@ -2,8 +2,27 @@ import React from 'react'
 import ProductItem from '../ProductItem'
 
 class ItemList extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      loadedItems: 0,
+      fullLoaded: false
+    }
+    this._handleOnLoadItem = this._handleOnLoadItem.bind(this)
+  }
   componentDidMount () {
     window.scrollTo(0, 0)
+  }
+  componentDidUpdate (prevProps, prevState) {
+    if (this.props.onLoad && this.state.loadedItems + 1 === this.props.items.length) {
+      this.props.onLoad()
+    }
+  }
+  _handleOnLoadItem () {
+    this.setState({ loadedItems: this.state.loadedItems + 1 })
+    if (this.state.loadedItems + 1 === this.props.items.length) {
+      this.setState({ fullLoaded: true })
+    }
   }
   render () {
     const renderItems = () => {
@@ -11,7 +30,7 @@ class ItemList extends React.Component {
       const items = this.props.items
       for (const item of items) {
         returnComponent
-        .push(<ProductItem key={item.id} item={item} type={this.props.itemType} />)
+        .push(<ProductItem key={item.id} item={item} type={this.props.itemType} onLoad={this._handleOnLoadItem} />)
       }
       if (returnComponent.length === 0) {
         return <div className='text-center'
@@ -29,7 +48,8 @@ class ItemList extends React.Component {
 
 ItemList.propTypes = {
   items: React.PropTypes.array.isRequired,
-  itemType: React.PropTypes.string.isRequired
+  itemType: React.PropTypes.string.isRequired,
+  onLoad: React.PropTypes.func
 }
 
 export default ItemList

@@ -168,7 +168,7 @@ class ProductItem extends React.Component {
       <div className={`col-md-4 masonry-grid-item ${this.props.type === 'lesson' ? this.props.item.mainCategory : this.props.item.subCategory}`}>
         <div className='listing-item white-bg bordered mb-20'>
           <div className='overlay-container'>
-            <img src={item.titleImg} />
+            <img src={item.titleImg} onLoad={this.props.onLoad} onError={this.props.onLoad} />
             <Link to={this.props.link || `/item/${this.props.type}/${item.id}`} className='overlay-link'>
               <i className='fa fa-search-plus' />
             </Link>
@@ -214,7 +214,8 @@ ProductItem.propTypes = {
   user: React.PropTypes.object,
   fetchCartsByUserId: React.PropTypes.func.isRequired,
   cartList: React.PropTypes.array,
-  link: React.PropTypes.string
+  link: React.PropTypes.string,
+  onLoad: React.PropTypes.func
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProductItem)

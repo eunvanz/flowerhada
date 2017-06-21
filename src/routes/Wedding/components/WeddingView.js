@@ -4,6 +4,23 @@ import $ from 'jquery'
 import { isMobile } from 'common/util'
 import Button from 'components/Button'
 
+const swiperSliderStyle = {
+  textAlign: 'center',
+  background: '#fff',
+  display: 'flex',
+  alignItems: 'center',
+  height: `${document.innerWidth * 3 / 5}px`
+}
+
+const swiperContainerStyle = {
+  width: '100%',
+  height: `${document.innerWidth * 3 / 5}px`
+}
+
+const swiperImgStyle = {
+  width: '100%'
+}
+
 class WeddingView extends React.Component {
   constructor (props) {
     super(props)
@@ -16,11 +33,22 @@ class WeddingView extends React.Component {
     let height = window.innerHeight - $('.header-container').height()
     if (height / window.innerWidth > 3 / 5) height = window.innerWidth * 3 / 5
     this.setState({ mainParallaxHeight: height })
-    window.$('.isotope-container').fadeIn()
-    window.$('.isotope-container').isotope({
-      itemSelector: '.isotope-item',
-      layoutMode: 'masonry',
-      transitionDuration: '0.6s'
+    // window.$('.isotope-container').fadeIn()
+    // window.$('.isotope-container').isotope({
+    //   itemSelector: '.isotope-item',
+    //   layoutMode: 'masonry',
+    //   transitionDuration: '0.6s'
+    // })
+    const Swiper = window.Swiper
+    Swiper('.swiper-container', {
+      pagination: '.swiper-pagination',
+      nextButton: '.swiper-button-next',
+      prevButton: '.swiper-button-prev',
+      slidesPerView: 1,
+      paginationClickable: true,
+      spaceBetween: 30,
+      loop: true,
+      autoplay: 2500
     })
   }
   _handleOnClickInquiry () {
@@ -76,7 +104,38 @@ class WeddingView extends React.Component {
             </div>
           </div>
         </section>
-        <div className='isotope-container row grid-space-0'>
+        <div className='swiper-container' style={swiperContainerStyle}>
+          <div className='swiper-wrapper'>
+            <div className='swiper-slide' style={swiperSliderStyle}>
+              <img src='http://i.imgur.com/cImVLB1.jpg' style={swiperImgStyle} />
+            </div>
+            <div className='swiper-slide' style={swiperSliderStyle}>
+              <img src='http://i.imgur.com/qRbomxU.jpg' style={swiperImgStyle} />
+            </div>
+            <div className='swiper-slide' style={swiperSliderStyle}>
+              <img src='http://i.imgur.com/CIazVNP.jpg' style={swiperImgStyle} />
+            </div>
+            <div className='swiper-slide' style={swiperSliderStyle}>
+              <img src='http://i.imgur.com/92hyKAo.jpg' style={swiperImgStyle} />
+            </div>
+            <div className='swiper-slide' style={swiperSliderStyle}>
+              <img src='http://i.imgur.com/haAzovD.jpg' style={swiperImgStyle} />
+            </div>
+            <div className='swiper-slide' style={swiperSliderStyle}>
+              <img src='http://i.imgur.com/wDab2Ds.jpg' style={swiperImgStyle} />
+            </div>
+            <div className='swiper-slide' style={swiperSliderStyle}>
+              <img src='http://i.imgur.com/ZChxiRA.jpg' style={swiperImgStyle} />
+            </div>
+            <div className='swiper-slide' style={swiperSliderStyle}>
+              <img src='http://i.imgur.com/IEwEZn9.jpg' style={swiperImgStyle} />
+            </div>
+          </div>
+          <div className='swiper-pagination swiper-pagination-white' />
+          <div className='swiper-button-next swiper-button-white' />
+          <div className='swiper-button-prev swiper-button-white' />
+        </div>
+        {/* <div className='isotope-container row grid-space-0'>
           <div className='col-sm-6 isotope-item'>
             <img src='http://i.imgur.com/oBBXlYR.jpg' />
           </div>
@@ -95,7 +154,7 @@ class WeddingView extends React.Component {
           <div className='col-sm-6 isotope-item'>
             <img src='http://i.imgur.com/DD88v4Y.jpg?1' />
           </div>
-        </div>
+        </div> */}
         <section className='section light-gray-bg pv-40 clearfix'>
           <div className='container'>
             <div className='row'>

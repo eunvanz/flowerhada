@@ -34,11 +34,11 @@ class ItemListView extends React.Component {
   _loadItems () {
     const { type } = this.props.params
     if (type === 'lesson') {
-      this.props.fetchLessons().then(() => this._applyMasonry())
+      this.props.fetchLessons()
     } else if (type === 'flower') {
-      this.props.fetchProductsByMainCategory('꽃다발').then(() => this._initMasonry())
+      this.props.fetchProductsByMainCategory('꽃다발')
     } else if (type === 'wedding') {
-      this.props.fetchProductsByMainCategory('웨딩').then(() => this._initMasonry())
+      this.props.fetchProductsByMainCategory('웨딩')
     } else {
       this.context.router.push('/not-found')
     }
@@ -163,6 +163,7 @@ class ItemListView extends React.Component {
                   <ItemList
                     items={filterItems()}
                     itemType={type === 'lesson' ? 'lesson' : 'product'}
+                    onLoad={this._initMasonry}
                   />
                 }
               </div>

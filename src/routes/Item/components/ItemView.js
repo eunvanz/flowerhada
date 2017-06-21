@@ -19,6 +19,7 @@ import DatePicker from 'components/DatePicker'
 import { deleteCartByUserIdAndItemTypeAndItemIdAndCartType, postCart, getCartsByUserId } from 'common/CartService'
 import { Tooltip } from 'react-bootstrap'
 import { getCommentsByUserIdAndType } from 'common/CommentService'
+import { groupFlower } from 'common/constants'
 
 class ItemView extends React.Component {
   constructor (props) {
@@ -157,7 +158,8 @@ class ItemView extends React.Component {
         this.context.router.push('/not-found')
         return
       }
-      this.setState({ itemPrice: this.props.item.price })
+      this.setState({ itemPrice: this.props.item.price,
+        quantity: this.props.item.subCategory === '단체꽃다발' ? groupFlower.MIN_QTY : 1 })
       return this.props.fetchReviewsByGroupName(this.props.item.groupName,
         this.state.reviews.curPage, this.state.reviews.perPage)
     })
@@ -200,7 +202,10 @@ class ItemView extends React.Component {
   }
   _handleOnChangeQuantity (e) {
     let quantity = e.target.value
-    // if (quantity < 1) quantity = 1
+    if (quantity !== '' && quantity < 1) quantity = 1
+    // if (this.props.item.subCategory === '단체꽃다발') {
+    //   if (quantity < groupFlower.MIN_QTY) quantity = groupFlower.MIN_QTY
+    // } else if (quantity < 1) quantity = 1
     this.setState({ quantity })
   }
   _handleOnClickTab (e) {
@@ -290,7 +295,23 @@ class ItemView extends React.Component {
     }
   }
   _getItemPrice = () => {
-    return (this.props.item.discountedPrice === 0 ? this.props.item.price : this.props.item.discountedPrice) +
+    let itemPrice = 0
+    if (this.props.item.subCategory === '단체꽃다발') {
+      if (this.state.quantity >= groupFlower.QTYS[0] && this.state.quantity < groupFlower.QTYS[1]) {
+        itemPrice = groupFlower.PRICES[0]
+      } else if (this.state.quantity >= groupFlower.QTYS[1] && this.state.quantity < groupFlower.QTYS[2]) {
+        itemPrice = groupFlower.PRICES[1]
+      } else if (this.state.quantity >= groupFlower.QTYS[2] && this.state.quantity < groupFlower.QTYS[3]) {
+        itemPrice = groupFlower.PRICES[2]
+      } else if (this.state.quantity >= groupFlower.QTYS[3]) {
+        itemPrice = groupFlower.PRICES[3]
+      } else {
+        itemPrice = groupFlower.PRICE
+      }
+    } else {
+      itemPrice = this.props.item.discountedPrice === 0 ? this.props.item.price : this.props.item.discountedPrice
+    }
+    return itemPrice +
       this.state.option1.price + this.state.option2.price + this.state.option3.price + this.state.receiveArea.price
   }
   _getTotalPrice = () => {
@@ -454,7 +475,9 @@ class ItemView extends React.Component {
   }
   _handleOnBlurQuantity (e) {
     let quantity = e.target.value
-    if (quantity < 1) quantity = 1
+    if (this.props.item.subCategory === '단체꽃다발') {
+      if (quantity < groupFlower.MIN_QTY) quantity = groupFlower.MIN_QTY
+    } else if (quantity < 1) quantity = 1
     this.setState({ quantity })
   }
   _handleOnClickInquiry () {
@@ -788,9 +811,10 @@ class ItemView extends React.Component {
         return (
           <div>
             <div className='form-group'>
-              {`￦${numeral(this._getItemPrice()).format('0,0')} `}<i className='fa fa-times-circle' />{' '}
-              <input className='' type='number' style={{ width: '50px', paddingRight: '5px', paddingLeft: '5px' }}  id='quantity' value={this.state.quantity} onFocus={e => e.target.value = ''} onBlur={this._handleOnBlurQuantity} onChange={this._handleOnChangeQuantity} /> 개
+              {this.props.item.subCategory === '단체꽃다발' && this.state.quantity >= 5 ? <del className='text-muted' style={{ paddingRight: '5px', fontSize: '13px' }}>{`￦${numeral(groupFlower.PRICE).format('0,0')}`}</del> : ''}{`￦${numeral(this._getItemPrice()).format('0,0')} `}<i className='fa fa-times-circle' />{' '}
+              <input className='' type='number' style={{ width: '50px', paddingRight: '5px', paddingLeft: '5px' }} id='quantity' value={this.state.quantity} onFocus={e => e.target.value = ''} onBlur={this._handleOnBlurQuantity} onChange={this._handleOnChangeQuantity} /> 개
             </div>
+            {this.props.item.subCategory === '단체꽃다발' && <div><small><i className='fa fa-exclamation-circle' /> 단체꽃다발은 5개 이상만 주문 가능합니다.<br /><i className='fa fa-exclamation-circle' /> 5/10/15/20개 이상 구간으로 할인이 적용됩니다.</small></div>}
           </div>
         )
         /* eslint-enable */
