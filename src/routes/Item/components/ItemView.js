@@ -43,7 +43,8 @@ class ItemView extends React.Component {
       receiveArea: { name: '서울', price: 0 },
       carouselFlag: true,
       isReviewWriteable: false,
-      pointInfoFlag: false // 포인트 적립정보 툴팁을 다시 렌더링 하기위한 플래그
+      pointInfoFlag: false, // 포인트 적립정보 툴팁을 다시 렌더링 하기위한 플래그
+      itemOptions: []
     }
     this._handleOnClickShowMap = this._handleOnClickShowMap.bind(this)
     this._handleOnClickHideMap = this._handleOnClickHideMap.bind(this)
@@ -72,11 +73,15 @@ class ItemView extends React.Component {
     this._changeFlagRecursively = this._changeFlagRecursively.bind(this)
     this._handleOnBlurQuantity = this._handleOnBlurQuantity.bind(this)
     this._handleOnClickInquiry = this._handleOnClickInquiry.bind(this)
+    this._handleOnChangeItemOptionInput = this._handleOnChangeItemOptionInput.bind(this)
   }
   componentDidMount () {
     window.scrollTo(0, 0)
     if (this._isValidPage()) {
       this._loadItemInfo()
+      .then(() => {
+        $('img').css('margin', '0 auto')
+      })
     } else {
       this.context.router.push('/not-found')
     }
@@ -160,6 +165,15 @@ class ItemView extends React.Component {
       }
       this.setState({ itemPrice: this.props.item.price,
         quantity: this.props.item.subCategory === '단체꽃다발' ? groupFlower.MIN_QTY : 1 })
+      const itemOptions = []
+      if (this.props.item.options.length > 0) {
+        const categorySet = new Set()
+        this.props.item.options.forEach(option => categorySet.add(option.category))
+        categorySet.forEach(category => {
+          itemOptions.push(this.props.item.options.filter(option => option.category === category)[0])
+        })
+        this.setState({ itemOptions })
+      }
       return this.props.fetchReviewsByGroupName(this.props.item.groupName,
         this.state.reviews.curPage, this.state.reviews.perPage)
     })
@@ -295,24 +309,21 @@ class ItemView extends React.Component {
     }
   }
   _getItemPrice = () => {
-    let itemPrice = 0
+    let itemPrice = this.props.item.discountedPrice === 0 ? this.props.item.price : this.props.item.discountedPrice
     if (this.props.item.subCategory === '단체꽃다발') {
       if (this.state.quantity >= groupFlower.QTYS[0] && this.state.quantity < groupFlower.QTYS[1]) {
-        itemPrice = groupFlower.PRICES[0]
+        itemPrice = itemPrice - (itemPrice * groupFlower.DISCOUNT_RATE[0])
       } else if (this.state.quantity >= groupFlower.QTYS[1] && this.state.quantity < groupFlower.QTYS[2]) {
-        itemPrice = groupFlower.PRICES[1]
+        itemPrice = itemPrice - (itemPrice * groupFlower.DISCOUNT_RATE[1])
       } else if (this.state.quantity >= groupFlower.QTYS[2] && this.state.quantity < groupFlower.QTYS[3]) {
-        itemPrice = groupFlower.PRICES[2]
+        itemPrice = itemPrice - (itemPrice * groupFlower.DISCOUNT_RATE[2])
       } else if (this.state.quantity >= groupFlower.QTYS[3]) {
-        itemPrice = groupFlower.PRICES[3]
-      } else {
-        itemPrice = groupFlower.PRICE
+        itemPrice = itemPrice - (itemPrice * groupFlower.DISCOUNT_RATE[3])
       }
-    } else {
-      itemPrice = this.props.item.discountedPrice === 0 ? this.props.item.price : this.props.item.discountedPrice
     }
+    const itemOptionPrice = this.state.itemOptions.reduce((prev, curr) => prev.addPrice + curr.addPrice)
     return itemPrice +
-      this.state.option1.price + this.state.option2.price + this.state.option3.price + this.state.receiveArea.price
+      this.state.option1.price + this.state.option2.price + this.state.option3.price + this.state.receiveArea.price + parseInt(itemOptionPrice)
   }
   _getTotalPrice = () => {
     return this._getItemPrice() * this.state.quantity
@@ -327,6 +338,10 @@ class ItemView extends React.Component {
     options.push(this.state.option1)
     options.push(this.state.option2)
     options.push(this.state.option3)
+    this.state.itemOptions.forEach(option => {
+      option.price = option.addPrice
+      options.push(option)
+    })
     const cart = {
       userId: user.id,
       quantity: this.state.quantity,
@@ -376,6 +391,10 @@ class ItemView extends React.Component {
     options.push(this.state.option1)
     options.push(this.state.option2)
     options.push(this.state.option3)
+    this.state.itemOptions.forEach(option => {
+      option.price = option.addPrice
+      options.push(option)
+    })
     const orderItem = {
       userId: user.id,
       lessonId: params.type === 'lesson' ? item.id : null,
@@ -508,6 +527,22 @@ class ItemView extends React.Component {
     }
     this.props.setInquiryModal(inquiryModal)
   }
+  _handleOnChangeItemOptionInput (e) {
+    const { category } = e.target.dataset
+    const { value } = e.target
+    const name = value.split(':')[0]
+    const addPrice = value.split(':')[1]
+    const itemOptions = this.state.itemOptions.map(option => {
+      if (option.category === category) {
+        const newOption = {}
+        newOption.name = name
+        newOption.addPrice = addPrice
+        return Object.assign({}, option, newOption)
+      }
+      return option
+    })
+    this.setState({ itemOptions })
+  }
   render () {
     const { type } = this.props.params
     const { item } = this.props
@@ -587,16 +622,57 @@ class ItemView extends React.Component {
       )
       return returnComponent
     }
+    const renderLevel = () => {
+      return (
+        <div>
+          <div className={`text-center`}
+            style={{ width: '80px', borderRadius: '2px', display: 'inline-block', backgroundColor: item.level === 1 || item.level === 4 || item.level === 6 ? '#21bb9d' : 'rgb(212, 212, 212)', color: 'white', marginRight: '2px' }}
+            >초급</div>
+          <div className='text-center' style={{ width: '80px', borderRadius: '2px', display: 'inline-block', backgroundColor: item.level === 2 || item.level >= 4 ? '#21bb9d' : 'rgb(212, 212, 212)', color: 'white', marginRight: '2px' }}>중급</div>
+          <div className='text-center' style={{ width: '80px', borderRadius: '2px', display: 'inline-block', backgroundColor: item.level === 3 || item.level >= 5 ? '#21bb9d' : 'rgb(212, 212, 212)', color: 'white', marginRight: '2px' }}>고급</div>
+        </div>
+      )
+    }
+    const renderItemOptions = () => {
+      if (item.options.length > 0) {
+        const categorySet = new Set()
+        item.options.forEach(option => {
+          categorySet.add(option.category)
+        })
+        const returnComponent = []
+        categorySet.forEach(category => {
+          const categoryOptions = item.options.filter(option => option.category === category)
+          returnComponent.push(
+            <tr>
+              <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>{category}</strong></td>
+              <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>{category}</strong></div>
+              <td>
+                <select className='form-control' id='itemOption' data-category={category} style={{ width: '200px' }}
+                  value={this.state.itemOptions.filter(option => option.category === category)[0].name + ':' + this.state.itemOptions.filter(option => option.category === category)[0].addPrice}
+                  onChange={this._handleOnChangeItemOptionInput}>
+                  {categoryOptions.map(option => <option value={`${option.name}:${option.addPrice}`}>{option.name} ({`+${numeral(option.addPrice).format('0,0')}원`})</option>)}
+                </select>
+              </td>
+            </tr>
+          )
+        })
+        return returnComponent
+      }
+    }
     const renderSpecs = () => {
       if (item.lessonDate || item.lessonDays && type === 'lesson') {
         /* eslint-disable */
         return (
           <table className='table' style={{ marginBottom: '0px' }}>
             <tbody>
+              <tr>
+                <td className='text-right' style={{ width: '90px' }}><strong>난이도</strong></td>
+                <td>{renderLevel()}</td>
+              </tr>
               {
                 !item.expired &&
                 <tr>
-                  <td className='text-right' style={{ width: '90px' }}><strong>모집인원</strong></td>
+                  <td className='text-right'><strong>모집인원</strong></td>
                   <td>최대 <strong>{item.maxParty}</strong>명, 현재 <strong>{item.currParty}</strong>명 등록 중</td>
                 </tr>
               }
@@ -678,6 +754,7 @@ class ItemView extends React.Component {
                   </td>
                 </tr>
               }
+              {renderItemOptions()}
               <tr>
                 <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>옵션</strong></td>
                 <td>
@@ -742,14 +819,14 @@ class ItemView extends React.Component {
                 </tr>
               }
               <tr>
-                <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>코사지</strong></td>
+                <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>코사지세트</strong></td>
                 <td>
-                  <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>코사지</strong></div>
+                  <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>코사지세트</strong></div>
                   <select className='form-control' id='option1' style={{ width: '200px' }}
                     value={this.state.option1.name + ':' + this.state.option1.price}
                     onChange={this._handleOnChangeInput}>
                     <option value='선택안함:0'>선택안함</option>
-                    <option value='코사지1:8000'>코사지1 (+8,000)</option>
+                    <option value='코사지세트:30000'>코사지세트 (+30,000)</option>
                   </select>
                 </td>
               </tr>
@@ -761,7 +838,7 @@ class ItemView extends React.Component {
                     value={this.state.option2.name + ':' + this.state.option2.price}
                     onChange={this._handleOnChangeInput}>
                     <option value='선택안함:0'>선택안함</option>
-                    <option value='부토니에1:8000' data-price={8000}>부토니에1 (+8,000)</option>
+                    <option value='부토니에:5000' data-price={5000}>부토니에 (+5,000)</option>
                   </select>
                 </td>
               </tr>
@@ -773,15 +850,23 @@ class ItemView extends React.Component {
                     value={this.state.option3.name + ':' + this.state.option3.price}
                     onChange={this._handleOnChangeInput}>
                     <option value='선택안함:0'>선택안함</option>
-                    <option value='플라워샤워:8000' data-price={8000}>플라워샤워 (+8,000)</option>
+                    <option value='플라워샤워:20000' data-price={20000}>플라워샤워 (+20,000)</option>
                   </select>
                 </td>
               </tr>
             </tbody>
           </table>
         )
-      } else if (item.subCategory === '공간장식') {
-        return null
+      } else {
+        if (item.options.length > 0) {
+          return (
+            <table className='table' style={{ marginBottom: '0px' }}>
+              <tbody>
+                {renderItemOptions()}
+              </tbody>
+            </table>
+          )
+        }
       }
     }
     const renderLessonQuantity = () => {
@@ -811,7 +896,7 @@ class ItemView extends React.Component {
         return (
           <div>
             <div className='form-group'>
-              {this.props.item.subCategory === '단체꽃다발' && this.state.quantity >= 5 ? <del className='text-muted' style={{ paddingRight: '5px', fontSize: '13px' }}>{`￦${numeral(groupFlower.PRICE).format('0,0')}`}</del> : ''}{`￦${numeral(this._getItemPrice()).format('0,0')} `}<i className='fa fa-times-circle' />{' '}
+              {this.props.item.subCategory === '단체꽃다발' && this.state.quantity >= 5 ? <del className='text-muted' style={{ paddingRight: '5px', fontSize: '13px' }}>{`￦${numeral(this.props.item.discountedPrice === 0 ? this.props.item.price : this.props.item.discountedPrice).format('0,0')}`}</del> : ''}{`￦${numeral(this._getItemPrice()).format('0,0')} `}<i className='fa fa-times-circle' />{' '}
               <input className='' type='number' style={{ width: '50px', paddingRight: '5px', paddingLeft: '5px' }} id='quantity' value={this.state.quantity} onFocus={e => e.target.value = ''} onBlur={this._handleOnBlurQuantity} onChange={this._handleOnChangeQuantity} /> 개
             </div>
             {this.props.item.subCategory === '단체꽃다발' && <div><small><i className='fa fa-exclamation-circle' /> 단체꽃다발은 5개 이상만 주문 가능합니다.<br /><i className='fa fa-exclamation-circle' /> 5/10/15/20개 이상 구간으로 할인이 적용됩니다.</small></div>}
@@ -1110,26 +1195,51 @@ class ItemView extends React.Component {
       return (
         <section className='pv-30 light-gray-bg'>
           <div className='container'>
-            <div className='row'>
-              <div className='col-md-4'>
-                <h4>안내사항</h4>
-                <p>[정시 시작] 클래스는 정시에 바로 시작합니다. 함께 들으시는 분들을 위해 10분 정도 미리 오셔서 준비해주세요.</p>
-                <p>[문자 안내] 매 수업일 2일 전에 문자를 통해 확인 및 안내를 드립니다.</p>
-                <p>[신청 확인] ‘마이페이지’에서 신청 현황을 확인할 수 있습니다.</p>
+            { type === 'product' &&
+              <div className='row'>
+                <div className='col-md-4'>
+                  <h4>안내사항</h4>
+                  <p>- 선주문 후 제작이 들어가는 100% 주문제작 제품이기 때문에 주문은 넉넉하게 3~4일 전에, 최소 이틀 전에 부탁드려요.</p>
+                  <p>- 꽃의 수급에 따라서 디자인은 조금 변경될 수도 있습니다.</p>
+                  <p>- 생화상품이므로 퀵배송만 가능합니다. 현재 서울/경기 지역만 배송 가능합니다.</p>
+                </div>
+                <div className='col-md-4'>
+                  <h4>취소 및 환불 관련</h4>
+                  <p>- 생화를 취급하기 때문에 배송 전이라도 재료 구매 후에는 환불이 불가한 점 양해 부탁드립니다. 재료구매 문자 바송 후 취소는 불가능합니다.</p>
+                  <p>- 재료 구매 전 날 일괄적으로 문자를 발송드립니다. 발송일 당일까지는 취소 가능합니다.</p>
+                  <p>- 배송 이후에는 생화라는 특성 상 환불 불가능한 점 양해 부탁드립니다.</p>
+                </div>
+                <div className='col-md-4'>
+                  <h4>퀵 배송비 관련</h4>
+                  <p>- 서울 전 지역 무료 배송</p>
+                  <p>- 1만원 추가지역: 구리 / 하남 / 성남 / 과천 / 의왕 / 군포 / 안양 / 광명 / 부천</p>
+                  <p>- 2만원 추가지역: 김포 / 고양 / 파주 / 양주 / 광주 / 용인 / 남양주 / 오산 / 화성 / 안산 / 시흥 / 인천 / 수원 / 의정부</p>
+                  <p>- 택배 배송 제품은 해당 안됩니다.</p>
+                </div>
               </div>
-              <div className='col-md-4'>
-                <h4>주문 및 취소, 환불 정책</h4>
-                <p>[정시 시작] 클래스는 정시에 바로 시작합니다. 함께 들으시는 분들을 위해 10분 정도 미리 오셔서 준비해주세요.</p>
-                <p>[문자 안내] 매 수업일 2일 전에 문자를 통해 확인 및 안내를 드립니다.</p>
-                <p>[신청 확인] ‘마이페이지’에서 신청 현황을 확인할 수 있습니다.</p>
+            }
+            { type === 'lesson' &&
+              <div className='row'>
+                <div className='col-md-4'>
+                  <h4>안내사항</h4>
+                  <p>- 레슨은 정확히 정시에 시작합니다. 다른 수강생 분들을 위해 10분 정도 미리 오셔서 준비해주세요.</p>
+                  <p>- 꽃의 수급에 따라서 디자인은 조금 변경될 수도 있습니다.</p>
+                  <p>- 생화상품이므로 퀵배송만 가능합니다. 현재 서울/경기 지역만 배송 가능합니다.</p>
+                </div>
+                <div className='col-md-4'>
+                  <h4>취소 및 환불 관련</h4>
+                  <p>- 생화를 취급하기 때문에 배송 전이라도 재료 구매 후에는 환불이 불가한 점 양해 부탁드립니다. 재료구매 문자 바송 후 취소는 불가능합니다.</p>
+                  <p>- 재료 구매 전 날 일괄적으로 문자를 발송드립니다. 발송일 당일까지는 취소 가능합니다.</p>
+                  <p>- 배송 이후에는 생화라는 특성 상 환불 불가능한 점 양해 부탁드립니다.</p>
+                </div>
+                <div className='col-md-4'>
+                  <h4>퀵 배송비 관련</h4>
+                  <p>- 서울 전 지역 무료 배송</p>
+                  <p>- 1만원 추가지역: 구리 / 하남 / 성남 / 과천 / 의왕 / 군포 / 안양 / 광명 / 부천</p>
+                  <p>- 2만원 추가지역: 김포 / 고양 / 파주 / 양주 / 광주 / 용인 / 남양주 / 오산 / 화성 / 안산 / 시흥 / 인천 / 수원 / 의정부</p>
+                </div>
               </div>
-              <div className='col-md-4'>
-                <h4>주의사항</h4>
-                <p>[정시 시작] 클래스는 정시에 바로 시작합니다. 함께 들으시는 분들을 위해 10분 정도 미리 오셔서 준비해주세요.</p>
-                <p>[문자 안내] 매 수업일 2일 전에 문자를 통해 확인 및 안내를 드립니다.</p>
-                <p>[신청 확인] ‘마이페이지’에서 신청 현황을 확인할 수 있습니다.</p>
-              </div>
-            </div>
+            }
           </div>
         </section>
       )
@@ -1221,7 +1331,7 @@ ItemView.propTypes = {
   setMessageModalShow: React.PropTypes.func.isRequired,
   setMessageModal: React.PropTypes.func.isRequired,
   setInquiryModal: React.PropTypes.func.isRequired,
-  isAdmin: React.PropTypes.bool.isRequired
+  isAdmin: React.PropTypes.bool
 }
 
 export default ItemView

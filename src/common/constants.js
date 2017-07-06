@@ -36,11 +36,17 @@ export const KAKAO_JS_KEY = '6767c238cd266c15b40d9f79f5331f9b'
 export const KAKAO_ADMIN_KEY = '3ab9fd5554abb491fb48f9fff88bafdd'
 
 // 단체꽃다발 관련
+// export const groupFlower = {
+//   MIN_QTY: 5,
+//   QTYS: [5, 10, 15, 20],
+//   PRICES: [23000, 20000, 18000, 15000],
+//   PRICE: 25000
+// }
+
 export const groupFlower = {
   MIN_QTY: 5,
   QTYS: [5, 10, 15, 20],
-  PRICES: [23000, 20000, 18000, 15000],
-  PRICE: 25000
+  DISCOUNT_RATE: [0.15, 0.2, 0.25, 0.3]
 }
 
 export const policy = `

@@ -424,6 +424,9 @@ class Header extends React.Component {
                                   <Link to='/item-list/wedding/부케' onClick={this._collapseNav}>부케</Link>
                                 </li>
                                 <li>
+                                  <Link to='/item-list/wedding/소품' onClick={this._collapseNav}>소품</Link>
+                                </li>
+                                <li>
                                   <Link to='/party' onClick={this._collapseNav}>공간장식</Link>
                                 </li>
                               </ul>
@@ -485,6 +488,9 @@ class Header extends React.Component {
                                   </li>
                                   <li>
                                     <Link to='/admin/user-list'>회원</Link>
+                                  </li>
+                                  <li>
+                                    <Link to='/admin/tutor'>강사</Link>
                                   </li>
                                 </ul>
                               </li>

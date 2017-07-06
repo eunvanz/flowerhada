@@ -5,8 +5,10 @@ import Button from 'components/Button'
 import TextField from 'components/TextField'
 import Checkbox from 'components/Checkbox'
 import { putProduct, postProduct, deleteProduct } from 'common/ProductService'
+import { putOption, postOption, deleteOption } from 'common/OptionService'
 import { postLessonImage } from 'common/LessonService'
 import $ from 'jquery'
+import keygen from 'keygenerator'
 
 class ProductListView extends React.Component {
   constructor (props) {
@@ -27,13 +29,18 @@ class ProductListView extends React.Component {
       activated: true,
       deliveryType: '퀵',
       mode: this.props.params.id === 'register' ? 'register' : 'update',
-      process: false
+      process: false,
+      numberOfOptions: 0,
+      options: []
     }
     this._handleOnChangeCheckbox = this._handleOnChangeCheckbox.bind(this)
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
     this._handleOnClickSubmit = this._handleOnClickSubmit.bind(this)
     this._handleOnClickDelete = this._handleOnClickDelete.bind(this)
     this._isValidForm = this._isValidForm.bind(this)
+    this._handleOnClickAddOption = this._handleOnClickAddOption.bind(this)
+    this._handleOnClickDeleteOption = this._handleOnClickDeleteOption.bind(this)
+    this._handleOnChangeOptionInput = this._handleOnChangeOptionInput.bind(this)
     // this._handleOnChangeImage = this._handleOnChangeImage.bind(this)
   }
   componentDidMount () {
@@ -41,6 +48,7 @@ class ProductListView extends React.Component {
       this.props.fetchProduct(this.props.params.id)
       .then(() => {
         this.setState(Object.assign({}, this.props.product, { images: this.props.product.images.indexOf('[') > -1 ? JSON.parse(this.props.product.images) : ['', '', ''] }))
+        this.setState({ numberOfOptions: this.props.product.options.length })
         $('#content').val(this.state.content)
         const scripts = ['//cdn.tinymce.com/4/tinymce.min.js',
           '/template/js/inline-lesson-register-view.js']
@@ -108,8 +116,9 @@ class ProductListView extends React.Component {
     // product.append('images', JSON.stringify(removeEmptyIndex(this.state.images)))
     product.append('deliveryType', this.state.deliveryType)
     let action = putProduct
-    if (this.state.mode === 'register') action = postProduct
-
+    if (this.state.mode === 'register') {
+      action = postProduct
+    }
     let titleImgFile = document.getElementById('titleImg').files[0]
     if (titleImgFile) titleImgFile = resizeImage(titleImgFile, 800)
     const imageFiles = []
@@ -158,6 +167,22 @@ class ProductListView extends React.Component {
       product.append('images', JSON.stringify(images))
       return action(product, this.props.params.id)
     })
+    .then(res => {
+      if (this.state.options.length > 0) {
+        const productId = res.data.id
+        const promArr = this.state.options.map(option => {
+          option.productId = productId
+          if (!isNaN(parseInt(option.id))) return () => putOption(option)
+          else {
+            option.id = 0
+            return () => postOption(option)
+          }
+        })
+        return promArr.reduce((prev, prom) => prev.then(prom), Promise.resolve())
+      } else {
+        return Promise.resolve()
+      }
+    })
     .then(() => {
       this.setState({ process: false })
       this.context.router.push('/admin/product')
@@ -171,6 +196,36 @@ class ProductListView extends React.Component {
     .then(() => {
       this.context.router.push('/admin/product')
     })
+  }
+  _handleOnClickAddOption () {
+    this.setState({ numberOfOptions: this.state.numberOfOptions + 1 })
+    const options = this.state.options
+    options.push({
+      id: keygen._(),
+      productId: this.props.product ? this.props.product.id : null,
+      category: '',
+      name: '',
+      addPrice: 0
+    })
+    this.setState({ options })
+  }
+  _handleOnClickDeleteOption (id) {
+    if (typeof id === 'number') {
+      deleteOption(id)
+    }
+    const options = this.state.options.filter(option => option.id !== id)
+    this.setState({ options, numberOfOptions: this.state.numberOfOptions - 1 })
+  }
+  _handleOnChangeOptionInput (e) {
+    const { type, id } = e.target.dataset
+    let { options } = this.state
+    options = options.map(option => {
+      if (option.id == id) {
+        option[type] = e.target.value
+      }
+      return option
+    })
+    this.setState({ options })
   }
   // _handleOnChangeImage (e) {
   //   const idx = e.target.id.substr(-1)
@@ -188,9 +243,48 @@ class ProductListView extends React.Component {
       } else if (this.state.mainCategory === '웨딩') {
         return [
           <option key='1' value='부케'>부케</option>,
-          <option key='2' value='공간장식'>공간장식</option>
+          <option key='2' value='소품'>소품</option>,
+          <option key='3' value='공간장식'>공간장식</option>
         ]
       }
+    }
+    const renderOptionForm = () => {
+      const returnComponent = []
+      for (let i = 0; i < this.state.numberOfOptions; i++) {
+        returnComponent.push(
+          <div key={i}>
+            <TextField
+              id={`option-category-${i + 1}`}
+              label={`카테고리 #${i + 1}`}
+              dataId={this.state.options[i].id}
+              dataType='category'
+              onChange={this._handleOnChangeOptionInput}
+              value={this.state.options[i].category}
+            />
+            <TextField
+              id={`option-name-${i + 1}`}
+              label={`옵션명 #${i + 1}`}
+              dataId={this.state.options[i].id}
+              dataType='name'
+              onChange={this._handleOnChangeOptionInput}
+              value={this.state.options[i].name}
+            />
+            <TextField
+              id={`option-price-${i + 1}`}
+              label={`추가가격 #${i + 1}`}
+              dataId={this.state.options[i].id}
+              dataType='addPrice'
+              onChange={this._handleOnChangeOptionInput}
+              value={this.state.options[i].addPrice}
+              type='number'
+            />
+            <Button
+              textComponent={<span>{`옵션 #${i + 1} 삭제`}</span>} size='sm'
+              onClick={() => this._handleOnClickDeleteOption(this.state.options[i].id)} />
+          </div>
+        )
+      }
+      return returnComponent
     }
     return (
       <div>
@@ -279,6 +373,12 @@ class ProductListView extends React.Component {
             value={this.state.discountedPrice}
             type='number'
           />
+          <div className='form-group'>
+            <label>옵션</label> <Button textComponent={<span>옵션추가</span>} size='sm' onClick={this._handleOnClickAddOption} />
+            <div>
+              {renderOptionForm()}
+            </div>
+          </div>
           <Checkbox
             id='soldout'
             onChange={this._handleOnChangeCheckbox}

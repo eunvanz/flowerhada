@@ -104,6 +104,7 @@
     "normalize.css": "^5.0.0",
     "numeral": "^2.0.4",
     "postcss-loader": "^1.1.0",
+    "promise-sequential": "^1.1.1",
     "react": "^15.0.0",
     "react-bootstrap": "^0.30.7",
     "react-bootstrap-date-picker": "^4.0.0",

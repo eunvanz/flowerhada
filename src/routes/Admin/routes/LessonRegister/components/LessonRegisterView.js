@@ -46,7 +46,8 @@ class LessonListView extends React.Component {
       mode: this.props.params.id === 'register' ? 'register' : 'update',
       process: false,
       tutorList: [],
-      tutorId: 1
+      tutorId: 1,
+      level: 1
     }
     this._handleOnChangeCheckbox = this._handleOnChangeCheckbox.bind(this)
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
@@ -234,6 +235,7 @@ class LessonListView extends React.Component {
     lesson.append('discountedPrice', $('#discountedPrice').val())
     lesson.append('lessonDate', this.state.lessonDate)
     lesson.append('tutorId', this.state.tutorId)
+    lesson.append('level', this.state.level)
     if (this.state.oneday) {
       lesson.append('startTime', convertTimeToString(this.state.startTime))
       lesson.append('endTime', convertTimeToString(this.state.endTime))
@@ -614,6 +616,18 @@ class LessonListView extends React.Component {
           {
             _renderLessonDays()
           }
+          <div className='form-group'>
+            <label htmlFor='level'>난이도</label>
+            <select id='level' className='form-control' value={this.state.level}
+              onChange={this._handleOnChangeInput}>
+              <option value='1'>초급</option>
+              <option value='2'>중급</option>
+              <option value='3'>고급</option>
+              <option value='4'>초급 + 중급</option>
+              <option value='5'>중급 + 고급</option>
+              <option value='6'>초급 + 중급 + 고급</option>
+            </select>
+          </div>
           <label htmlFor='content'>내용</label>
           <textarea id='content' defaultValue={this.state.content} />
           <Checkbox

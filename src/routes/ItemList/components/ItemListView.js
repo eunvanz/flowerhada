@@ -93,7 +93,7 @@ class ItemListView extends React.Component {
       } else if (type === 'flower') {
         return ['전체', '단체꽃다발', '이벤트꽃다발']
       } else if (type === 'wedding') {
-        return ['전체', '부케', '공간장식']
+        return ['전체', '부케', '소품', '공간장식']
       }
     }
     const setTabIcons = () => {
@@ -102,7 +102,7 @@ class ItemListView extends React.Component {
       } else if (type === 'flower') {
         return ['fa fa-list', 'fa fa-users', 'fa fa-gift']
       } else if (type === 'wedding') {
-        return ['fa fa-list', 'fa fa-asterisk', 'fa fa-glass']
+        return ['fa fa-list', 'fa fa-asterisk', 'fa fa-birthday-cake', 'fa fa-glass']
       }
     }
     const setTabLinks = () => {
@@ -112,7 +112,7 @@ class ItemListView extends React.Component {
       } else if (type === 'flower') {
         return ['/item-list/flower/all', '/item-list/flower/단체꽃다발', '/item-list/flower/이벤트꽃다발']
       } else if (type === 'wedding') {
-        return ['/item-list/wedding/all', '/item-list/wedding/부케', '/party']
+        return ['/item-list/wedding/all', '/item-list/wedding/부케', '/item-list/wedding/소품', '/party']
       }
     }
     const filterItems = () => {
