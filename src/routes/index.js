@@ -13,6 +13,7 @@ import MyPage from './MyPage'
 import News from './News'
 import GroupFlower from './GroupFlower'
 import Wedding from './Wedding'
+import Gallery from './Gallery'
 
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
@@ -33,6 +34,7 @@ export const createRoutes = (store) => ({
     News(store),
     GroupFlower(store),
     Wedding(store),
+    Gallery(store),
     // 이곳에 추가해야 함
     NotFound(store)
   ]

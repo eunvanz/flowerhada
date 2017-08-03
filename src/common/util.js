@@ -332,3 +332,13 @@ export const resizeImage = (image, width) => {
   image.height = originHeight * (width / originWidth)
   return image
 }
+
+export const getImageUrlsFromContent = content => {
+  let m = null
+  const urls = []
+  const rex = /<img[^>]+src="(http:\/\/[^">]+)"/g
+  while (m = rex.exec(content)) {
+    urls.push(m[1])
+  }
+  return urls
+}

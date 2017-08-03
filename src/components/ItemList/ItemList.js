@@ -1,5 +1,9 @@
 import React from 'react'
 import ProductItem from '../ProductItem'
+import keygen from 'keygenerator'
+import GalleryItem from '../GalleryItem'
+import { getImageUrlsFromContent } from 'common/util'
+import _ from 'lodash'
 
 class ItemList extends React.Component {
   constructor (props) {
@@ -27,14 +31,32 @@ class ItemList extends React.Component {
   render () {
     const renderItems = () => {
       const returnComponent = []
-      const items = this.props.items
-      for (const item of items) {
-        returnComponent
-        .push(<ProductItem key={item.id} item={item} type={this.props.itemType} onLoad={this._handleOnLoadItem} />)
-      }
-      if (returnComponent.length === 0) {
-        return <div className='text-center'
-          style={{ height: '100px', top: '50px', position: 'relative' }}><i className='fa fa-exclamation-triangle' /> 현재 판매중인 상품이 없습니다.</div>
+      const { items, itemType } = this.props
+      if (itemType === 'gallery') {
+        for (const item of items) {
+          returnComponent
+          .push(<GalleryItem key={keygen._()} item={item} src={item.titleImg} />)
+          if (item.images) {
+            let images = JSON.parse(item.images)
+            images = _.drop(images)
+            for (const image of images) {
+              returnComponent.push(<GalleryItem key={keygen._()} item={item} src={image} />)
+            }
+          }
+          const contentImages = getImageUrlsFromContent(item.content)
+          for (const image of contentImages) {
+            returnComponent.push(<GalleryItem key={keygen._()} item={item} src={image} />)
+          }
+        }
+      } else {
+        for (const item of items) {
+          returnComponent
+          .push(<ProductItem key={item.id} item={item} type={this.props.itemType} onLoad={this._handleOnLoadItem} />)
+        }
+        if (returnComponent.length === 0) {
+          return <div className='text-center'
+            style={{ height: '100px', top: '50px', position: 'relative' }}><i className='fa fa-exclamation-triangle' /> 현재 판매중인 상품이 없습니다.</div>
+          }
       }
       return returnComponent
     }

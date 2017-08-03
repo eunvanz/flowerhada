@@ -10,8 +10,9 @@ import PhoneNumberInput from 'components/PhoneNumberInput'
 import keygen from 'keygenerator'
 import Button from 'components/Button'
 import ScrollModal from 'components/ScrollModal'
-import { policy, privacy, NAVER_CLIENT_ID, SOCIAL_LOGIN_CALLBACK_URL } from 'common/constants'
+import { policy, privacy, NAVER_CLIENT_ID, SOCIAL_LOGIN_CALLBACK_URL, SECRET_KEY } from 'common/constants'
 import { Facebook } from 'common/socialUtil'
+import crypto from 'crypto-js'
 
 class SignUp extends React.Component {
   constructor (props) {
@@ -103,7 +104,9 @@ class SignUp extends React.Component {
         return this.props.fetchAuthUser(userInfo.email, userInfo.password)
       })
       .then((res) => {
-        document.cookie = `authUser=${JSON.stringify(this.props.authUser.data)}; max-age=${60 * 60 * 24}; path=/;`
+        const authUserString = JSON.stringify(this.props.authUser.data)
+        const encAuthUserString = crypto.AES.encrypt(authUserString, SECRET_KEY).toString()
+        document.cookie = `authUser=${encAuthUserString}; max-age=${60 * 60 * 24}; path=/;`
         return this.props.fetchUser(this.props.authUser.data.id)
       })
       .then((res) => {

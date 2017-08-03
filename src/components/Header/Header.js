@@ -3,7 +3,7 @@ import { IndexLink, Link, browserHistory } from 'react-router'
 import { connect } from 'react-redux'
 import { removeUser, fetchUser } from 'store/user'
 import { removeAuthUser, receiveAuthUser } from 'store/authUser'
-import { address, phone, email, facebook, instagram, LOGO_FONT } from 'common/constants'
+import { address, phone, email, facebook, instagram, LOGO_FONT, SECRET_KEY } from 'common/constants'
 import { fetchCartsByUserId, clearCarts } from 'store/cart'
 import WishList from 'components/WishList'
 import CartWindow from 'components/CartWindow'
@@ -14,6 +14,7 @@ import { setMessageModalShow, setMessageModalMessage, setMessageModalCancelBtnTx
 import cookie from 'cookie'
 import $ from 'jquery'
 import { isScreenSize } from 'common/util'
+import crypto from 'crypto-js'
 
 const mapStateToProps = state => ({
   user: state.user,
@@ -52,7 +53,10 @@ class Header extends React.Component {
     // const authUser = JSON.parse(sessionStorage.getItem('authUser'))
     const cookies = cookie.parse(document.cookie)
     let authUser = null
-    if (cookies.authUser && cookies.authUser.indexOf('{') !== -1) authUser = JSON.parse(cookies.authUser)
+    if (cookies.authUser && cookies.authUser.length > 0) {
+      const decAuthUser = crypto.AES.decrypt(cookies.authUser, SECRET_KEY).toString(crypto.enc.Utf8)
+      authUser = JSON.parse(decAuthUser)
+    }
     if (authUser) { // 세션에 authUser가 있을 경우 store에 세팅하고 db에서 user 가져옴
       this.props.receiveAuthUser(authUser)
       this.props.fetchUser(authUser.id)
@@ -205,7 +209,7 @@ class Header extends React.Component {
         <div className='header-top dark'>
           <div className='container'>
             <div className='row'>
-              <div className='col-xs-3 col-sm-6 col-md-9'>
+              <div className='col-xs-3 col-sm-6 col-md-7'>
                 <div className='header-top-first clearfix'>
                   {/* Social Links Start */}
                   <ul className='social-links circle small clearfix hidden-xs'>
@@ -255,13 +259,19 @@ class Header extends React.Component {
                   {/* Contact Info End */}
                 </div>
               </div>
-              <div className='col-xs-9 col-sm-6 col-md-3'>
+              <div className='col-xs-9 col-sm-6 col-md-5'>
                 <div id='header-top-second' className='clearfix'>
                   {!this.props.user &&
                     <div className='header-top-dropdown text-right'>
                       <div className='btn-group'>
+                        <a id='inquiryBtn' onClick={this._handleOnClickInquiry} className='btn btn-default btn-sm'
+                          style={{ cursor: 'pointer', marginRight: '3px' }}>
+                          <i className='fa fa-question-circle pr-10 hidden-xs' /> 1:1 문의
+                        </a>
+                      </div>
+                      <div className='btn-group'>
                         <Link to='/sign-up' className='btn btn-default btn-sm' style={{ marginRight: '3px' }}>
-                          <i className='fa fa-user pr-10' /> 회원가입
+                          <i className='fa fa-user pr-10 hidden-xs' /> 회원가입
                         </Link>
                       </div>
                       <div className='btn-group'>
@@ -270,7 +280,7 @@ class Header extends React.Component {
                             type='button'
                             className='btn btn-default btn-sm'
                           >
-                            <i className='fa fa-lock pr-10' /> 로그인
+                            <i className='fa fa-lock pr-10 hidden-xs' /> 로그인
                           </button>
                         </Link>
                       </div>
@@ -279,8 +289,14 @@ class Header extends React.Component {
                   {this.props.user &&
                     <div className='header-top-dropdown text-right'>
                       <div className='btn-group'>
+                        <a id='inquiryBtn' onClick={this._handleOnClickInquiry} className='btn btn-default btn-sm'
+                          style={{ cursor: 'pointer', marginRight: '3px' }}>
+                          <i className='fa fa-question-circle pr-10 hidden-xs' /> 1:1 문의
+                        </a>
+                      </div>
+                      <div className='btn-group'>
                         <Link to='/my-page/profile' className='btn btn-default btn-sm' style={{ marginRight: '3px' }}>
-                          <i className='fa fa-user pr-10' /> 마이페이지
+                          <i className='fa fa-user pr-10 hidden-xs' /> 마이페이지
                         </Link>
                       </div>
                       <div className='btn-group'>
@@ -289,7 +305,7 @@ class Header extends React.Component {
                           className='btn btn-default btn-sm'
                           onClick={this._handleOnClickLogout}
                         >
-                          <i className='fa fa-sign-out pr-10' /> 로그아웃
+                          <i className='fa fa-sign-out pr-10 hidden-xs' /> 로그아웃
                         </button>
                       </div>
                     </div>
@@ -426,43 +442,17 @@ class Header extends React.Component {
                                 <li>
                                   <Link to='/item-list/wedding/소품' onClick={this._collapseNav}>소품</Link>
                                 </li>
-                                <li>
-                                  <Link to='/party' onClick={this._collapseNav}>공간장식</Link>
-                                </li>
                               </ul>
                             </li>
-                            {/* <li>
-                              <Link to='/lessons' className='dropdown-toggle' data-toggle='dropdown'>
-                                이벤트
+                            <li>
+                              <Link to='/party' onClick={this._collapseNav}>
+                                공간장식
                               </Link>
                             </li>
                             <li>
-                              <Link to='/lessons' className='dropdown-toggle' data-toggle='dropdown'>
+                              <Link to='/gallery' onClick={this._collapseNav}>
                                 갤러리
                               </Link>
-                            </li> */}
-                            <li
-                              // className='dropdown'
-                            >
-                              <Link to='/news' onClick={this._collapseNav}
-                                // className='dropdown-toggle'
-                                // data-toggle='dropdown'
-                              >
-                                hada NEWS
-                              </Link>
-                              {/* <ul className='dropdown-menu'>
-                                <li>
-                                  <Link to='/lessons/hobby' onClick={this._collapseNav}>브랜드 스토리</Link>
-                                </li>
-                                <li>
-                                  <Link to='/lessons/business' onClick={this._collapseNav}>hada NEWS</Link>
-                                </li>
-                              </ul> */}
-                            </li>
-                            <li>
-                              <a id='inquiryBtn' onClick={this._handleOnClickInquiry} style={{ cursor: 'pointer' }}>
-                                1:1 문의
-                              </a>
                             </li>
                             {this.props.authUser.data && this.props.authUser.data.authorities[1] &&
                               this.props.authUser.data.authorities[1].authority === 'ADMIN' &&

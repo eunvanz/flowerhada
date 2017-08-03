@@ -114,7 +114,7 @@ class OrderCompleteView extends React.Component {
           return <span key={keygen._()}>
             {option.name}
             {option.price === 0 ? '' : `(+${numeral(option.price).format('0,0')}원)`}
-            {((optionsArray[seq + 1].name !== '선택안함') && (seq !== optionsArray.length - 1)) || (cart.receiveDate || cart.receiveArea) ? ' / ' : ''}
+            {(seq + 1 < optionsArray.length && (optionsArray[seq + 1].name !== '선택안함') && (seq !== optionsArray.length - 1)) || (cart.receiveDate || cart.receiveArea) ? ' / ' : ''}
           </span>
         }
       })

@@ -3,10 +3,14 @@ import Parallax from 'components/Parallax'
 import Navigation from 'components/Navigation'
 import ItemList from 'components/ItemList'
 import LessonRequestActionBlock from 'components/LessonRequestActionBlock'
+import Loading from 'components/Loading'
 
 class ItemListView extends React.Component {
   constructor (props) {
     super(props)
+    this.state = {
+      isLoading: true
+    }
     this._loadItems = this._loadItems.bind(this)
     this._clearItems = this._clearItems.bind(this)
     this._applyMasonry = this._applyMasonry.bind(this)
@@ -48,13 +52,14 @@ class ItemListView extends React.Component {
     this._filter(this.props.params.filter)
   }
   _applyMasonry () {
-    /* eslint-disable */
     const $ = window.$
-    $('.masonry-grid').isotope({
-    	itemSelector: '.masonry-grid-item',
-    	layoutMode: 'masonry'
-    });
-    /* eslint-enable */
+    const msnryGrid = $('.masonry-grid').imagesLoaded(() => {
+      this.setState({ isLoading: false })
+      msnryGrid.isotope({
+        itemSelector: '.masonry-grid-item',
+        layoutMode: 'masonry'
+      })
+    })
   }
   _filter (filter) {
     const $ = window.$
@@ -93,7 +98,7 @@ class ItemListView extends React.Component {
       } else if (type === 'flower') {
         return ['전체', '단체꽃다발', '이벤트꽃다발']
       } else if (type === 'wedding') {
-        return ['전체', '부케', '소품', '공간장식']
+        return ['전체', '부케', '소품']
       }
     }
     const setTabIcons = () => {
@@ -102,7 +107,7 @@ class ItemListView extends React.Component {
       } else if (type === 'flower') {
         return ['fa fa-list', 'fa fa-users', 'fa fa-gift']
       } else if (type === 'wedding') {
-        return ['fa fa-list', 'fa fa-asterisk', 'fa fa-birthday-cake', 'fa fa-glass']
+        return ['fa fa-list', 'fa fa-asterisk', 'fa fa-birthday-cake']
       }
     }
     const setTabLinks = () => {
@@ -112,7 +117,7 @@ class ItemListView extends React.Component {
       } else if (type === 'flower') {
         return ['/item-list/flower/all', '/item-list/flower/단체꽃다발', '/item-list/flower/이벤트꽃다발']
       } else if (type === 'wedding') {
-        return ['/item-list/wedding/all', '/item-list/wedding/부케', '/item-list/wedding/소품', '/party']
+        return ['/item-list/wedding/all', '/item-list/wedding/부케', '/item-list/wedding/소품']
       }
     }
     const filterItems = () => {
@@ -156,7 +161,11 @@ class ItemListView extends React.Component {
         <section className='main-container'>
           <div className='container'>
             <div className='row'>
-              <div className='main col-md-12'>
+              {
+                this.state.isLoading &&
+                <Loading text='상품을 불러오는 중...' style={{ height: '200px' }} />
+              }
+              <div className='main col-md-12' style={{ display: this.state.isLoading ? 'none' : 'block' }}>
                 {renderNavigation()}
                 {
                   items &&

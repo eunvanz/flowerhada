@@ -6,9 +6,10 @@ import validator from 'validator'
 import $ from 'jquery'
 import FindPasswordModal from 'components/FindPasswordModal'
 import Button from 'components/Button'
-import { NAVER_CLIENT_ID, SOCIAL_LOGIN_CALLBACK_URL, SOCIAL_PASSWORD } from 'common/constants'
+import { NAVER_CLIENT_ID, SOCIAL_LOGIN_CALLBACK_URL, SOCIAL_PASSWORD, SECRET_KEY } from 'common/constants'
 import { getUserByEmailAndSocialType, signUp, updateUser } from 'common/UserService'
 import { Facebook } from 'common/socialUtil'
+import crypto from 'crypto-js'
 
 class Login extends React.Component {
   constructor (props) {
@@ -115,7 +116,9 @@ class Login extends React.Component {
     if (socialType) authUserFetcher = () => this.props.fetchSocialAuthUser(userInfo.email, userInfo.password, socialType)
     authUserFetcher()
     .then(() => {
-      document.cookie = `authUser=${JSON.stringify(this.props.authUser.data)}; max-age=${60 * 60 * 24}; path=/;`
+      const authUserString = JSON.stringify(this.props.authUser.data)
+      const encAuthUserString = crypto.AES.encrypt(authUserString, SECRET_KEY).toString()
+      document.cookie = `authUser=${encAuthUserString}; max-age=${60 * 60 * 24}; path=/;`
       return Promise.resolve()
     })
     .then(() => {

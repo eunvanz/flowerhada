@@ -287,6 +287,11 @@ class CartView extends React.Component {
           const user = Object.assign({}, this.props.user, { phone: this.props.orderItem.product ? assemblePhoneNumber(this.state.senderPhoneNumber) : assemblePhoneNumber(this.state.studentPhoneNumbers[0]), regDate: null })
           updateUser(user)
         }
+        const orderTransactionForQuery = Object.assign({}, orderTransaction)
+        for (let i = 0; i < orderTransactionForQuery.carts.length; i++) {
+          if (orderTransactionForQuery.carts[i].product) orderTransactionForQuery.carts[i].product.content = ''
+          else orderTransactionForQuery.carts[i].lesson.content = ''
+        }
         const settings = {
           pg: isIE() ? 'inicis' : 'html5_inicis',
           pay_method: this.state.paymentMethod,
@@ -296,7 +301,7 @@ class CartView extends React.Component {
           buyer_name: this.props.user.name,
           buyer_email: this.props.user.email,
           buyer_tel: this.props.user.phone ? assemblePhoneNumber(this.props.user.phone) : this.props.orderItem.product ? assemblePhoneNumber(this.state.senderPhoneNumber) : assemblePhoneNumber(this.state.studentPhoneNumbers[0]),
-          m_redirect_url: `http://flowerhada.com/order-complete?order_transaction=${JSON.stringify(orderTransaction)}`
+          m_redirect_url: `http://flowerhada.com/order-complete?order_transaction=${JSON.stringify(orderTransactionForQuery)}`
         }
         const view = this
         window.IMP.request_pay(settings, function (rsp) {

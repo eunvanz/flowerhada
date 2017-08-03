@@ -1,6 +1,6 @@
 import React from 'react'
 import { convertDateToString, extractDaysFromLessonDays, extractDetailScheduleFromLessonDays,
-  setRecentItemToCookie, getCookie } from 'common/util'
+  setRecentItemToCookie, getCookie, isScreenSize } from 'common/util'
 import MapModal from 'components/MapModal'
 import numeral from 'numeral'
 import LessonRequestActionBlock from 'components/LessonRequestActionBlock'
@@ -166,7 +166,7 @@ class ItemView extends React.Component {
       this.setState({ itemPrice: this.props.item.price,
         quantity: this.props.item.subCategory === '단체꽃다발' ? groupFlower.MIN_QTY : 1 })
       const itemOptions = []
-      if (this.props.item.options.length > 0) {
+      if (this.props.item.options && this.props.item.options.length > 0) {
         const categorySet = new Set()
         this.props.item.options.forEach(option => categorySet.add(option.category))
         categorySet.forEach(category => {
@@ -321,9 +321,12 @@ class ItemView extends React.Component {
         itemPrice = itemPrice - (itemPrice * groupFlower.DISCOUNT_RATE[3])
       }
     }
-    const itemOptionPrice = this.state.itemOptions.reduce((prev, curr) => prev.addPrice + curr.addPrice)
+    let itemOptionPrice = 0
+    if (this.state.itemOptions.length > 0) {
+      itemOptionPrice = this.state.itemOptions.reduce((prev, curr) => prev + curr.addPrice, 0)
+    }
     return itemPrice +
-      this.state.option1.price + this.state.option2.price + this.state.option3.price + this.state.receiveArea.price + parseInt(itemOptionPrice)
+      this.state.option1.price + this.state.option2.price + this.state.option3.price + this.state.receiveArea.price + itemOptionPrice
   }
   _getTotalPrice = () => {
     return this._getItemPrice() * this.state.quantity
@@ -626,10 +629,10 @@ class ItemView extends React.Component {
       return (
         <div>
           <div className={`text-center`}
-            style={{ width: '80px', borderRadius: '2px', display: 'inline-block', backgroundColor: item.level === 1 || item.level === 4 || item.level === 6 ? '#21bb9d' : 'rgb(212, 212, 212)', color: 'white', marginRight: '2px' }}
+            style={{ width: isScreenSize.xs() ? '50px' : '80px', borderRadius: '2px', display: 'inline-block', backgroundColor: item.level === 1 || item.level === 4 || item.level === 6 ? '#21bb9d' : 'rgb(212, 212, 212)', color: 'white', marginRight: '2px' }}
             >초급</div>
-          <div className='text-center' style={{ width: '80px', borderRadius: '2px', display: 'inline-block', backgroundColor: item.level === 2 || item.level >= 4 ? '#21bb9d' : 'rgb(212, 212, 212)', color: 'white', marginRight: '2px' }}>중급</div>
-          <div className='text-center' style={{ width: '80px', borderRadius: '2px', display: 'inline-block', backgroundColor: item.level === 3 || item.level >= 5 ? '#21bb9d' : 'rgb(212, 212, 212)', color: 'white', marginRight: '2px' }}>고급</div>
+          <div className='text-center' style={{ width: isScreenSize.xs() ? '50px' : '80px', borderRadius: '2px', display: 'inline-block', backgroundColor: item.level === 2 || item.level >= 4 ? '#21bb9d' : 'rgb(212, 212, 212)', color: 'white', marginRight: '2px' }}>중급</div>
+          <div className='text-center' style={{ width: isScreenSize.xs() ? '50px' : '80px', borderRadius: '2px', display: 'inline-block', backgroundColor: item.level === 3 || item.level >= 5 ? '#21bb9d' : 'rgb(212, 212, 212)', color: 'white', marginRight: '2px' }}>고급</div>
         </div>
       )
     }
