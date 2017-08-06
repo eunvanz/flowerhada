@@ -62,7 +62,7 @@ class GalleryView extends React.Component {
     const { items } = this.state
     return (
       <div>
-        <Parallax title='꽃하다 갤러리' description='꽃하다의 모든 상품 이미지들이 모여있는 꽃하다 갤러리입니다.'
+        <Parallax title={<span>'꽃하다 갤러리'</span>} description={<span>'꽃하다의 모든 상품 이미지들이 모여있는 꽃하다 갤러리입니다.'</span>}
           backgroundImage={'http://i.imgur.com/vEU5rNa.jpg'} />
         <section className='main-container'>
           <div className='container'>

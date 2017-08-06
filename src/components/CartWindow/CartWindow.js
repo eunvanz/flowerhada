@@ -22,7 +22,7 @@ class CartWindow extends React.Component {
       })
     }
     return (
-      <ul className='dropdown-menu dropdown-menu-right dropdown-animation cart'>
+      <ul className='dropdown-menu dropdown-menu-right dropdown-animation cart' style={{ zIndex: 1000 }}>
         <li>
           {items && items.length > 0 &&
             <div>

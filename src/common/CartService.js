@@ -6,6 +6,8 @@ export const postCart = cart => {
 }
 
 export const putCart = (cart, id) => {
+  cart.product = null
+  cart.lesson = null
   return axios.put(`${API_BASE_URL}/carts/${id}`, cart)
 }
 

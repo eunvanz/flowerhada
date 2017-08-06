@@ -87,19 +87,19 @@ class Header extends React.Component {
 			})
 		}
 
-		//Show dropdown on click only for mobile devices
-		//-----------------------------------------------
+		// Show dropdown on click only for mobile devices
+		// -----------------------------------------------
 		// if (isScreenSize.xs() || $('.main-navigation.onclick').length > 0 ) {
 		// 	$('.main-navigation [data-toggle=dropdown], .header-top [data-toggle=dropdown]').on('click', event => {
-    //     console.log('clicked')
+    //     // console.log('clicked')
 		// 	// Avoid following the href location when clicking
 		// 	event.preventDefault()
 		// 	// Avoid having the menu to close when clicking
 		// 	event.stopPropagation()
 		// 	// close all the siblings
 		// 	$(this).parent().siblings().removeClass('open')
-    //   console.log($(this))
-    //   console.log($(this).parent().siblings())
+    //   // console.log($(this))
+    //   // console.log($(this).parent().siblings())
 		// 	// close all the submenus of siblings
 		// 	$(this).parent().siblings().find('[data-toggle=dropdown]').parent().removeClass('open')
 		// 	// opening the one you clicked on
@@ -452,6 +452,11 @@ class Header extends React.Component {
                             <li>
                               <Link to='/gallery' onClick={this._collapseNav}>
                                 갤러리
+                              </Link>
+                            </li>
+                            <li>
+                              <Link to='/news' onClick={this._collapseNav}>
+                                뉴스
                               </Link>
                             </li>
                             {this.props.authUser.data && this.props.authUser.data.authorities[1] &&

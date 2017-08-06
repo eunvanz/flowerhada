@@ -64,7 +64,7 @@ class OrderListView extends React.Component {
     const updatedOrder = Object.assign({}, order, { status })
     getOrderById(order.id)
     .then(res => {
-      if (res.data.status === '수강완료' || res.data.status === '배송완료') {
+      if (res.data.status !== '등록접수' && res.data.status !== '등록완료' && res.data.status !== '주문접수') {
         return Promise.reject({ data: { message: '취소할 수 없는 상품입니다.' } })
       } else {
         return Promise.resolve()
@@ -77,7 +77,7 @@ class OrderListView extends React.Component {
       if (res.data.code !== 0) return Promise.reject(res)
       // cart 업데이트
       for (const cart of order.carts) {
-        const updatedCart = Object.assign({}, cart, { status })
+        const updatedCart = Object.assign({}, cart, { status, transDate: null })
         proms.push(putCart(updatedCart, updatedCart.id))
       }
       // order 업데이트
@@ -128,7 +128,7 @@ class OrderListView extends React.Component {
     const renderCancelButton = order => {
       const { status } = order
       let returnComponent = null
-      if (status === '등록접수' || status === '등록완료' || status === '주문접수' || status === '배송준비중') {
+      if (status === '등록접수' || status === '등록완료' || status === '주문접수') {
         returnComponent =
           <span>
             <br />

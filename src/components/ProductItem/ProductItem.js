@@ -6,6 +6,7 @@ import { postCart, deleteCartByUserIdAndItemTypeAndItemIdAndCartType } from 'com
 import { fetchCartsByUserId } from 'store/cart'
 import { connect } from 'react-redux'
 import LessonDateInfo from 'components/LessonDateInfo'
+import { groupFlower } from 'common/constants'
 
 const mapStateToProps = state => ({
   user: state.user,
@@ -59,7 +60,11 @@ class ProductItem extends React.Component {
     const { item, cartList, type } = this.props
     const renderPrice = () => {
       let returnComponent = null
-      if (item.discountedPrice &&
+      if (item.subCategory === '단체꽃다발') {
+        returnComponent = (<span className='price'>
+          <del>￦{`${numeral(item.price).format('0,0')}`}</del> ￦<span>{`${numeral(item.price * (1 - groupFlower.DISCOUNT_RATE[0])).format('0,0')}`} ~</span>
+        </span>)
+      } else if (item.discountedPrice &&
       item.discountedPrice !== 0 &&
       item.discountedPrice !== item.price) {
         /* eslint-disable */

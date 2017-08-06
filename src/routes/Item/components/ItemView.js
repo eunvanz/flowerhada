@@ -539,7 +539,7 @@ class ItemView extends React.Component {
       if (option.category === category) {
         const newOption = {}
         newOption.name = name
-        newOption.addPrice = addPrice
+        newOption.addPrice = Number(addPrice)
         return Object.assign({}, option, newOption)
       }
       return option
@@ -646,14 +646,14 @@ class ItemView extends React.Component {
         categorySet.forEach(category => {
           const categoryOptions = item.options.filter(option => option.category === category)
           returnComponent.push(
-            <tr>
+            <tr key={keygen._()}>
               <td className='text-right hidden-xs' style={{ width: '120px', paddingTop: '18px' }}><strong>{category}</strong></td>
-              <div className='visible-xs' style={{ marginBottom: '6px' }}><strong>{category}</strong></div>
               <td>
+                <span className='visible-xs' style={{ marginBottom: '6px' }}><strong>{category}</strong></span>
                 <select className='form-control' id='itemOption' data-category={category} style={{ width: '200px' }}
                   value={this.state.itemOptions.filter(option => option.category === category)[0].name + ':' + this.state.itemOptions.filter(option => option.category === category)[0].addPrice}
                   onChange={this._handleOnChangeItemOptionInput}>
-                  {categoryOptions.map(option => <option value={`${option.name}:${option.addPrice}`}>{option.name} ({`+${numeral(option.addPrice).format('0,0')}원`})</option>)}
+                  {categoryOptions.map(option => <option key={option.name} value={`${option.name}:${option.addPrice}`}>{option.name} ({`+${numeral(option.addPrice).format('0,0')}원`})</option>)}
                 </select>
               </td>
             </tr>

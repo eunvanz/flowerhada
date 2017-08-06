@@ -45,7 +45,7 @@ class WishList extends React.Component {
       })
     }
     return (
-      <ul className='dropdown-menu dropdown-menu-right dropdown-animation'>
+      <ul className='dropdown-menu dropdown-menu-right dropdown-animation' style={{ zIndex: 1000 }}>
         <li>
           {
             items &&

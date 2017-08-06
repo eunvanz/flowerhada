@@ -288,9 +288,20 @@ class CartView extends React.Component {
           updateUser(user)
         }
         const orderTransactionForQuery = Object.assign({}, orderTransaction)
+        // orderTransactionForQuery.order.address = ''
+        // orderTransactionForQuery.order.restAddress = ''
         for (let i = 0; i < orderTransactionForQuery.carts.length; i++) {
-          if (orderTransactionForQuery.carts[i].product) orderTransactionForQuery.carts[i].product.content = ''
-          else orderTransactionForQuery.carts[i].lesson.content = ''
+          if (orderTransactionForQuery.carts[i].product) {
+            orderTransactionForQuery.carts[i].product.content = ''
+            orderTransactionForQuery.carts[i].product.title = ''
+            orderTransactionForQuery.carts[i].product.detail = ''
+            orderTransactionForQuery.carts[i].product.groupName = ''
+          } else {
+            orderTransactionForQuery.carts[i].lesson.content = ''
+            orderTransactionForQuery.carts[i].lesson.title = ''
+            orderTransactionForQuery.carts[i].lesson.detail = ''
+            orderTransactionForQuery.carts[i].lesson.groupName = ''
+          }
         }
         const settings = {
           pg: isIE() ? 'inicis' : 'html5_inicis',

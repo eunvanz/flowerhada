@@ -56,8 +56,8 @@ class Parallax extends React.Component {
 }
 
 Parallax.propTypes = {
-  title: PropTypes.string,
-  description: PropTypes.string,
+  title: PropTypes.element,
+  description: PropTypes.element,
   backgroundImage: PropTypes.string.isRequired,
   blur: PropTypes.number,
   innerComponent: PropTypes.object,
