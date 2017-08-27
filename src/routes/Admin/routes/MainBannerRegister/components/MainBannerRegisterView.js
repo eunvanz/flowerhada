@@ -68,7 +68,7 @@ class MainBannerRegister extends React.Component {
     } else {
       postImage = file ? () => postLessonImage(file) : Promise.resolve()
     }
-    postImage
+    postImage()
     .then(res => {
       if (res) {
         const imgUrl = res.data.data.link

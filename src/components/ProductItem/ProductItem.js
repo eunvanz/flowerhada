@@ -62,7 +62,7 @@ class ProductItem extends React.Component {
       let returnComponent = null
       if (item.subCategory === '단체꽃다발') {
         returnComponent = (<span className='price'>
-          <del>￦{`${numeral(item.price).format('0,0')}`}</del> ￦<span>{`${numeral(item.price * (1 - groupFlower.DISCOUNT_RATE[0])).format('0,0')}`} ~</span>
+          <del>￦{`${numeral(item.price).format('0,0')}`}</del> ~ ￦<span>{`${numeral(item.price * (1 - groupFlower.DISCOUNT_RATE[3])).format('0,0')}`}</span>
         </span>)
       } else if (item.discountedPrice &&
       item.discountedPrice !== 0 &&

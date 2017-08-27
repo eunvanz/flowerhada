@@ -26,28 +26,30 @@ class ItemList extends React.Component {
     this.setState({ loadedItems: this.state.loadedItems + 1 })
     if (this.state.loadedItems + 1 === this.props.items.length) {
       this.setState({ fullLoaded: true })
+      if (this.props.onLoad) this.props.onLoad()
     }
   }
   render () {
     const renderItems = () => {
-      const returnComponent = []
+      let returnComponent = []
       const { items, itemType } = this.props
       if (itemType === 'gallery') {
         for (const item of items) {
           returnComponent
-          .push(<GalleryItem key={keygen._()} item={item} src={item.titleImg} />)
+          .push(<GalleryItem key={keygen._()} item={item} src={item.titleImg} onLoad={this._handleOnLoadItem} />)
           if (item.images) {
             let images = JSON.parse(item.images)
             images = _.drop(images)
             for (const image of images) {
-              returnComponent.push(<GalleryItem key={keygen._()} item={item} src={image} />)
+              returnComponent.push(<GalleryItem key={keygen._()} item={item} src={image} onLoad={this._handleOnLoadItem} />)
             }
           }
           const contentImages = getImageUrlsFromContent(item.content)
           for (const image of contentImages) {
-            returnComponent.push(<GalleryItem key={keygen._()} item={item} src={image} />)
+            returnComponent.push(<GalleryItem key={keygen._()} item={item} src={image} onLoad={this._handleOnLoadItem} />)
           }
         }
+        returnComponent = _.shuffle(returnComponent)
       } else {
         for (const item of items) {
           returnComponent

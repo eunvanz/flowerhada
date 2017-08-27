@@ -49,7 +49,8 @@ GalleryItem.contextTypes = {
 
 GalleryItem.propTypes = {
   item: React.PropTypes.object.isRequired,
-  src: React.PropTypes.string.isRequired
+  src: React.PropTypes.string.isRequired,
+  onLoad: React.PropTypes.func
 }
 
 export default GalleryItem

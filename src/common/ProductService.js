@@ -22,13 +22,16 @@ export const getProduct = id => {
 }
 
 export const getProductByMainCategory = mainCategory => {
-  return axios.get(`${API_BASE_URL}/products/main-category/${mainCategory}`)
+  const encodedMainCategory = encodeURIComponent(mainCategory)
+  return axios.get(`${API_BASE_URL}/products/main-category/${encodedMainCategory}`)
 }
 
 export const getProductBySubCategory = subCategory => {
-  return axios.get(`${API_BASE_URL}/products/sub-category/${subCategory}`)
+  const encodedSubCategory = encodeURIComponent(subCategory)
+  return axios.get(`${API_BASE_URL}/products/sub-category/${encodedSubCategory}`)
 }
 
 export const getProductByRelationName = relationName => {
-  return axios.get(`${API_BASE_URL}/products/relation-name/${relationName}`)
+  const encodedRelationName = encodeURIComponent(relationName)
+  return axios.get(`${API_BASE_URL}/products/relation-name/${encodedRelationName}`)
 }

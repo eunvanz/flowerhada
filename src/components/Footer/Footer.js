@@ -1,5 +1,5 @@
 import React from 'react'
-import { address, phone, email, facebook, instagram, LOGO_FONT } from 'common/constants'
+import { address, phone, email, facebook, instagram, LOGO_FONT, mobile } from 'common/constants'
 
 class Footer extends React.Component {
   render () {
@@ -19,10 +19,10 @@ class Footer extends React.Component {
                         <span className='text-default'>상호명</span> flowerhada(꽃하다)
                       </li>
                       <li>
-                        <span className='text-default'>사업자등록번호</span> 210-26-67507
+                        <span className='text-default'>사업자등록번호</span> 540-99-00351
                       </li>
                       <li>
-                        <span className='text-default'>통신판매업신고</span> 2017-서울송파-01121호
+                        <span className='text-default'>통신판매업신고</span> 2017-서울송파-1558호
                       </li>
                       <li>
                         <span className='text-default'>대표</span> 성스런
@@ -32,6 +32,9 @@ class Footer extends React.Component {
                       </li>
                       <li>
                         <i className='text-default fa fa-phone pl-10 pr-5' /> {phone}
+                      </li>
+                      <li>
+                        <i className='text-default fa fa-mobile pl-10 pr-5' /> {mobile}
                       </li>
                       <li>
                         <i className='text-default fa fa-envelope-o pl-10 pr-5' /> {email}
@@ -51,7 +54,7 @@ class Footer extends React.Component {
                     </ul>
                     <div className='separator' />
                     <p className='text-center margin-clear'>
-                      Copyright © 2017 <span className='text-default'>hada</span>. All Right Reserved
+                      Copyright © 2017 <span className='text-default'>flowerhada</span>. All Right Reserved
                     </p>
                   </div>
                 </div>

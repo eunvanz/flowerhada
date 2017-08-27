@@ -87,7 +87,7 @@ class HomeView extends React.Component {
     }
     const renderLessons = () => {
       if (this.props.lessons) {
-        return <ItemList items={this.props.lessons.slice(0, 3)} itemType='lesson' />
+        return <ItemList items={this.props.lessons.filter(lesson => lesson.activated).slice(0, 3)} itemType='lesson' />
       } else {
         return <Loading text='레슨 목록을 불러오는 중..' />
       }

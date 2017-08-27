@@ -64,6 +64,7 @@ class NewsRegisterView extends React.Component {
       news = Object.assign({}, this.props.news, news)
       news.regDate = null
       news.updateDate = null
+      news.user = null
     }
     const action = this.state.mode === 'register' ? () => postBoard(news) : () => putBoard(news)
     action()

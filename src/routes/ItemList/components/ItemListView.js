@@ -84,7 +84,7 @@ class ItemListView extends React.Component {
     const renderDescription = () => {
       let returnComponent = null
       if (type === 'lesson') {
-        returnComponent = <span>유러피안 감성의 작품들을 직접 만들어보세요. 출장레슨 신청은 언제나 환영입니다.</span>
+        returnComponent = <span>프렌치 감성의 작품들을 직접 만들어보세요. 출장레슨 신청은 언제나 환영입니다.</span>
       } else if (type === 'flower') {
         returnComponent = <span>꽃하다는 꽃다발 주문 이후 꽃시장에서 장을 보기 때문에, 가장 신선한 상태의 꽃다발을 받아보실 수 있습니다.</span>
       } else if (type === 'wedding') {

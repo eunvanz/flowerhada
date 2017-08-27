@@ -81,6 +81,7 @@ class ItemView extends React.Component {
       this._loadItemInfo()
       .then(() => {
         $('img').css('margin', '0 auto')
+        this._changeFlagRecursively()
       })
     } else {
       this.context.router.push('/not-found')
@@ -88,7 +89,6 @@ class ItemView extends React.Component {
     $(window).resize(() => {
       this._renderPointInfo()
     })
-    this._changeFlagRecursively()
   }
   shouldComponentUpdate (nextProps, nextState) {
     if (this.state.pointInfoFlag !== nextState.pointInfoFlag) return true
@@ -96,7 +96,9 @@ class ItemView extends React.Component {
     return true
   }
   componentWillUpdate (nextProps, nextState) {
-    if (!this.state.carouselFlag) this.setState({ carouselFlag: !this.state.carouselFlag })
+    if (!this.state.carouselFlag) {
+      this.setState({ carouselFlag: !this.state.carouselFlag })
+    }
   }
   componentDidUpdate (prevProps, prevState) {
     if (this.props.params !== prevProps.params) {
@@ -113,6 +115,7 @@ class ItemView extends React.Component {
     this.props.clearReviews()
   }
   _changeFlagRecursively () {
+    if (this.props.item.expired) return
     this.setState({ pointInfoFlag: !this.state.pointInfoFlag })
     if ($('#point-info').length < 1) {
       setTimeout(() => this._changeFlagRecursively(), 100)
@@ -1283,7 +1286,7 @@ class ItemView extends React.Component {
         return (
           <div>
             {renderProductSection()}
-            {this.props.item.tutor && renderTutorSection()}
+            {/* {this.props.item.tutor && renderTutorSection()} */}
             {renderPolicySection()}
             {renderTabSection()}
           </div>
