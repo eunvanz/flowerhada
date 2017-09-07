@@ -202,12 +202,14 @@ class CartView extends React.Component {
           if (cart.lessonId) {
             updatedCart.lessonId = cart.lessonId
             updatedCart.lesson = cart.lesson
+            updatedCart.lesson.regDateTime = null
           } else {
             updatedCart.productId = cart.productId
             updatedCart.receiveDate = cart.receiveDate
             updatedCart.receiveTime = cart.receiveTime
             updatedCart.receiveArea = cart.receiveArea
             updatedCart.product = cart.product
+            updatedCart.product.regDateTime = null
           }
           updatedCart.quantity = this.state.quantity[idx]
           updatedCart.type = '구매목록'
@@ -228,12 +230,14 @@ class CartView extends React.Component {
         if (orderItem.lessonId) {
           cart.lessonId = orderItem.lessonId
           cart.lesson = orderItem.lesson
+          cart.lesson.regDateTime = null
         } else {
           cart.productId = orderItem.productId
           cart.receiveDate = orderItem.receiveDate
           cart.receiveTime = orderItem.receiveTime
           cart.receiveArea = orderItem.receiveArea
           cart.product = orderItem.product
+          cart.product.regDateTime = null
         }
         cart.quantity = this.state.quantity[0]
         cart.type = '구매목록'
@@ -308,6 +312,7 @@ class CartView extends React.Component {
           pay_method: this.state.paymentMethod,
           merchant_uid: 'merchant_' + new Date().getTime(),
           name: title,
+          display: { card_quota: [2, 3] }, // 선택가능한 할부개월 표시
           amount: this._getTotalPrice() - this.state.pointSpent,
           buyer_name: this.props.user.name,
           buyer_email: this.props.user.email,

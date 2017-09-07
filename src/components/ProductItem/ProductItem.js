@@ -7,6 +7,7 @@ import { fetchCartsByUserId } from 'store/cart'
 import { connect } from 'react-redux'
 import LessonDateInfo from 'components/LessonDateInfo'
 import { groupFlower } from 'common/constants'
+import Img from 'components/Img'
 
 const mapStateToProps = state => ({
   user: state.user,
@@ -173,7 +174,7 @@ class ProductItem extends React.Component {
       <div className={`col-md-4 masonry-grid-item ${this.props.type === 'lesson' ? this.props.item.mainCategory : this.props.item.subCategory}`}>
         <div className='listing-item white-bg bordered mb-20'>
           <div className='overlay-container'>
-            <img src={item.titleImg} onLoad={this.props.onLoad} onError={this.props.onLoad} />
+            <Img src={item.titleImg} onLoad={this.props.onLoad} onError={this.props.onLoad} />
             <Link to={this.props.link || `/item/${this.props.type}/${item.id}`} className='overlay-link'>
               <i className='fa fa-search-plus' />
             </Link>

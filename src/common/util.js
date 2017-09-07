@@ -1,5 +1,6 @@
 import numeral from 'numeral'
 import validator from 'validator'
+import _ from 'lodash'
 
 export const clearInlineScripts = () => {
   const scriptElements = document.body.getElementsByTagName('SCRIPT')
@@ -305,7 +306,7 @@ export const assemblePhoneNumber = phoneNumberArr => {
 
 export const isIE = () => {
   const agent = navigator.userAgent.toLowerCase()
-  return agent.indexOf('trident') !== -1 || agent.indexOf('msie') !== -1
+  return agent.indexOf('Trident') !== -1 || agent.indexOf('msie') !== -1
 }
 
 export const isScreenSize = {
@@ -341,4 +342,24 @@ export const getImageUrlsFromContent = content => {
     urls.push(m[1])
   }
   return urls
+}
+
+export const checkExpiredLesson = lesson => {
+  // 들어온 레슨이 지나간 레슨이면 expired 필드를 true로 바꿔서 리턴
+  const yyyyMMdd = lesson.lessonDate.split('-')
+  const yyyy = yyyyMMdd[0]
+  const mm = yyyyMMdd[1] - 1
+  const dd = yyyyMMdd[2]
+  const lessonDate = new Date(yyyy, mm, dd)
+  const now = new Date()
+  if (now - lessonDate > 0) {
+    lesson.expired = true
+  }
+  return lesson
+}
+
+export const sortLessonsByLessonDayDesc = lessons => {
+  // 레슨 배열을 레슨날짜 역순으로(최신순) 정렬
+  const sortedLessons = _.reverse(_.sortBy(lessons, lesson => lesson.lessonDate))
+  return sortedLessons
 }

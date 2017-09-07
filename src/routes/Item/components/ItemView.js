@@ -1286,7 +1286,7 @@ class ItemView extends React.Component {
         return (
           <div>
             {renderProductSection()}
-            {/* {this.props.item.tutor && renderTutorSection()} */}
+            {this.props.item.tutor && renderTutorSection()}
             {renderPolicySection()}
             {renderTabSection()}
           </div>

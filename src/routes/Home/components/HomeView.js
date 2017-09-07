@@ -6,6 +6,7 @@ import ItemList from 'components/ItemList'
 import LessonRequestActionBlock from 'components/LessonRequestActionBlock'
 import Loading from 'components/Loading'
 import Button from 'components/Button'
+import { sortLessonsByLessonDayDesc } from 'common/util'
 // import 'template/plugins/rs-plugin/js/jquery.themepunch.tools.min.js'
 // import 'template/plugins/rs-plugin/js/jquery.themepunch.revolution.min.js'
 // import 'template/plugins/owl-carousel/owl.carousel.js'
@@ -87,7 +88,7 @@ class HomeView extends React.Component {
     }
     const renderLessons = () => {
       if (this.props.lessons) {
-        return <ItemList items={this.props.lessons.filter(lesson => lesson.activated).slice(0, 3)} itemType='lesson' />
+        return <ItemList items={sortLessonsByLessonDayDesc(this.props.lessons).filter(lesson => lesson.activated).slice(0, 3)} itemType='lesson' />
       } else {
         return <Loading text='레슨 목록을 불러오는 중..' />
       }

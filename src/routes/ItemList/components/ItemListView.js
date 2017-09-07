@@ -4,6 +4,7 @@ import Navigation from 'components/Navigation'
 import ItemList from 'components/ItemList'
 import LessonRequestActionBlock from 'components/LessonRequestActionBlock'
 import Loading from 'components/Loading'
+import { sortLessonsByLessonDayDesc } from 'common/util'
 
 class ItemListView extends React.Component {
   constructor (props) {
@@ -69,7 +70,7 @@ class ItemListView extends React.Component {
   }
   render () {
     const { type } = this.props.params
-    const items = type === 'lesson' ? this.props.lessonList : this.props.productList
+    const items = type === 'lesson' ? sortLessonsByLessonDayDesc(this.props.lessonList) : this.props.productList
     const renderTitle = () => {
       let returnComponent = null
       if (type === 'lesson') {

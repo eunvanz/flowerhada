@@ -1,4 +1,5 @@
 import { getAllLessons, getLesson, getLessonByMainCategory } from 'common/LessonService'
+import { checkExpiredLesson } from 'common/util'
 
 // ------------------------------------
 // Constants
@@ -33,7 +34,9 @@ export const fetchLessons = () => {
   return dispatch => {
     return getAllLessons()
     .then(res => {
-      return dispatch(receiveLessons(res.data))
+      const lessons = res.data
+      const checkedLessons = lessons.map(lesson => checkExpiredLesson(lesson))
+      return dispatch(receiveLessons(checkedLessons))
     })
   }
 }
@@ -42,7 +45,9 @@ export const fetchLesson = id => {
   return dispatch => {
     return getLesson(id)
     .then(res => {
-      return dispatch(selectLesson(res.data))
+      const lesson = res.data
+      const checkedLesson = checkExpiredLesson(lesson)
+      return dispatch(selectLesson(checkedLesson))
     })
   }
 }
@@ -51,7 +56,9 @@ export const fetchLessonsByMainCategory = mainCategory => {
   return dispatch => {
     return getLessonByMainCategory(mainCategory)
     .then(res => {
-      return dispatch(receiveLessons(res.data))
+      const lessons = res.data
+      const checkedLessons = lessons.map(lesson => checkExpiredLesson(lesson))
+      return dispatch(receiveLessons(checkedLessons))
     })
   }
 }
