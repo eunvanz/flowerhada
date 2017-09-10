@@ -100,7 +100,9 @@ class LessonListView extends React.Component {
     const { id, value } = e.target
     if (id === 'mainCategory') {
       if (value === '원데이레슨') {
-        this.setState({ oneday: true })
+        this.setState({ oneday: true,
+          startTime: this.state.startTime || { hour: 3, min: 0, amPm: 'PM' },
+          endTime: this.state.endTime || { hour: 6, min: 0, amPm: 'PM' } })
       } else {
         this.setState({ oneday: false })
       }

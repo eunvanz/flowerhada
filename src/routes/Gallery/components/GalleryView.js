@@ -119,7 +119,7 @@ class GalleryView extends React.Component {
           <div className='container'>
             <div className='row'>
               { isLoading &&
-                <Loading text='갤러리 아이템을 불러오는 중...' />
+                <Loading text='갤러리 아이템을 구성하는 중...' />
               }
               <div className='main col-md-12' style={{ display: isLoading ? 'none' : 'block' }}>
                 { items &&
