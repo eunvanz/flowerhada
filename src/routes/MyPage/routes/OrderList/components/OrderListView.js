@@ -31,7 +31,11 @@ class OrderListView extends React.Component {
     } else {
       this.props.fetchOrdersByUserId(this.props.user.id, 0, 10) // 현재페이지, 페이지당 개수
       .then(() => {
-        this.setState({ orders: this.props.orders.content })
+        const orders = this.props.orders.content.map(order => {
+          order.carts = this.props.carts.filter(cart => cart.orderId === order.id)
+          return order
+        })
+        this.setState({ orders })
       })
       .then(() => {
         this._initialize()

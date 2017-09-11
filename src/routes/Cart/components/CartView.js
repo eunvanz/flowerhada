@@ -161,11 +161,11 @@ class CartView extends React.Component {
       this.setState({ orderProcess: true })
       const { carts, orderItem } = this.props
       const { type } = this.props.params
-      let items = carts
+      let items = Object.assign({}, carts)
       if (type === 'direct') items = [orderItem]
       const title = `${items[0].lesson ? items[0].lesson.title : items[0].product.title}${items.length > 1 ? `외 ${items.length - 1}건` : ''}` // eslint-disable-line
 
-      const orderTransaction = {}
+      let orderTransaction = {}
       orderTransaction.userId = this.props.user.id
 
       // Order post
@@ -196,19 +196,21 @@ class CartView extends React.Component {
         orderTransaction.cartUpdateType = 'update'
         // 장바구니의 type과 status 변경
         let idx = 0
-        const carts = this.props.carts.map(cart => {
+        let cartsForOrderTransaction = []
+        this.props.carts.forEach(cart => {
+          // const updatedCart = Object.assign({}, cart)
           const updatedCart = {}
           updatedCart.userId = cart.userId
           if (cart.lessonId) {
             updatedCart.lessonId = cart.lessonId
-            updatedCart.lesson = cart.lesson
+            updatedCart.lesson = Object.assign({}, cart.lesson)
             updatedCart.lesson.regDateTime = null
           } else {
             updatedCart.productId = cart.productId
             updatedCart.receiveDate = cart.receiveDate
             updatedCart.receiveTime = cart.receiveTime
             updatedCart.receiveArea = cart.receiveArea
-            updatedCart.product = cart.product
+            updatedCart.product = Object.assign({}, cart.product)
             updatedCart.product.regDateTime = null
           }
           updatedCart.quantity = this.state.quantity[idx]
@@ -218,9 +220,9 @@ class CartView extends React.Component {
           updatedCart.totalAmount = cart.itemPrice * this.state.quantity[idx++]
           updatedCart.itemPrice = cart.itemPrice
           updatedCart.id = cart.id
-          return updatedCart
+          cartsForOrderTransaction.push(updatedCart)
         })
-        orderTransaction.carts = carts
+        orderTransaction = Object.assign({}, orderTransaction, { carts: cartsForOrderTransaction })
       } else if (type === 'direct') {
         // orderItem을 cart에 등록
         orderTransaction.cartUpdateType = 'create'
@@ -229,14 +231,14 @@ class CartView extends React.Component {
         cart.userId = this.props.user.id
         if (orderItem.lessonId) {
           cart.lessonId = orderItem.lessonId
-          cart.lesson = orderItem.lesson
+          cart.lesson = Object.assign({}, orderItem.lesson)
           cart.lesson.regDateTime = null
         } else {
           cart.productId = orderItem.productId
           cart.receiveDate = orderItem.receiveDate
           cart.receiveTime = orderItem.receiveTime
           cart.receiveArea = orderItem.receiveArea
-          cart.product = orderItem.product
+          cart.product = Object.assign({}, orderItem.product)
           cart.product.regDateTime = null
         }
         cart.quantity = this.state.quantity[0]
@@ -245,7 +247,7 @@ class CartView extends React.Component {
         cart.options = orderItem.options
         cart.totalAmount = orderItem.itemPrice * this.state.quantity
         cart.itemPrice = orderItem.itemPrice
-        orderTransaction.carts = [cart]
+        orderTransaction = Object.assign({}, orderTransaction, { carts: [cart] })
       }
 
       // 최근배송주소 저장
@@ -297,12 +299,12 @@ class CartView extends React.Component {
         for (let i = 0; i < orderTransactionForQuery.carts.length; i++) {
           if (orderTransactionForQuery.carts[i].product) {
             orderTransactionForQuery.carts[i].product.content = ''
-            orderTransactionForQuery.carts[i].product.title = ''
+            // orderTransactionForQuery.carts[i].product.title = ''
             orderTransactionForQuery.carts[i].product.detail = ''
             orderTransactionForQuery.carts[i].product.groupName = ''
           } else {
             orderTransactionForQuery.carts[i].lesson.content = ''
-            orderTransactionForQuery.carts[i].lesson.title = ''
+            // orderTransactionForQuery.carts[i].lesson.title = ''
             orderTransactionForQuery.carts[i].lesson.detail = ''
             orderTransactionForQuery.carts[i].lesson.groupName = ''
           }
@@ -353,7 +355,6 @@ class CartView extends React.Component {
                 return cancelPayment(orderTransaction.order)
               })
               .then((res) => {
-                // console.log('cancel res', res)
                 view.setState({ orderProcess: false })
                 alert('처리 중 오류가 발생했습니다. 다시 시도해주세요.')
               })
