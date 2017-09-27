@@ -30,9 +30,9 @@ class Footer extends React.Component {
                       <li>
                         <i className='text-default fa fa-map-marker pr-5' /> {address}
                       </li>
-                      <li>
+                      {/* <li>
                         <i className='text-default fa fa-phone pl-10 pr-5' /> {phone}
-                      </li>
+                      </li> */}
                       <li>
                         <i className='text-default fa fa-mobile pl-10 pr-5' /> {mobile}
                       </li>
@@ -41,11 +41,11 @@ class Footer extends React.Component {
                       </li>
                     </ul>
                     <ul className='social-links circle animated-effect-1 margin-clear'>
-                      <li className='facebook'>
+                      {/* <li className='facebook'>
                         <a href={facebook} target='_blank'>
                           <i className='fa fa-facebook' style={{ cursor: 'pointer' }} />
                         </a>
-                      </li>
+                      </li> */}
                       <li className='flickr'>
                         <a href={instagram} target='_blank'>
                           <i className='fa fa-instagram' style={{ cursor: 'pointer' }} />

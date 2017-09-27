@@ -706,7 +706,7 @@ class ItemView extends React.Component {
               { !item.expired &&
                 <tr>
                   <td className='text-right'><strong>장소</strong></td>
-                  <td>{`${item.address} ${item.restAddress} `}<LinkButton onClick={this._handleOnClickShowMap} textComponent={<span>지도보기 <i className='fa fa-map-marker' /></span>} /></td>
+                  <td>{`${item.address} ${item.restAddress || ''} `}<LinkButton onClick={this._handleOnClickShowMap} textComponent={<span>지도보기 <i className='fa fa-map-marker' /></span>} /></td>
                 </tr>
             }
             </tbody>

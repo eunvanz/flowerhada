@@ -59,6 +59,7 @@ class GalleryView extends React.Component {
       // this.setState({ allItems, totalPage: Math.ceil(items.length / this.state.perPage) })
       // this.setState({ items: _.slice(allItems, 0, this.state.perPage) })
       this.setState({ items: allItems })
+      // console.log('allItems', allItems)
       this._initMasonry()
     })
   }

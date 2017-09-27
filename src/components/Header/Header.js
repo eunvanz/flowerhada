@@ -3,7 +3,7 @@ import { IndexLink, Link, browserHistory } from 'react-router'
 import { connect } from 'react-redux'
 import { removeUser, fetchUser } from 'store/user'
 import { removeAuthUser, receiveAuthUser } from 'store/authUser'
-import { address, phone, email, facebook, instagram, LOGO_FONT, SECRET_KEY } from 'common/constants'
+import { address, mobile, email, facebook, instagram, LOGO_FONT, SECRET_KEY } from 'common/constants'
 import { fetchCartsByUserId, clearCarts } from 'store/cart'
 import WishList from 'components/WishList'
 import CartWindow from 'components/CartWindow'
@@ -213,11 +213,11 @@ class Header extends React.Component {
                 <div className='header-top-first clearfix'>
                   {/* Social Links Start */}
                   <ul className='social-links circle small clearfix hidden-xs'>
-                    <li className='facebook'>
+                    {/* <li className='facebook'>
                       <a href={facebook} target='_blank'>
                         <i className='fa fa-facebook' style={{ cursor: 'pointer' }} />
                       </a>
-                    </li>
+                    </li> */}
                     <li className='flickr'>
                       <a href={instagram} target='_balnk'>
                         <i className='fa fa-instagram' style={{ cursor: 'pointer' }} />
@@ -230,11 +230,11 @@ class Header extends React.Component {
                         <i className='fa fa-share-alt' />
                       </button>
                       <ul className='dropdown-menu dropdown-animation' style={{ minWidth: '76px' }}>
-                        <li className='facebook'>
+                        {/* <li className='facebook'>
                           <a href='http://www.facebook.com' target='_blank'>
                             <i className='fa fa-facebook' style={{ cursor: 'pointer' }} />
                           </a>
-                        </li>
+                        </li> */}
                         <li className='flickr'>
                           <a href='http://instagram.com/flowerhada' target='_blank'>
                             <i className='fa fa-instagram' style={{ cursor: 'pointer' }} />
@@ -250,7 +250,7 @@ class Header extends React.Component {
                       <i className='fa fa-map-marker pr-5 pl-10' />{address}
                     </li>
                     <li>
-                      <i className='fa fa-phone pr-5 pl-10' />{phone}
+                      <i className='fa fa-phone pr-5 pl-10' />{mobile}
                     </li>
                     <li>
                       <i className='fa fa-envelope-o pr-5 pl-10' />{email}

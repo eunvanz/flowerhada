@@ -314,7 +314,7 @@ class CartView extends React.Component {
           pay_method: this.state.paymentMethod,
           merchant_uid: 'merchant_' + new Date().getTime(),
           name: title,
-          display: { card_quota: [2, 3] }, // 선택가능한 할부개월 표시
+          // display: { card_quota: [2, 3] }, // 선택가능한 할부개월 표시
           amount: this._getTotalPrice() - this.state.pointSpent,
           buyer_name: this.props.user.name,
           buyer_email: this.props.user.email,
