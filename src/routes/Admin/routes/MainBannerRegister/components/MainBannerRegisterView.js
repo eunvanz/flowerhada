@@ -66,7 +66,7 @@ class MainBannerRegister extends React.Component {
     if (this.state.mode === 'register') {
       postImage = () => postLessonImage(file)
     } else {
-      postImage = file ? () => postLessonImage(file) : Promise.resolve()
+      postImage = file ? () => postLessonImage(file) : () => Promise.resolve()
     }
     postImage()
     .then(res => {
