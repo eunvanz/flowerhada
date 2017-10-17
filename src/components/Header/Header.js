@@ -479,10 +479,10 @@ class Header extends React.Component {
                                     <Link to='/admin/order-list'>주문관리</Link>
                                   </li>
                                   <li>
-                                    <Link to='/admin/inquiry-list'>오류관리</Link>
+                                    <Link to='/admin/error-list'>오류관리</Link>
                                   </li>
                                   <li>
-                                    <Link to='/admin/error-list'>문의관리</Link>
+                                    <Link to='/admin/inquiry-list'>문의관리</Link>
                                   </li>
                                   <li>
                                     <Link to='/admin/user-list'>회원</Link>

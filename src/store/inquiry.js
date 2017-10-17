@@ -65,6 +65,15 @@ export const fetchAllInquiries = (curPage, perPage) => {
   }
 }
 
+export const appendAllInquiries = (curPage, perPage) => {
+  return dispatch => {
+    return getAllInquiries(curPage, perPage)
+    .then(res => {
+      return dispatch(appendInquiries(res.data))
+    })
+  }
+}
+
 export const appendInquiriesByUserId = (userId, curPage, perPage) => {
   return dispatch => {
     return getAllInquiriesByUserId(userId, curPage, perPage)
