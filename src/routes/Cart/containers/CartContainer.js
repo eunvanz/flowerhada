@@ -15,7 +15,8 @@ const mapStateToProps = (state) => {
   return ({
     carts: state.cart.cartList ? state.cart.cartList.filter(cart => cart.type === '장바구니') : null,
     user: state.user,
-    orderItem: state.order.orderItem
+    orderItem: state.order.orderItem,
+    authUser: state.authUser
   })
 }
 

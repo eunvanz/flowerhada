@@ -43,7 +43,8 @@ class CartView extends React.Component {
       same: false,
       orderProcess: false,
       anonymous: false,
-      savePhoneNumber: false
+      savePhoneNumber: false,
+      customOrdererId: ''
     }
     this._handleOnClickDelete = this._handleOnClickDelete.bind(this)
     this._handleOnChangeQuantity = this._handleOnChangeQuantity.bind(this)
@@ -173,7 +174,7 @@ class CartView extends React.Component {
       order.paymentMethod = this.state.paymentMethod
       order.pointSpent = this.state.pointSpent
       order.totalAmount = this._getTotalPrice() - this.state.pointSpent
-      order.userId = this.props.user.id
+      order.userId = this.state.customOrdererId === '' ? this.props.user.id : this.state.customOrdererId
       order.status = items[0].product ? '주문접수' : '등록접수'
       if (items[0].product) {
         order.receiver = this.state.receiver
@@ -200,7 +201,7 @@ class CartView extends React.Component {
         this.props.carts.forEach(cart => {
           // const updatedCart = Object.assign({}, cart)
           const updatedCart = {}
-          updatedCart.userId = cart.userId
+          updatedCart.userId = this.state.customOrdererId === '' ? cart.userId : this.state.customOrdererId
           if (cart.lessonId) {
             updatedCart.lessonId = cart.lessonId
             updatedCart.lesson = Object.assign({}, cart.lesson)
@@ -228,7 +229,7 @@ class CartView extends React.Component {
         orderTransaction.cartUpdateType = 'create'
         const { orderItem } = this.props
         const cart = {}
-        cart.userId = this.props.user.id
+        cart.userId = this.state.customOrdererId === '' ? this.props.user.id : this.state.customOrdererId
         if (orderItem.lessonId) {
           cart.lessonId = orderItem.lessonId
           cart.lesson = Object.assign({}, orderItem.lesson)
@@ -279,7 +280,7 @@ class CartView extends React.Component {
       // 포인트 사용내역 기록
       if (this.state.pointSpent > 0) {
         const spentPointHistory = {}
-        spentPointHistory.userId = this.props.user.id
+        spentPointHistory.userId = this.state.customOrdererId === '' ? this.props.user.id : this.state.customOrdererId
         spentPointHistory.amount = this.state.pointSpent * -1
         spentPointHistory.action = '상품구매사용'
         orderTransaction.spentPointHistory = spentPointHistory
@@ -322,48 +323,56 @@ class CartView extends React.Component {
           m_redirect_url: `http://flowerhada.com/order-complete?order_transaction=${JSON.stringify(orderTransactionForQuery)}`
         }
         const view = this
-        window.IMP.request_pay(settings, function (rsp) {
-          if (rsp.success) {
-            orderTransaction.order.uid = rsp.imp_uid
-            if (view.state.paymentMethod === 'card') {
-              orderTransaction.order.applyNum = rsp.apply_num
-            } else if (view.state.paymentMethod === 'vbank') {
-              orderTransaction.order.vbankNum = rsp.vbank_num
-              orderTransaction.order.vbankName = rsp.vbank_name
-              orderTransaction.order.vbankHolder = rsp.vbank_holder
-              orderTransaction.order.vbankDate = rsp.vbank_date
-            }
-            postOrderTransaction(orderTransaction)
-            .then(() => {
-              return view.props.fetchCartsByUserId(view.props.user.id)
-            })
-            .then(() => {
-              return view.props.fetchUser(view.props.user.id)
-            })
-            .then(() => {
-              view.context.router.push('/order-complete')
-            })
-            .catch(() => {
-              const error = {
-                type: '결제후처리에러',
-                log: JSON.stringify(orderTransaction),
-                userId: view.props.user.id,
-                status: '미해결'
+        if (this.state.customOrdererId === '') {
+          window.IMP.request_pay(settings, function (rsp) {
+            if (rsp.success) {
+              orderTransaction.order.uid = rsp.imp_uid
+              if (view.state.paymentMethod === 'card') {
+                orderTransaction.order.applyNum = rsp.apply_num
+              } else if (view.state.paymentMethod === 'vbank') {
+                orderTransaction.order.vbankNum = rsp.vbank_num
+                orderTransaction.order.vbankName = rsp.vbank_name
+                orderTransaction.order.vbankHolder = rsp.vbank_holder
+                orderTransaction.order.vbankDate = rsp.vbank_date
               }
-              postError(error)
+              postOrderTransaction(orderTransaction)
               .then(() => {
-                return cancelPayment(orderTransaction.order)
+                return view.props.fetchCartsByUserId(view.props.user.id)
               })
-              .then((res) => {
-                view.setState({ orderProcess: false })
-                alert('처리 중 오류가 발생했습니다. 다시 시도해주세요.')
+              .then(() => {
+                return view.props.fetchUser(view.props.user.id)
               })
-            })
-          } else {
-            view.setState({ orderProcess: false })
-            view._showMessageModal('결제에 실패했습니다. - ' + rsp.error_msg + '.')
-          }
-        })
+              .then(() => {
+                view.context.router.push('/order-complete')
+              })
+              .catch(() => {
+                const error = {
+                  type: '결제후처리에러',
+                  log: JSON.stringify(orderTransaction),
+                  userId: view.props.user.id,
+                  status: '미해결'
+                }
+                postError(error)
+                .then(() => {
+                  return cancelPayment(orderTransaction.order)
+                })
+                .then((res) => {
+                  view.setState({ orderProcess: false })
+                  alert('처리 중 오류가 발생했습니다. 다시 시도해주세요.')
+                })
+              })
+            } else {
+              view.setState({ orderProcess: false })
+              view._showMessageModal('결제에 실패했습니다. - ' + rsp.error_msg + '.')
+            }
+          })
+        } else {
+          orderTransaction.order.uid = 'customOrder'
+          postOrderTransaction(orderTransaction)
+          .then(() => {
+            view.context.router.push('/order-complete')
+          })
+        }
       }
     }
   }
@@ -885,6 +894,32 @@ class CartView extends React.Component {
         )
       }
     }
+    const renderCustomInfo = () => {
+      if (this.props.authUser.data && this.props.authUser.data.authorities[1] &&
+        this.props.authUser.data.authorities[1].authority === 'ADMIN') {
+        return (
+          <div>
+            <div className='space-bottom'></div>
+            <fieldset>
+              <legend>직접 주문자 설정</legend>
+              <form role='form' className='form-horizontal' id='custom-orderer'>
+                <div className='row'>
+                  <div className='col-lg-3'>주문자 정보</div>
+                  <div className='col-lg-8 col-lg-offset-1'>
+                    <div className='form-group'>
+                      <label htmlFor='customOrdererId' className='col-md-3 control-label'>주문자 아이디(번호)</label>
+                      <div className='col-md-4'>
+                        <input type='text' className='form-control' id='customOrdererId' value={this.state.customOrdererId} onChange={this._handleOnChangeInput} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </fieldset>
+          </div>
+        )
+      }
+    }
     const renderBillingInfo = () => {
       if (this.state.mode === '주문하기') {
         return (
@@ -972,6 +1007,7 @@ class CartView extends React.Component {
                   {renderTotalPayment()}
                 </tbody>
               </table>
+              {renderCustomInfo()}
               {renderBillingInfo()}
               {renderPaymentInfo()}
               {this.state.validateText.length > 0 &&
@@ -1004,7 +1040,8 @@ CartView.propTypes = {
   fetchCartsByUserId: PropTypes.func.isRequired,
   params: PropTypes.object,
   orderItem: PropTypes.object,
-  receiveOrderTransaction: PropTypes.func.isRequired
+  receiveOrderTransaction: PropTypes.func.isRequired,
+  authUser: PropTypes.object
 }
 
 export default CartView
