@@ -8,6 +8,7 @@ import FindPasswordModal from 'components/FindPasswordModal'
 import Button from 'components/Button'
 import { NAVER_CLIENT_ID, SOCIAL_LOGIN_CALLBACK_URL, SOCIAL_PASSWORD, SECRET_KEY } from 'common/constants'
 import { getUserByEmailAndSocialType, signUp, updateUser } from 'common/UserService'
+import { postPointHistory } from 'common/PointHistoryService'
 import { Facebook } from 'common/socialUtil'
 import crypto from 'crypto-js'
 
@@ -85,6 +86,15 @@ class Login extends React.Component {
             }
             // console.log('userInfo', userInfo)
             signUp(userInfo)
+            .then((res) => {
+              // 회원가입 이벤트 용
+              const pointHistory = {
+                userId: res.data.id,
+                amount: 2000,
+                action: '회원가입 보너스'
+              }
+              return postPointHistory(pointHistory)
+            })
             .then((res) => {
               this._loginProcess(userInfo, socialType)
             })

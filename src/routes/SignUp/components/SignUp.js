@@ -13,6 +13,7 @@ import ScrollModal from 'components/ScrollModal'
 import { policy, privacy, NAVER_CLIENT_ID, SOCIAL_LOGIN_CALLBACK_URL, SECRET_KEY } from 'common/constants'
 import { Facebook } from 'common/socialUtil'
 import crypto from 'crypto-js'
+import { postPointHistory } from 'common/PointHistoryService'
 
 class SignUp extends React.Component {
   constructor (props) {
@@ -82,7 +83,7 @@ class SignUp extends React.Component {
   }
   _handleOnClickSubmit (e) {
     e.preventDefault()
-
+    this.setState({ process: true })
     this._checkEmailField()
     .then(() => {
       if (!this._checkPasswordField() || !this._checkPasswordConfirmField() || !this._checkNameField() || !this._checkPhoneField()) {
@@ -100,7 +101,6 @@ class SignUp extends React.Component {
       }
       signUp(userInfo)
       .then((res) => {
-        // console.log('res', res)
         return this.props.fetchAuthUser(userInfo.email, userInfo.password)
       })
       .then((res) => {
@@ -109,7 +109,17 @@ class SignUp extends React.Component {
         document.cookie = `authUser=${encAuthUserString}; max-age=${60 * 60 * 24}; path=/;`
         return this.props.fetchUser(this.props.authUser.data.id)
       })
+      .then(() => {
+        // 회원가입 이벤트 용
+        const pointHistory = {
+          userId: this.props.authUser.data.id,
+          amount: 2000,
+          action: '회원가입 보너스'
+        }
+        return postPointHistory(pointHistory)
+      })
       .then((res) => {
+        this.setState({ process: false })
         this.context.router.push('/')
       })
     })

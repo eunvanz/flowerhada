@@ -107,13 +107,16 @@ class WeddingView extends React.Component {
         <div className='swiper-container' style={swiperContainerStyle}>
           <div className='swiper-wrapper'>
             <div className='swiper-slide' style={swiperSliderStyle}>
+              <img src='https://i.imgur.com/KubABTY.jpg' style={swiperImgStyle} />
+            </div>
+            <div className='swiper-slide' style={swiperSliderStyle}>
+              <img src='https://i.imgur.com/GMAgH1y.jpg' style={swiperImgStyle} />
+            </div>
+            <div className='swiper-slide' style={swiperSliderStyle}>
               <img src='http://i.imgur.com/cImVLB1.jpg' style={swiperImgStyle} />
             </div>
             <div className='swiper-slide' style={swiperSliderStyle}>
               <img src='http://i.imgur.com/qRbomxU.jpg' style={swiperImgStyle} />
-            </div>
-            <div className='swiper-slide' style={swiperSliderStyle}>
-              <img src='http://i.imgur.com/CIazVNP.jpg' style={swiperImgStyle} />
             </div>
             <div className='swiper-slide' style={swiperSliderStyle}>
               <img src='http://i.imgur.com/92hyKAo.jpg' style={swiperImgStyle} />
@@ -123,12 +126,6 @@ class WeddingView extends React.Component {
             </div>
             <div className='swiper-slide' style={swiperSliderStyle}>
               <img src='http://i.imgur.com/wDab2Ds.jpg' style={swiperImgStyle} />
-            </div>
-            <div className='swiper-slide' style={swiperSliderStyle}>
-              <img src='http://i.imgur.com/ZChxiRA.jpg' style={swiperImgStyle} />
-            </div>
-            <div className='swiper-slide' style={swiperSliderStyle}>
-              <img src='http://i.imgur.com/IEwEZn9.jpg' style={swiperImgStyle} />
             </div>
           </div>
           <div className='swiper-pagination swiper-pagination-white' />

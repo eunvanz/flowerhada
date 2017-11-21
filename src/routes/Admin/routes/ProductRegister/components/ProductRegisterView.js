@@ -238,7 +238,8 @@ class ProductListView extends React.Component {
       if (this.state.mainCategory === '꽃다발') {
         return [
           <option key='1' value='이벤트꽃다발'>이벤트꽃다발</option>,
-          <option key='2' value='단체꽃다발'>단체꽃다발</option>
+          <option key='2' value='단체꽃다발'>단체꽃다발</option>,
+          <option key='3' value='기타'>기타</option>
         ]
       } else if (this.state.mainCategory === '웨딩') {
         return [

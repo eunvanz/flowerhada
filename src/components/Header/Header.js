@@ -414,7 +414,7 @@ class Header extends React.Component {
                             </li>
                             <li className='dropdown'>
                               <Link to='/item-list/flower/all' className='dropdown-toggle' data-toggle='dropdown'>
-                                꽃다발
+                                꽃상품
                               </Link>
                               <ul className='dropdown-menu'>
                                 <li>
@@ -425,6 +425,9 @@ class Header extends React.Component {
                                 </li>
                                 <li>
                                   <Link to='/item-list/flower/이벤트꽃다발' onClick={this._collapseNav}>이벤트꽃다발</Link>
+                                </li>
+                                <li>
+                                  <Link to='/item-list/flower/기타' onClick={this._collapseNav}>기타</Link>
                                 </li>
                               </ul>
                             </li>
@@ -441,6 +444,9 @@ class Header extends React.Component {
                                 </li>
                                 <li>
                                   <Link to='/item-list/wedding/소품' onClick={this._collapseNav}>소품</Link>
+                                </li>
+                                <li>
+                                  <Link to='/item-list/wedding/공간장식' onClick={this._collapseNav}>공간장식</Link>
                                 </li>
                               </ul>
                             </li>

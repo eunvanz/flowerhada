@@ -76,7 +76,7 @@ class ItemListView extends React.Component {
       if (type === 'lesson') {
         returnComponent = <span>플라워레슨</span>
       } else if (type === 'flower') {
-        returnComponent = <span>꽃다발</span>
+        returnComponent = <span>꽃상품</span>
       } else if (type === 'wedding') {
         returnComponent = <span>웨딩 & 파티</span>
       }
@@ -87,7 +87,7 @@ class ItemListView extends React.Component {
       if (type === 'lesson') {
         returnComponent = <span>프렌치 감성의 작품들을 직접 만들어보세요. 출장레슨 신청은 언제나 환영입니다.</span>
       } else if (type === 'flower') {
-        returnComponent = <span>꽃하다는 꽃다발 주문 이후 꽃시장에서 장을 보기 때문에, 가장 신선한 상태의 꽃다발을 받아보실 수 있습니다.</span>
+        returnComponent = <span>주문과 함께 만들어지는 신선한 꽃다발과 예쁘고 다양한 꽃상품들이 준비되어있습니다.</span>
       } else if (type === 'wedding') {
         returnComponent = <span>꽃하다가 제안하는 웨딩 & 파티 솔루션으로 더욱 반짝이는 추억을 만들어 보세요.</span>
       }
@@ -97,18 +97,18 @@ class ItemListView extends React.Component {
       if (type === 'lesson') {
         return ['전체', '원데이레슨', '취미반', '창업반', '웨딩반']
       } else if (type === 'flower') {
-        return ['전체', '단체꽃다발', '이벤트꽃다발']
+        return ['전체', '단체꽃다발', '이벤트꽃다발', '기타']
       } else if (type === 'wedding') {
-        return ['전체', '부케', '소품']
+        return ['전체', '부케', '소품', '공간장식']
       }
     }
     const setTabIcons = () => {
       if (type === 'lesson') {
         return ['fa fa-list', 'fa fa-scissors', 'fa fa-heart', 'fa fa-graduation-cap', 'fa fa-diamond']
       } else if (type === 'flower') {
-        return ['fa fa-list', 'fa fa-users', 'fa fa-gift']
+        return ['fa fa-list', 'fa fa-users', 'fa fa-gift', 'fa fa-leaf']
       } else if (type === 'wedding') {
-        return ['fa fa-list', 'fa fa-asterisk', 'fa fa-birthday-cake']
+        return ['fa fa-list', 'fa fa-asterisk', 'fa fa-birthday-cake', 'fa fa-tree']
       }
     }
     const setTabLinks = () => {
@@ -116,9 +116,9 @@ class ItemListView extends React.Component {
         return ['/item-list/lesson/all', '/item-list/lesson/원데이레슨',
           '/item-list/lesson/취미반', '/item-list/lesson/창업반', '/item-list/lesson/웨딩반']
       } else if (type === 'flower') {
-        return ['/item-list/flower/all', '/item-list/flower/단체꽃다발', '/item-list/flower/이벤트꽃다발']
+        return ['/item-list/flower/all', '/item-list/flower/단체꽃다발', '/item-list/flower/이벤트꽃다발', '/item-list/flower/기타']
       } else if (type === 'wedding') {
-        return ['/item-list/wedding/all', '/item-list/wedding/부케', '/item-list/wedding/소품']
+        return ['/item-list/wedding/all', '/item-list/wedding/부케', '/item-list/wedding/소품', '/item-list/wedding/공간장식']
       }
     }
     const filterItems = () => {

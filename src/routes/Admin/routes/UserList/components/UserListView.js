@@ -28,6 +28,7 @@ class UserListView extends React.Component {
       if (userList) {
         return userList.content.map(user =>
           [
+            user.id,
             convertSqlDateToStringDateOnly(user.regDate),
             user.email,
             user.name,
@@ -53,7 +54,7 @@ class UserListView extends React.Component {
     }
     return (
       <TableList
-        headers={['가입일', '이메일', '이름', '연락처', '포인트']}
+        headers={['#', '가입일', '이메일', '이름', '연락처', '포인트']}
         elements={getElements()}
         onClickMoreBtn={this._handleOnClickMoreList}
         restElements={getRestElements()}

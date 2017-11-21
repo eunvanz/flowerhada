@@ -32,7 +32,7 @@ class CoreLayout extends React.Component {
     return (
       <div className='page-wrapper'>
         <Helmet
-          title='Flowerhada - live florally!'
+          title='꽃하다 - live florally!'
           link={[
             {
               'rel': 'stylesheet',
@@ -100,6 +100,32 @@ class CoreLayout extends React.Component {
             {
               'rel': 'stylesheet',
               'href': `https://cdnjs.cloudflare.com/ajax/libs/Swiper/3.4.2/css/swiper.min.css`
+            }
+          ]}
+          meta={[
+            {
+              name: 'description',
+              content: '출장 플라워레슨, 단체꽃다발, 부케, 꽃바구니, 꽃이 있는 웨딩, 파티, 공간장식이 필요하다면 꽃하다를 찾아주세요.'
+            },
+            {
+              property: 'og:type',
+              content: 'website'
+            },
+            {
+              property: 'og:title',
+              content: '꽃하다'
+            },
+            {
+              property: 'og:description',
+              content: '출장 플라워레슨, 단체꽃다발, 부케, 꽃바구니, 꽃이 있는 웨딩, 파티, 공간장식이 필요하다면 꽃하다를 찾아주세요.'
+            },
+            {
+              property: 'og:image',
+              content: 'http://i.imgur.com/VCJ1Bqd.jpg'
+            },
+            {
+              property: 'og:url',
+              content: 'http://flowerhada.com'
             }
           ]}
         />

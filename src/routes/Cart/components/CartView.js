@@ -367,7 +367,7 @@ class CartView extends React.Component {
             }
           })
         } else {
-          orderTransaction.order.uid = 'customOrder'
+          orderTransaction.order.uid = `custom${keygen._()}`
           postOrderTransaction(orderTransaction)
           .then(() => {
             view.context.router.push('/order-complete')
